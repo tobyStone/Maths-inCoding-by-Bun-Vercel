@@ -49,16 +49,16 @@ module.exports = async (req, res) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="${sections.page.description}">
     <title>Maths inCoding</title>
-    <link rel="icon" type="image/png" href="/public/images/linux_site_logo.webp" sizes="32x32">
-    <link href="/public/style.css" rel="stylesheet">    
+    <link rel="icon" type="image/png" href="../public/images/linux_site_logo.webp" sizes="32x32">
+    <link href="../public/style.css" rel="stylesheet">    
 </head>
 <body>
     <main>
         <header class="SiteHeader">
-            <h1>Maths inCoding<img style="float: right;" width="120" height="120" src="/public/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
+            <h1>Maths inCoding<img style="float: right;" width="120" height="120" src="../public/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
             <h3>... learning maths through coding computer games</h3>
             <nav class="header-bottom">
-                <a href="/public/about_us.html" class="about-us-link">About Us</a>
+                <a href="../public/about_us.html" class="about-us-link">About Us</a>
             </nav>
         </header>
 
