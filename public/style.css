@@ -1,0 +1,372 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&family=Open+Sans:wght@400;600&display=swap');
+
+/* Reset browser styles */
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    box-sizing: border-box;
+}
+
+/* Global styles */
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    background-color: #82a2c2;
+    color: #333;
+}
+
+/* Color Variables */
+:root {
+    --primary-color: #6d7bab;
+    --secondary-color: #575f8a;
+    --background-color: #82a2c2;
+    --text-color: #333;
+    --text-color-light: #fff;
+    --border-color: #ccc;
+    --shadow-color: rgba(0,0,0,0.2);
+}
+
+
+/* Header styles */
+header.SiteHeader {
+    background-color: rgb(109, 123, 171);
+    padding: 20px 0;
+    text-align: center;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    justify-content: space-between;
+}
+
+header.SiteHeader h1 {
+    font-family: 'Roboto Slab', serif;
+    font-size: 4em;
+    margin-bottom: 0.5em;
+    font-weight: 700;
+}
+
+.header-bottom {
+    align-self: flex-start; /* Aligns the navigation to the left */
+    margin-left: 20px; /* Add margin to align with the rest of the content */
+    margin-bottom: 10px; /* Space from the bottom of the header */
+}
+
+/* Image and heading container */
+.image-and-heading-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.about-us-link {
+    font-size: 1em;
+    color: white; 
+    text-decoration: none;
+    padding: 8px 15px;
+    background: #445577;
+    border-radius: 4px;
+    margin-left: 20px; /
+}
+
+    .about-us-link:hover {
+        background: #2c3e50; 
+        text-decoration: underline; 
+    }
+
+.containerImg {
+    width: 75%;
+    float: right;
+}
+
+#missionStatement {
+    font-size: 1.2em;
+    color: white;
+    margin-right: 20px;
+    flex: 1;
+}
+
+/* Heading for game subject selection */
+.game-subject-heading {
+    flex: 1;
+    font-size: 1.5em;
+    color: #fff;
+    text-align: left;
+    padding: 10px;
+    font-weight: 600;
+}
+
+/* Main content container */
+.content-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 40px;
+    padding: 0 20px;
+}
+
+/* Container styles */
+.container {
+    width: calc(33.33% - 20px);
+    margin: 10px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+/* Image wrapping styles */
+.imgWrap {
+    display: inline-block;
+    border: 1px solid transparent;
+    transition: transform 0.3s;
+    width: 100%;
+    max-height: 200px;
+    overflow: hidden;
+}
+
+.imgWrap img {
+    width: 100%;
+    height: auto;
+}
+
+.imgWrap:hover {
+    transform: scale(1.05);
+}
+
+/* Heading styles */
+h1, h3 {
+    font-family: 'Open Sans', sans-serif;
+    margin-bottom: 0.5em;
+    color: #333;
+}
+
+h1 {
+    font-size: 2.5em;
+    font-weight: 700;
+}
+
+h3 {
+    font-size: 1.8em;
+    font-weight: 600;
+}
+
+h4 {
+    font-size: 1.3em;
+    font-weight: 400;
+    color: white;
+}
+
+/* Footer styles */
+#FatFooter {
+    background: rgba(44, 66, 91, 0.8);
+    border-top: 1px solid black;
+    font-size: 14px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+
+   
+
+/* Button styles */
+.myButton {
+    width: auto; /* Adjusted to 'auto' to fit content */
+    height: auto; /* Adjusted to 'auto' for a normal button height */
+    padding: 10px 20px; /* Added padding for visual appeal */
+    border: none;
+    background-color: #6d7bab; /* Adjusted to match the header color */
+    color: white; /* Text color */
+    font-size: 16px; /* Text size */
+    cursor: pointer; /* Changes cursor to indicate it's clickable */
+    border-radius: 5px; /* Rounded corners for the button */
+    margin-top: 20px; /* Space above the button */
+    text-transform: uppercase; /* Uppercase text */
+    font-weight: bold; /* Bold text */
+    box-shadow: 2px 4px rgba(0,0,0,0.2); /* Shadow for depth /
+transition: background-color 0.3s; / Smooth transition for hover effect */
+}
+
+.myButton:hover {
+background-color: #575f8a; /* Darker shade on hover */
+}
+
+
+.question-block {
+    margin-bottom: 50px; /* Vertical space after each question */
+    padding-bottom: 50px; /* Padding at the bottom of each question block */
+    border-bottom: 1px solid #ccc; /* Visual separator between questions */
+}
+
+/* Adjusting spacing around choices for clarity */
+.choices {
+    margin-top: 10px; /* Space above the choices */
+    padding-left: 20px; /* Indent choices for better alignment with question text */
+    margin-bottom: 30px; /* Increased space below the choices */
+    display: flex;
+    justify-content: center; /* This centers the children (radio buttons) horizontally */
+    flex-wrap: wrap; /* This allows items to wrap as needed */
+}
+
+    .choices label {
+        margin-right: 15px; /* Adjust the right margin to increase spacing */
+        margin-left: 15px; /* Adjust the left margin if needed */
+    }
+
+/* Feedback link */
+.wordWrapper2 {
+margin-top: 20px;
+}
+
+.about-us-container {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #82a2c2; /* Change as needed */
+}
+
+.profile-images {
+    display: flex;
+    justify-content: center; /* Centers the images in the container */
+    align-items: center; /* Align the images vertically */
+    gap: 50px; /* Spacing between images */
+    margin-bottom: 30px; /* Spacing between images and text */
+}
+
+.imageLeft {
+    width: 160px; /* Decrease the size of the larger image */
+    height: 160px; /* Keep the same height to maintain the aspect ratio */
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.imageRight {
+    width: 155px; /* Increase the size of the smaller image */
+    height: 155px; /* Keep the same height to maintain the aspect ratio */
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+    .about-us-text {
+    max-width: 800px; /* Maximum width of the text block */
+    margin: auto; /* Centers the block horizontally */
+}
+
+.about-us-text h2 {
+    font-size: 2.5em; /* Size of the heading */
+    margin-bottom: 1em; /* Spacing after the heading */
+}
+
+.about-us-text p {
+    font-size: 1em; /* Size of the paragraph text */
+    line-height: 1.5; /* Line height of the paragraph text */
+    text-align: left; /* Align text to the left */
+    margin-bottom: 2em; /* Spacing after each paragraph */
+}
+
+
+
+.thank-you-container {
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: #fff;
+    transition: transform 0.3s ease-in-out;
+}
+
+    .thank-you-container:hover {
+        transform: scale(1.05);
+    }
+
+    .thank-you-container h1 {
+        color: #333;
+    }
+
+    .thank-you-container p {
+        color: #666;
+    }
+
+/* Custom styles for mobile responsiveness */
+@media (max-width: 768px) {
+    .imgToHover {
+        width: 100%; /* Make images full width on smaller screens */
+        height: auto; /* Adjust height automatically */
+    }
+
+    .math-section h1, #missionStatement h3 {
+        font-size: 18px; /* Adjust title sizes for smaller screens */
+    }
+
+    .profile-images {
+        flex-direction: column; /* Stack images vertically on smaller screens */
+        gap: 10px; /* Reduce gap on smaller screens */
+    }
+
+}
+
+/* Media query for very small devices (mobile phones in portrait mode) */
+@media (max-width: 576px) {
+    .math-section h1 {
+        font-size: 12px; /* Smaller font size for titles to ensure they fit in their boxes */
+        line-height: 1.2; /* Adjust line height to ensure the text fits and looks balanced */
+        word-wrap: break-word; /* Allows long words to break and wrap onto the next line */
+        padding: 0 5px; /* Add padding on the sides if necessary */
+    }
+
+    .container {
+        padding: 0 5px; /* Adjust container padding to make sure content has breathing room */
+    }
+
+    /* Adjust section margins if needed to ensure they fit within the parent container */
+    .math-section {
+        margin: 5px;
+    }
+
+    /* For the images, ensure they take up the correct amount of space */
+    .imgWrap {
+        margin: 0; /* Adjust margins as needed */
+        padding: 0; /* Adjust padding as needed */
+    }
+
+    .imgToHover {
+        max-width: 100%; /* Full width */
+        height: auto; /* Maintain aspect ratio */
+        padding: 0; /* Remove padding to utilize all available space */
+    }
+
+    /* If the titles still don't fit, you might need to consider altering the layout a bit for mobile */
+    /* For example, stacking images and titles vertically */
+    .math-section {
+        display: flex;
+        flex-direction: column; /* Stack elements vertically */
+        align-items: center; /* Center-align items for aesthetics */
+    }
+
+    /* Ensure that the image containers are not restricting the size of the content */
+    .imgWrap {
+        width: 100%; /* Allow image container to fill width of its container */
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    }
+
+    /* Adjustments to the header image if necessary */
+    .SiteHeader img {
+        width: 50px; /* Resize the header logo for small screens */
+        height: auto; /* Adjust height automatically to maintain aspect ratio */
+    }
+
+    .profile-images {
+        flex-direction: column; /* Stack images vertically on smaller screens */
+        gap: 10px; /* Reduce gap on smaller screens */
+    }
+
+
+}

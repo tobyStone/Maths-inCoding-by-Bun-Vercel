@@ -1,0 +1,15 @@
+{
+  "name": "Maths-inCoding-by-Bun-Vercel",
+  "version": "1.0.0",
+  "description": "The Vercel serverless version of my maths inCoding website",
+  "dependencies": {
+    "mongoose": "^5.13.8",
+    "escape-html": "^1.0.3",
+    "geoip-lite": "^1.4.10"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "author": "Toby Stone",
+  "license": "ISC"
+}
