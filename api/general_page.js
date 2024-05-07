@@ -7,11 +7,14 @@ const geoip = require('geoip-lite'); // GeoIP for location-based content
 
 module.exports = async (req, res) => {
     await db.connectToDatabase(); // Ensures a single connection
-
-    const { query } = parse(req.url, true);
-    const { path } = query;
+    const urlPath = req.path;
+    const query = { 'page.url_stub': urlPath };
+   
+//    const { query } = parse(req.url, true);
+//    const { path } = query;
     try {
-        const sections = await Layout.findOne({ 'page.url_stub': path }).exec();
+        const sections = await Layout.findOne(query).exec();
+
         if (sections) {
             const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
             const geo = geoip.lookup(ip);
@@ -75,7 +78,7 @@ module.exports = async (req, res) => {
             res.status(200).send(html);
         } else {
             res.status(404).send('Page not found');
-            console.log("sections: ", sections)
+            console.log("sections: ", sections, "query: ",query, "url: ", urlPath )
         }
     } catch (error) {
         console.error('Error fetching page data:', error);
