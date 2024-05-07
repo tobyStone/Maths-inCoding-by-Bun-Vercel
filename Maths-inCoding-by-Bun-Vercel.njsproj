@@ -37,6 +37,10 @@
     <Content Include="api\submit_feedback.js" />
     <Content Include="api\videoPlayer.js" />
     <Content Include="config\index.js" />
+    <Content Include="models\feedbackModel.js" />
+    <Content Include="models\linkedPage.js" />
+    <Content Include="models\mathQuestionsModel.js" />
+    <Content Include="models\videoModel.js" />
     <Content Include="package.json" />
     <Content Include="public\about_us.html" />
     <Content Include="public\feedback_form.html" />
@@ -110,6 +114,7 @@
   <ItemGroup>
     <Folder Include="api\" />
     <Folder Include="config\" />
+    <Folder Include="models\" />
     <Folder Include="public\" />
     <Folder Include="public\images\" />
     <Folder Include="public\images\question_images\" />
