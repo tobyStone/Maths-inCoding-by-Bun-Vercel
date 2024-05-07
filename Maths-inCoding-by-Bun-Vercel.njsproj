@@ -103,17 +103,7 @@
     <Content Include="public\style.css" />
     <Content Include="public\VideoPlayer.css" />
     <Content Include="public\videos\3Dgameengine.mp4" />
-    <Content Include="public\videos\eggHatching.mp4" />
-    <Content Include="public\videos\HelpWithAngles.mp4" />
-    <Content Include="public\videos\lemonoids.mp4" />
-    <Content Include="public\videos\mental_math_tricks.mp4" />
-    <Content Include="public\videos\OrderingNumbers.mp4" />
-    <Content Include="public\videos\physics_simulator.mp4" />
-    <Content Include="public\videos\probability_independent.mp4" />
     <Content Include="public\videos\ratioWithDifferences.mp4" />
-    <Content Include="public\videos\SineRuleAngles.mp4" />
-    <Content Include="public\videos\sinewave.mp4" />
-    <Content Include="public\videos\waterBucket.mp4" />
     <Content Include="README.md" />
     <Content Include="vercel.json" />
   </ItemGroup>
