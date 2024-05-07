@@ -75,6 +75,7 @@ module.exports = async (req, res) => {
             res.status(200).send(html);
         } else {
             res.status(404).send('Page not found');
+            console.log("sections: ", sections)
         }
     } catch (error) {
         console.error('Error fetching page data:', error);
