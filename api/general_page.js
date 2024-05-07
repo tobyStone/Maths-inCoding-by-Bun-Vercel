@@ -4,21 +4,9 @@ const Layout = require('../models/linkedPage'); // Ensure path is correct
 const geoip = require('geoip-lite'); // GeoIP for location-based content
 
 
-// MongoDB connection (reusing a global connection)
-const mongoURI = process.env.MONGODB_URI;
-let db;
 
-function connectDB() {
-    if (db) {
-        return Promise.resolve(db);
-    }
-    return mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }).then((connectedDb) => {
-        db = connectedDb;
-        return db;
-    });
-}
 module.exports = async (req, res) => {
-    await connectDB();
+    await db.connectToDatabase(); // Ensures a single connection
 
     const { query } = parse(req.url, true);
     const { path } = query;
