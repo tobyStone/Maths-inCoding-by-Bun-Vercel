@@ -5,13 +5,16 @@ const geoip = require('geoip-lite'); // GeoIP for location-based content
 
 
 
+
+
 module.exports = async (req, res) => {
     await db.connectToDatabase(); // Ensures a single connection
-    const urlPath = req.path;
+    const parsedUrl = parse(req.url, true);
+    const urlPath = parsedUrl.pathname; // Gets the path part of the URL
+    // Ensuring the query matches the nested structure
     const query = { 'page.url_stub': urlPath };
-   
-//    const { query } = parse(req.url, true);
-//    const { path } = query;
+
+
     try {
         const sections = await Layout.findOne(query).exec();
 
@@ -78,7 +81,10 @@ module.exports = async (req, res) => {
             res.status(200).send(html);
         } else {
             res.status(404).send('Page not found');
-            console.log("sections: ", sections, "query: ",query, "url: ", urlPath )
+            console.log("sections: ", sections, "query: ", query, "url: ", urlPath)
+            console.log("Requested URL:", req.url);
+            console.log("Parsed Path:", urlPath);
+
         }
     } catch (error) {
         console.error('Error fetching page data:', error);

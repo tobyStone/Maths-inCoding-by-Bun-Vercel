@@ -5,6 +5,9 @@
 
 
 #ignore password/username for MongoDB
+# Environment variables
+.env
+
 
 *.config.json
 
