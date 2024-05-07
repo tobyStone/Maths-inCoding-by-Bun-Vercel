@@ -1,5 +1,5 @@
 const { parse } = require('url');
-const mongoose = require('mongoose');
+const db = require('./database');
 const Layout = require('../models/linkedPage'); // Ensure path is correct
 const geoip = require('geoip-lite'); // GeoIP for location-based content
 

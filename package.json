@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "The Vercel serverless version of my maths inCoding website",
   "dependencies": {
-    "mongoose": "^5.13.8",
+    "dotenv": "^16.4.5",
     "escape-html": "^1.0.3",
-    "geoip-lite": "^1.4.10"
+    "geoip-lite": "^1.4.10",
+    "mongoose": "^5.13.8"
   },
   "engines": {
     "node": ">=14"

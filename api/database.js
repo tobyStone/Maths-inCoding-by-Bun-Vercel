@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('../config'); // Adjust path as needed
+const config = require('../config'); // Adjust the path as needed
 
 const db = {
     connection: null,
@@ -8,7 +8,8 @@ const db = {
         if (this.connection) {
             return this.connection;
         }
-        this.connection = await mongoose.connect(config.dbUri, {
+        const dbUri = config.getDbConnectionString(); // Ensure this returns the correct string
+        this.connection = await mongoose.connect(dbUri, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });

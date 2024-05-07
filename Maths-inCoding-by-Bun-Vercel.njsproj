@@ -37,6 +37,9 @@
     <Content Include="api\submit_feedback.js" />
     <Content Include="api\videoPlayer.js" />
     <Content Include="config\index.js" />
+    <Content Include=".env">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="models\feedbackModel.js" />
     <Content Include="models\linkedPage.js" />
     <Content Include="models\mathQuestionsModel.js" />
