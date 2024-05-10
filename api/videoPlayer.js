@@ -1,43 +1,36 @@
 const { parse } = require('url');
-const mongoose = require('mongoose');
-const Videos = require('../models/videoModel'); // Ensure path is correct
+const db = require('./database');
+const Video = require('../models/videoModel'); // Ensure this path matches your model file path
 
-// MongoDB connection (reusing a global connection)
-const mongoURI = process.env.MONGODB_URI;
-let db;
-
-function connectDB() {
-    if (db) {
-        return Promise.resolve(db);
-    }
-    return mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }).then((connectedDb) => {
-        db = connectedDb;
-        return db;
-    });
-}
 module.exports = async (req, res) => {
-    await connectDB();
+    await db.connectToDatabase();
+    const parsedUrl = parse(req.url, true);
+    const urlPath = parsedUrl.pathname;
+    const query = { 'page.url_stub': urlPath };
 
-    const { query } = parse(req.url, true);
-    const { slug } = query; // 'slug' should match the path segment for specific video
-
-    // Connect slug to your database schema
-    const fullPath = `/videoPlayer/${slug}`;
 
     try {
-        const videoData = await Videos.findOne({
-            'page.url_stub': fullPath
-        }).exec();
+        // Modify query to match how your documents are structured
+        const videoEntry = await Video.findOne(query).exec();
 
-        if (videoData && videoData.page && videoData.page.videoData && videoData.page.videoData.length > 0) {
-            const video = videoData.page.videoData[0]; // assuming first item is what you want to display
-            const description = videoData.page.description || '';
-            const videoSrc = video.video;
-            const imageSrc = video.imgSrc;
-            const timeStop = video.time_stop_1; // ensure your model includes this
-            const questionLink = video.link_questions_1; // link to questions
+        if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
+            console.error("Video data not found for URL:", urlPath);
+            return res.status(404).send('Video not found');
+        }
 
-            const html = `
+
+        const video = videoEntry.page.videoData[0]; // Assuming the first video data is what you want to use
+        const description = videoEntry.page.description || '';
+        let videoSrc_temp = video.video || '';
+        const videoSrc = videoSrc_temp.replace('public/', '/');
+        const timeStop = video.time_stop_1 || 0; // Update your model if timeStop is stored differently
+        const questionLink = video.link_questions_1 || '#'; // Provide a default fallback URL
+        let imageSrc_temp = video.imgSrc || '';
+        const imageSrc = imageSrc_temp.replace('public/', '/');
+        const baseUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000/';//providing a root in production
+
+
+        const html = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,123 +38,143 @@ module.exports = async (req, res) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="${description}">
     <title>Maths inCoding</title>
-    <link rel="icon" type="image/png" href="/public/images/linux_site_logo.webp" sizes="32x32">
-    <link href="/public/style.css" rel="stylesheet">
-    <link href="/public/VideoPlayer.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/linux_site_logo.webp" sizes="32x32">
+    <link href="/style.css" rel="stylesheet">
+    <link href="/VideoPlayer.css" rel="stylesheet">
 </head>
 <body>
     <main>
         <header class="SiteHeader">
-            <h1>Maths inCoding<img style="float: right;" width="120" height="120" src="/public/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
-            <div id="missionStatement">
-                <h3>... learning maths through coding computer games</h3>
-            </div>
+            <h1>Maths inCoding<img style="float: right;" width="120" height="120" src="/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
+            <h3>... learning maths through coding computer games</h3>
         </header>
 
-        <div class="video-container" id="video-container">
-            <!-- Video Player Content -->
-            <video controls class="video" id="video" preload="auto" poster="${imageSrc}">
-                <source src="${videoSrc}" type="video/mp4">
+        <div class="video-container">
+            <video controls preload="auto" poster="${baseUrl}${imageSrc}">
+                <source src="${baseUrl}${videoSrc}" type="video/mp4">
+                Your browser does not support the video tag.
             </video>
-            <div class="video-controls" id="video-controls">
-                <button id="play-pause-btn">Play</button>
-                <input type="range" id="volume-control" min="0" max="1" step="0.1">
-                <input type="range" id="seek-bar" min="0" value="0">
-                <span id="current-time">00:00</span> / <span id="total-duration">00:00</span>
-            </div>
         </div>
 
         <section class="description-container">
             <h3>${description}</h3>
         </section>
-    </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const video = document.getElementById('video');
+        <!-- Additional interactive elements based on time stops and question links -->
+    </main>
+  <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const videoPlayer = document.getElementById('videoPlayer');
+                const videoData = {
+                    time_stop: ${timeStop}, 
+                    link_questions: ${questionLink}                 };
+
+                // Example to handle URL parameters to start video at specific time
+                const params = new URLSearchParams(window.location.search);
+                const startTime = params.get('t');
+                if (startTime) {
+                    videoPlayer.currentTime = parseFloat(startTime);
+                }
+
+                // Listen for time updates to handle time stops
+                videoPlayer.addEventListener('timeupdate', function() {
+                    if (videoPlayer.currentTime >= videoData.time_stop) {
+                        videoPlayer.pause();
+                        console.log('Video paused at the time stop.');
+                        window.location.href = videoData.link_questions; // Redirect to a new URL
+                    }
+                });
+
+                // Storing video information in localStorage
+                localStorage.setItem("previousVideoURL", window.location.pathname);
+                localStorage.setItem("previousVideoTimestamp", videoData.time_stop);
+            });
+
+            // Additional video controls
             const playButton = document.getElementById('play-pause-btn');
             const volumeControl = document.getElementById('volume-control');
             const seekBar = document.getElementById('seek-bar');
             const currentTimeDisplay = document.getElementById('current-time');
             const totalDurationDisplay = document.getElementById('total-duration');
 
-
-       // Listen to the video's time updates
-        video.addEventListener('timeupdate', () => {
-            seekBar.value = video.currentTime;
-            currentTimeDisplay.textContent = formatTime(video.currentTime);
-
-            const questionsAnswered = localStorage.getItem('questionsAnswered'); // Check if questions have been answered
-            // Assuming time_stop_1 is a property on the first videoData object
-            if (video.currentTime >= ${timeStop} && !questionsAnswered) {
-                video.pause();
-                window.location.href = '${questionLink}'; // Redirects to the questions page
-                localStorage.setItem("previousVideoURL", window.location.pathname); // Store the current URL
-                localStorage.setItem("previousVideoTimestamp", video.currentTime); // Store the current time
+            if (playButton) {
+                playButton.addEventListener('click', function() {
+                    if (videoPlayer.paused || videoPlayer.ended) {
+                        videoPlayer.play();
+                        playButton.textContent = 'Pause';
+                    } else {
+                        videoPlayer.pause();
+                        playButton.textContent = 'Play';
+                    }
+                });
             }
-        });
 
-        // This handles the scenario where the user returns to the video after answering questions
-        const params = new URLSearchParams(window.location.search);
-        const startTime = params.get('t');
-        if (startTime) {
-            video.currentTime = parseFloat(startTime); // Set the video time to the returned time
-        }
-
-
-            playButton.addEventListener('click', () => {
-                if (video.paused || video.ended) {
-                    video.play();
-                    playButton.textContent = 'Pause';
-                } else {
-                    video.pause();
-                    playButton.textContent = 'Play';
-                }
-            });
-
-            volumeControl.addEventListener('input', () => {
-                video.volume = volumeControl.value;
-            });
-
-            seekBar.addEventListener('input', () => {
-                video.currentTime = (seekBar.value / 100) * video.duration;
-            });
-
-            video.addEventListener('loadedmetadata', () => {
-                seekBar.max = video.duration;
-                totalDurationDisplay.textContent = formatTime(video.duration);
-            });
-
-            video.addEventListener('timeupdate', () => {
-                seekBar.value = video.currentTime;
-                currentTimeDisplay.textContent = formatTime(video.currentTime);
-
-                const questionsAnswered = localStorage.getItem('questionsAnswered');
-                if (video.currentTime >= ${timeStop} && !questionsAnswered) {
-                    video.pause();
-                    window.location.href = '${questionLink}';
-                }
-            });
-
-            function formatTime(seconds) {
-                const minutes = Math.floor(seconds / 60);
-                seconds = Math.floor(seconds % 60);
-                return \`\${minutes}:\${seconds < 10 ? '0' : ''}\${seconds}\`;
+            if (volumeControl) {
+                volumeControl.addEventListener('input', function() {
+                    videoPlayer.volume = volumeControl.value;
+                });
             }
-        });
-    </script>
+
+            if (seekBar) {
+                seekBar.addEventListener('input', function() {
+                    videoPlayer.currentTime = (seekBar.value / 100) * videoPlayer.duration;
+                });
+
+                videoPlayer.addEventListener('loadedmetadata', function() {
+                    seekBar.max = videoPlayer.duration;
+                    totalDurationDisplay.textContent = formatTime(videoPlayer.duration);
+                });
+
+                videoPlayer.addEventListener('timeupdate', function() {
+                    seekBar.value = videoPlayer.currentTime;
+                    currentTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
+                });
+            }
+
+ 
+
+        </script>
+    </main>
 
     <footer id="FatFooter">
-        <!-- Footer content -->
-    </footer>
+    <div class="wordWrapper">
+        <h4>How to set up</h4>
+    </div>
+    <div>
+        <a href="https://www.youtube.com/watch?v=F1LzrEUtcHI" target="_blank">
+            <div class="footerImgOne">
+                <img width="150" src="/images/scratch.webp" alt="Scratch">
+            </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=PcEbSoSGioY&t" target="_blank">
+            <div class="footerImgTwo">
+                <img width="195" height="125" src="/images/roblox.webp" alt="Roblox">
+            </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=NU-tSBCMfZw" target="_blank">
+            <div class="footerImgThree">
+                <img width="175" height="125" src="/images/minecraft_java.webp" alt="Unreal Engine">
+            </div>
+        </a>
+        <a href="https://www.youtube.com/watch?v=nCut7t2oNwA" target="_blank">
+            <div class="footerImgFour">
+                <img width="175" height="125" src="/images/visual_studio.webp" alt="Visual Studio">
+            </div>
+        </a>
+                <a href="https://www.youtube.com/watch?v=S5J2VnKiKP4" target="_blank">
+            <div class="footerImgOne">
+                <img width="150" src="/images/cave_engine.webp" alt="Scratch">
+            </div>
+        </a>
+
+    </div>
+
+
 </body>
 </html>
-            `;
-            res.setHeader('Content-Type', 'text/html');
-            res.status(200).send(html);
-        } else {
-            res.status(404).send('Video not found');
-        }
+        `;
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).send(html);
     } catch (error) {
         console.error('Error fetching video:', error);
         res.status(500).send('Internal Server Error');
