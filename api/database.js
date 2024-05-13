@@ -4,6 +4,8 @@ const config = require('../config'); // Adjust the path as needed
 const express = require('express');
 const app = express();
 
+console.log(process.cwd())
+
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
