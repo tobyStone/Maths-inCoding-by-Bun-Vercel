@@ -1,81 +1,92 @@
 const { parse } = require('url');
-const mongoose = require('mongoose');
-const QuestionModel = require('../models/QuestionModel'); // Adjust model path and name as necessary
-const geoip = require('geoip-lite');
+const db = require('./database');
+const QuestionModel = require('../models/mathQuestionsModel'); // Adjust model path and name as necessary
 
-const mongoURI = process.env.MONGODB_URI;
-let db;
 
-function connectDB() {
-    if (db) {
-        return Promise.resolve(db);
-    }
-    return mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }).then(connectedDb => {
-        db = connectedDb;
-        return db;
-    });
-}
 
 module.exports = async (req, res) => {
-    await connectDB();
-
-    const { query } = parse(req.url, true);
-    const { path } = query;
+    await db.connectToDatabase(); // Ensures a single connection
+    const parsedUrl = parse(req.url, true);
+    const urlPath = parsedUrl.pathname; // Gets the path part of the URL
+    const query = { 'page.url_stub': urlPath };
 
     try {
-        const pageData = await QuestionModel.findOne({ 'page.url_stub': path }).exec();
-        if (!pageData) {
+        const pageData = await QuestionModel.findOne(query).exec();
+        if (!pageData || !pageData.page || !pageData.page.questionData) {
             res.status(404).send('Page not found');
             return;
         }
 
-        // Assuming pageData contains questions and optionally a help video
-        const questionsHtml = pageData.questions.map((question, i) => {
+        const baseUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000/';//providing a root in production
+
+
+        const questionsHtml = pageData.page.questionData.map((question, i) => {
+            const imagePath_temp = question.imgSrc.startsWith('/maths_questions/public/') ? question.imgSrc.replace('/maths_questions/public/', '/') : question.imgSrc;
+            const imagePath = imagePath_temp.replace('public/', '/')
             const choicesHtml = question.choices.map((choice, j) =>
-                `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${j}">
-                 <label for="choice${i}-${j}">${choice}</label>`
+                `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
+        <label for="choice${i}-${j}">${choice}</label>`
             ).join('');
 
             return `
-            <div class="question-block">
-                <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
-                <div class="choices">${choicesHtml}</div>
-            </div>
-            `;
+        <div class="question-block">
+            <img src="${imagePath}" alt="${question.imgAlt}" width="525" height="350" />
+            <div class="choices">${choicesHtml}</div>
+        </div>
+    `;
         }).join('');
 
-        const videoHtml = pageData.helpVideo ? `
-            <div id="help-video-container" class="video-container" style="display:none;">
-                <video id="help-video" controls>
-                    <source src="${pageData.helpVideo.videoSrc}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-        ` : '';
+        const videoSrc = pageData.page.helpVideo.videoSrc.replace(/\/?public\//, '/');
+        const fullVideoUrl = new URL(videoSrc, baseUrl).href; // This ensures correct URL formation
 
-        const html = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maths Questions</title>
-    <link href="/public/style.css" rel="stylesheet">
-</head>
-<body>
-    <main>
-        <header>
-            <h1>Maths Questions</h1>
-        </header>
-        <form id="question-form">
-            ${questionsHtml}
-            <button type="submit">Submit Answers</button>
-        </form>
-        ${videoHtml}
-    </main>
-    <script>
-        const correctAnswers = ${JSON.stringify(pageData.questions.map(q => q.correctAnswer))};
+        // Define helpVideoExists based on whether the video HTML is generated
+        const helpVideoExists = !!pageData.page.helpVideo;
+        console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists)
+
+
+        const videoHtml = pageData.page.helpVideo ? `
+    <div id="help-video-container" class="video-container" style="display:none;">
+        <video id="help-video" controls>
+            <source src="${fullVideoUrl}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="video-controls">
+            <!-- Example: Custom control buttons -->
+        </div>
+    </div>
+` : '';
+
+
+        // JavaScript functions to handle the video visibility and controls
+        const script = `
+    function showHelpVideo() {
+        const videoContainer = document.getElementById('help-video-container');
+        const questionsContainer = document.getElementById('questions-container');
+        if (videoContainer) {
+            questionsContainer.style.display = 'none';
+            videoContainer.style.display = 'block';
+            const video = document.getElementById('help-video');
+            video.play();
+        video.addEventListener('ended', function() {
+            videoContainer.style.display = 'none';
+            questionsContainer.style.display = 'block';  // This line will show the questions again
+        });
+        }
+    }
+
+    function redirectToPreviousVideo() {
+        const previousVideoURL = localStorage.getItem('previousVideoURL');
+        const previousVideoTimestamp = localStorage.getItem('previousVideoTimestamp');
+        console.log("PREVIOUS VIDEO: ", previousVideoURL, "TIMESTAMP: ", previousVideoTimestamp)
+        window.location.href = previousVideoURL + '?t=' + previousVideoTimestamp;
+    }
+
+
+
+        const correctAnswers = ${JSON.stringify(pageData.page.questionData.map(q => q.answer))};
         const totalQuestions = correctAnswers.length;
+        const helpVideoExists = ${helpVideoExists}; // Pass this from server-side to client-side
+
 
         document.getElementById('question-form').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -83,31 +94,72 @@ module.exports = async (req, res) => {
             let score = 0;
 
             inputs.forEach((input, index) => {
-                if (correctAnswers[index] === parseInt(input.value)) {
+                if (correctAnswers[index] === input.value) {
                     score++;
                 }
             });
 
             const scorePercentage = (score / totalQuestions) * 100;
-            alert('Your score: ' + score + '/' + totalQuestions + ' (' + scorePercentage.toFixed(2) + '%)');
 
-            if (scorePercentage >= 80) {
+            if (scorePercentage <= 80) {
+                     alert(scorePercentage)
+                     if (helpVideoExists) {
+                        showHelpVideo();
+                    } else {
+                        alert("Not found video")
+                        window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
+                    }
+           } else {
                 localStorage.setItem('questionsAnswered', 'true');
-                alert('Congratulations! You scored over 80%.');
-            } else {
-                localStorage.setItem('questionsAnswered', 'false');
-                alert('Try again! Score more than 80% to pass.');
-            }
+                redirectToPreviousVideo();
+          }
         });
-    </script>
+
+`;
+
+
+
+        const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="${pageData.page.description}">
+    <title>Maths inCoding</title>
+    <link rel="icon" type="image/png" href="/images/linux_site_logo.webp" sizes="32x32">
+    <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+    <main>
+        <header>
+            <header class="SiteHeader">
+                <h1>Maths inCoding<img style="float: right;" width="120" height="120" src="/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
+                <h3>... learning maths through coding computer games</h3>
+       </header>
+        <div id="questions-container" class="video-container">
+            <form id="question-form">
+                  <div class="question-block">
+                        <div class="choices">
+
+                ${questionsHtml}
+                    </div>
+
+               <button type="submit" class="myButton">Send answer</button>
+                </div>
+            </form>
+         </div>
+        ${videoHtml}
+    </main>
+    <script>${script}</script>
 </body>
 </html>
         `;
 
-        res.setHeader('Content-Type', 'text/html');
-        res.status(200).send(html);
-    } catch (error) {
-        console.error('Error fetching page data:', error);
-        res.status(500).send('Internal Server Error');
-    }
-};
+            res.setHeader('Content-Type', 'text/html');
+            res.status(200).send(html);
+        } catch (error) {
+            console.error('Error fetching page data:', error);
+            res.status(500).send('Internal Server Error');
+        }
+    };

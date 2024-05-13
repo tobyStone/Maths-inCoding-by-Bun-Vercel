@@ -201,11 +201,22 @@ background-color: #575f8a; /* Darker shade on hover */
 }
 
 
-.question-block {
-    margin-bottom: 50px; /* Vertical space after each question */
-    padding-bottom: 50px; /* Padding at the bottom of each question block */
-    border-bottom: 1px solid #ccc; /* Visual separator between questions */
+.question-block, .video-container {
+    width: 100%; /* Ensures each question block takes up the full width */
+    box-sizing: border-box; /* Includes padding and border in the element's total width */
+    padding: 20px; /* Adds some padding inside each question block */
+    margin-bottom: 20px; /* Adds space between question blocks */
+    border-bottom: 1px solid #ccc; /* Keeps a line between questions if needed */
+    text-align: center; /* Center-aligns text and contents */
+    display: block; /* Ensures the block level so each question is on a new line */
 }
+
+/* Ensure the container of these blocks takes full width */
+#questions-container {
+    width: 100%; /* Adjust if necessary to ensure it doesn't restrict the child elements */
+    display: block; /* Ensures it's a block-level element, allowing child elements to stack vertically */
+}
+
 
 /* Adjusting spacing around choices for clarity */
 .choices {

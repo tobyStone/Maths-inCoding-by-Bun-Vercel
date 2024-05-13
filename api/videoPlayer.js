@@ -28,6 +28,8 @@ module.exports = async (req, res) => {
         let imageSrc_temp = video.imgSrc || '';
         const imageSrc = imageSrc_temp.replace('public/', '/');
         const baseUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000/';//providing a root in production
+        console.log("TIMESTOP: ", timeStop, "QUESTIONLINK: ", questionLink, "VIDEOSRC: ", videoSrc)
+
 
 
         const html = `
@@ -50,7 +52,7 @@ module.exports = async (req, res) => {
         </header>
 
         <div class="video-container">
-            <video controls preload="auto" poster="${baseUrl}${imageSrc}">
+           <video id="videoPlayer" controls preload="auto" poster="${baseUrl}${imageSrc}">
                 <source src="${baseUrl}${videoSrc}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -67,7 +69,7 @@ module.exports = async (req, res) => {
                 const videoPlayer = document.getElementById('videoPlayer');
                 const videoData = {
                     time_stop: ${timeStop}, 
-                    link_questions: ${questionLink}                 };
+                    link_questions: "${questionLink}"                 };
 
                 // Example to handle URL parameters to start video at specific time
                 const params = new URLSearchParams(window.location.search);
@@ -75,10 +77,11 @@ module.exports = async (req, res) => {
                 if (startTime) {
                     videoPlayer.currentTime = parseFloat(startTime);
                 }
-
+ 
                 // Listen for time updates to handle time stops
                 videoPlayer.addEventListener('timeupdate', function() {
-                    if (videoPlayer.currentTime >= videoData.time_stop) {
+                    const questionsAnswered = localStorage.getItem('questionsAnswered');
+                    if (videoPlayer.currentTime >= videoData.time_stop && !questionsAnswered) {
                         videoPlayer.pause();
                         console.log('Video paused at the time stop.');
                         window.location.href = videoData.link_questions; // Redirect to a new URL
@@ -86,8 +89,8 @@ module.exports = async (req, res) => {
                 });
 
                 // Storing video information in localStorage
-                localStorage.setItem("previousVideoURL", window.location.pathname);
-                localStorage.setItem("previousVideoTimestamp", videoData.time_stop);
+                       localStorage.setItem("previousVideoURL", window.location.pathname);
+                        localStorage.setItem("previousVideoTimestamp", videoData.time_stop.toString());
             });
 
             // Additional video controls
