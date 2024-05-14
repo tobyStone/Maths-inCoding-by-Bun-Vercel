@@ -44,18 +44,22 @@ module.exports = async (req, res) => {
 //            const geo = geoip.lookup(testIP);
 //            console.log(`Geo location for IP ${testIP}: `, geo);
 
-            //production geolocation
-            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            const geo = geoip.lookup(ip);
-            if (!geo) {
-                console.error('GeoIP lookup failed for IP:', ip);
-            }
-            console.log(`Geo location for IP ${ip}: `, geo);
+            ////production geolocation
+            //const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            //const geo = geoip.lookup(ip);
+            //if (!geo) {
+            //    console.error('GeoIP lookup failed for IP:', ip);
+            //}
+            //console.log(`Geo location for IP ${ip}: `, geo);
 
 
-            let locality = (geo && geo.country === 'GB') ? 'UK' : 'US';
-            let yearGroup = locality === 'UK' ? section.UK_yearGroup : section.US_yearGroup;
+            //let locality = (geo && geo.country === 'GB') ? 'UK' : 'US';
+            //let yearGroup = locality === 'UK' ? section.UK_yearGroup : section.US_yearGroup;
+            //let title = yearGroup ? section.title.replace(/Age \d{2}-\d{2}/, yearGroup) : section.title;
+
+            let yearGroup = section.UK_yearGroup;
             let title = yearGroup ? section.title.replace(/Age \d{2}-\d{2}/, yearGroup) : section.title;
+
 
             return `
                 <div class="container">
