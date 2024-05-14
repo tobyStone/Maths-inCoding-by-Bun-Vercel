@@ -2,20 +2,12 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/:prefix*/videoPlayer/:slug*",
-      "destination": "/api/videoPlayer.js?prefix=:prefix&slug=:slug"
-    },
-    {
-      "source": "/:prefix*/maths_questions/:slug*",
-      "destination": "/api/maths_questions.js?prefix=:prefix&slug=:slug"
-    },
-    {
-      "source": "/submit-feedback",
-      "destination": "/api/submit_feedback.js"
+      "source": "/api/:slug*",
+      "destination": "/api/$1.js"
     },
     {
       "source": "/(.*)",
-      "destination": "/api/general_page.js?path=$1"
+      "destination": "/public/$1"
     }
   ]
 }
