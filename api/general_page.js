@@ -3,6 +3,8 @@ const db = require('./database');
 const Layout = require('../models/linkedPage'); // Ensure path is correct
 const geoip = require('geoip-lite'); // GeoIP for location-based content
 
+
+
 module.exports = async (req, res) => {
     await db.connectToDatabase(); // Ensures a single connection
     const parsedUrl = parse(req.url, true);
@@ -34,10 +36,24 @@ module.exports = async (req, res) => {
                 section.imgSrc = `${baseUrl}${section.imgSrc}`;
             }
 
+
+
+
+            // localhost test usage of geoip... 8.8.8.8 for US
+//            const testIP = '81.2.69.160'; // Public IP example UK
+//            const geo = geoip.lookup(testIP);
+//            console.log(`Geo location for IP ${testIP}: `, geo);
+
+            //production geolocation
             const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
             const geo = geoip.lookup(ip);
-            let locality = (geo && geo.country === 'GB') ? 'UK' : 'US';
+            if (!geo) {
+                console.error('GeoIP lookup failed for IP:', ip);
+            }
+            console.log(`Geo location for IP ${ip}: `, geo);
 
+
+            let locality = (geo && geo.country === 'GB') ? 'UK' : 'US';
             let yearGroup = locality === 'UK' ? section.UK_yearGroup : section.US_yearGroup;
             let title = yearGroup ? section.title.replace(/Age \d{2}-\d{2}/, yearGroup) : section.title;
 
