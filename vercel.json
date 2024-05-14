@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/general_page.js?path=$1"
+      "destination": "/api/submit_feedback.js?path=$1"
     }
   ]
 }
