@@ -2,12 +2,9 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/api/:slug*",
-      "destination": "/api/$1.js"
-    },
-    {
       "source": "/(.*)",
-      "destination": "/public/$1"
+      "destination": "/api/general_page.js?path=$1"
     }
   ]
 }
+
