@@ -22,11 +22,7 @@ module.exports = async (req, res) => {
         // Make sure to test thoroughly and replace placeholders appropriately.
         const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel-poz8zgs4m-toby-stones-projects.vercel.app/' : 'http://localhost:3000/';
 
-        section.imgSrc = section.imgSrc.startsWith('/') ? section.imgSrc : `/${section.imgSrc}`;
-        if (!section.imgSrc.startsWith('http')) {
-            section.imgSrc = `${baseUrl}${section.imgSrc.substring(1)}`;
-        }
-
+    
         const sectionElements = sections.page.sections.map(section => {
             if (!section || !section.title || !section.imgSrc) {
 
