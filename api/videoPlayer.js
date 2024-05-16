@@ -17,17 +17,13 @@ module.exports = async (req, res) => {
 
         const video = videoEntry.page.videoData[0];
         const description = videoEntry.page.description || '';
-        let videoSrc = video.video.replace('public/', '/');
+        const videoSrc = video.video;  // Now using the full Blob URL directly
         const timeStop = video.time_stop_1 || 0;
         const questionLink = video.link_questions_1 || '#';
-        let imageSrc = video.imgSrc.replace('public/', '/');
+        const imageSrc = video.imgSrc.replace('public/', '/');
         const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
 
-        videoSrc = baseUrl + videoSrc;
-        imageSrc = baseUrl + imageSrc;
-
-
-
+        const posterSrc = baseUrl + imageSrc;
 
         const html = `
 <!DOCTYPE html>
@@ -49,8 +45,8 @@ module.exports = async (req, res) => {
         </header>
 
         <div class="video-container">
-           <video id="videoPlayer" controls preload="auto" poster="${baseUrl}${imageSrc}">
-                <source src="${baseUrl}${videoSrc}" type="video/mp4">
+           <video id="videoPlayer" controls preload="auto" poster="${posterSrc}">
+                <source src="${videoSrc}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -61,12 +57,13 @@ module.exports = async (req, res) => {
 
         <!-- Additional interactive elements based on time stops and question links -->
     </main>
-  <script>
+    <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const videoPlayer = document.getElementById('videoPlayer');
                 const videoData = {
                     time_stop: ${timeStop}, 
-                    link_questions: "${questionLink}"                 };
+                    link_questions: "${questionLink}"
+                };
 
                 // Example to handle URL parameters to start video at specific time
                 const params = new URLSearchParams(window.location.search);
@@ -86,8 +83,8 @@ module.exports = async (req, res) => {
                 });
 
                 // Storing video information in localStorage
-                       localStorage.setItem("previousVideoURL", window.location.pathname);
-                        localStorage.setItem("previousVideoTimestamp", videoData.time_stop.toString());
+                localStorage.setItem("previousVideoURL", window.location.pathname);
+                localStorage.setItem("previousVideoTimestamp", videoData.time_stop.toString());
             });
 
             // Additional video controls
@@ -131,8 +128,6 @@ module.exports = async (req, res) => {
                 });
             }
 
- 
-
         </script>
     </main>
 
@@ -161,15 +156,13 @@ module.exports = async (req, res) => {
                 <img width="175" height="125" src="/images/visual_studio.webp" alt="Visual Studio">
             </div>
         </a>
-                <a href="https://www.youtube.com/watch?v=S5J2VnKiKP4" target="_blank">
+        <a href="https://www.youtube.com/watch?v=S5J2VnKiKP4" target="_blank">
             <div class="footerImgOne">
                 <img width="150" src="/images/cave_engine.webp" alt="Scratch">
             </div>
         </a>
-
     </div>
-
-
+    </footer>
 </body>
 </html>
         `;

@@ -8,7 +8,10 @@
     "escape-html": "^1.0.3",
     "express": "^4.19.2",
     "geoip-lite": "^1.4.10",
-    "mongoose": "^5.13.8"
+    "mongoose": "^5.13.22"
+  },
+  "scripts": {
+    "update-urls": "node scripts/updateVideoUrls.js"
   },
   "engines": {
     "node": ">=14"

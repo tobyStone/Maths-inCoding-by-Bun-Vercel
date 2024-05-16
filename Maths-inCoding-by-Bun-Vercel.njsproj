@@ -37,9 +37,6 @@
     <Content Include="api\submit_feedback.js" />
     <Content Include="api\videoPlayer.js" />
     <Content Include="config\index.js" />
-    <Content Include=".env">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="models\feedbackModel.js" />
     <Content Include="models\linkedPage.js" />
     <Content Include="models\mathQuestionsModel.js" />
@@ -112,12 +109,17 @@
     <Content Include="public\videos\3Dgameengine.mp4" />
     <Content Include="public\videos\ratioWithDifferences.mp4" />
     <Content Include="README.md" />
+    <Content Include="scripts\updateVideoUrls.js" />
+    <Content Include="scripts\uploadVideos.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="vercel.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="api\" />
     <Folder Include="config\" />
     <Folder Include="models\" />
+    <Folder Include="scripts\" />
     <Folder Include="public\" />
     <Folder Include="public\images\" />
     <Folder Include="public\images\question_images\" />
