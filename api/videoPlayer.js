@@ -27,8 +27,23 @@ module.exports = async (req, res) => {
         const questionLink = video.link_questions_1 || '#'; // Provide a default fallback URL
         let imageSrc_temp = video.imgSrc || '';
         const imageSrc = imageSrc_temp.replace('public/', '/');
-        const baseUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000/';//providing a root in production
+        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel-poz8zgs4m-toby-stones-projects.vercel.app/' : 'http://localhost:3000/';
         console.log("TIMESTOP: ", timeStop, "QUESTIONLINK: ", questionLink, "VIDEOSRC: ", videoSrc)
+
+        // Function to ensure the path is correctly formatted
+        function ensureCorrectPath(path) {
+            if (!path.startsWith('http://') && !path.startsWith('https://')) {
+                return path.startsWith('/') ? path : `/${path}`;
+            }
+            return path;
+        }
+
+        videoSrc = ensureCorrectPath(video.video.replace('public/', ''));
+        imageSrc = ensureCorrectPath(video.imgSrc.replace('public/', ''));
+
+        videoSrc = videoSrc.startsWith('http') ? videoSrc : `${baseUrl}${videoSrc}`;
+        imageSrc = imageSrc.startsWith('http') ? imageSrc : `${baseUrl}${imageSrc}`;
+
 
 
 
@@ -52,8 +67,8 @@ module.exports = async (req, res) => {
         </header>
 
         <div class="video-container">
-           <video id="videoPlayer" controls preload="auto" poster="${baseUrl}${imageSrc}">
-                <source src="${baseUrl}${videoSrc}" type="video/mp4">
+           <video id="videoPlayer" controls preload="auto" poster="${imageSrc}">
+                <source src="${videoSrc}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
