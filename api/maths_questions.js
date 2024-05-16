@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const baseUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000/';//providing a root in production
+        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
 
 
         const questionsHtml = pageData.page.questionData.map((question, i) => {

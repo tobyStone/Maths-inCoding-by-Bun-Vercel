@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
         const questionLink = video.link_questions_1 || '#'; // Provide a default fallback URL
         let imageSrc_temp = video.imgSrc || '';
         const imageSrc = imageSrc_temp.replace('public/', '/');
-        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel-poz8zgs4m-toby-stones-projects.vercel.app/' : 'http://localhost:3000/';
+        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
         console.log("TIMESTOP: ", timeStop, "QUESTIONLINK: ", questionLink, "VIDEOSRC: ", videoSrc)
 
         // Function to ensure the path is correctly formatted

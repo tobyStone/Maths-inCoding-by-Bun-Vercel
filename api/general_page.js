@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
         }
 
         // Make sure to test thoroughly and replace placeholders appropriately.
-        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel-poz8zgs4m-toby-stones-projects.vercel.app' : 'http://localhost:3000/';
+        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
 
     
         const sectionElements = sections.page.sections.map(section => {
