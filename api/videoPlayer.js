@@ -58,79 +58,82 @@ module.exports = async (req, res) => {
         <!-- Additional interactive elements based on time stops and question links -->
     </main>
     <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const videoPlayer = document.getElementById('videoPlayer');
-                const videoData = {
-                    time_stop: ${timeStop}, 
-                    link_questions: "${questionLink}"
-                };
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoData = {
+                time_stop: ${timeStop}, 
+                link_questions: "${questionLink}"
+            };
 
-                // Example to handle URL parameters to start video at specific time
-                const params = new URLSearchParams(window.location.search);
-                const startTime = params.get('t');
-                if (startTime) {
-                    videoPlayer.currentTime = parseFloat(startTime);
+            // Example to handle URL parameters to start video at specific time
+            const params = new URLSearchParams(window.location.search);
+            const startTime = params.get('t');
+            if (startTime) {
+                videoPlayer.currentTime = parseFloat(startTime);
+            }
+
+            // Listen for time updates to handle time stops
+            videoPlayer.addEventListener('timeupdate', function() {
+                const questionsAnswered = localStorage.getItem('questionsAnswered');
+                if (videoPlayer.currentTime >= videoData.time_stop && !questionsAnswered) {
+                    videoPlayer.pause();
+                    console.log('Video paused at the time stop.');
+                    window.location.href = videoData.link_questions; // Redirect to a new URL
                 }
- 
-                // Listen for time updates to handle time stops
-                videoPlayer.addEventListener('timeupdate', function() {
-                    const questionsAnswered = localStorage.getItem('questionsAnswered');
-                    if (videoPlayer.currentTime >= videoData.time_stop && !questionsAnswered) {
-                        videoPlayer.pause();
-                        console.log('Video paused at the time stop.');
-                        window.location.href = videoData.link_questions; // Redirect to a new URL
-                    }
-                });
-
-                // Storing video information in localStorage
-                localStorage.setItem("previousVideoURL", window.location.pathname);
-                localStorage.setItem("previousVideoTimestamp", videoData.time_stop.toString());
             });
 
-            // Additional video controls
-            const playButton = document.getElementById('play-pause-btn');
-            const volumeControl = document.getElementById('volume-control');
-            const seekBar = document.getElementById('seek-bar');
-            const currentTimeDisplay = document.getElementById('current-time');
-            const totalDurationDisplay = document.getElementById('total-duration');
+            // Storing video information in localStorage
+            localStorage.setItem("previousVideoURL", window.location.pathname);
+            localStorage.setItem("previousVideoTimestamp", videoData.time_stop.toString());
+        });
 
-            if (playButton) {
-                playButton.addEventListener('click', function() {
-                    if (videoPlayer.paused || videoPlayer.ended) {
-                        videoPlayer.play();
-                        playButton.textContent = 'Pause';
-                    } else {
-                        videoPlayer.pause();
-                        playButton.textContent = 'Play';
-                    }
-                });
-            }
+        // Additional video controls
+        const playButton = document.getElementById('play-pause-btn');
+        const volumeControl = document.getElementById('volume-control');
+        const seekBar = document.getElementById('seek-bar');
+        const currentTimeDisplay = document.getElementById('current-time');
+        const totalDurationDisplay = document.getElementById('total-duration');
 
-            if (volumeControl) {
-                volumeControl.addEventListener('input', function() {
-                    videoPlayer.volume = volumeControl.value;
-                });
-            }
+        if (playButton) {
+            playButton.addEventListener('click', function() {
+                if (videoPlayer.paused || videoPlayer.ended) {
+                    videoPlayer.play();
+                    playButton.textContent = 'Pause';
+                } else {
+                    videoPlayer.pause();
+                    playButton.textContent = 'Play';
+                }
+            });
+        }
 
-            if (seekBar) {
-                seekBar.addEventListener('input', function() {
-                    videoPlayer.currentTime = (seekBar.value / 100) * videoPlayer.duration;
-                });
+        if (volumeControl) {
+            volumeControl.addEventListener('input', function() {
+                videoPlayer.volume = volumeControl.value;
+            });
+        }
 
-                videoPlayer.addEventListener('loadedmetadata', function() {
-                    seekBar.max = videoPlayer.duration;
-                    totalDurationDisplay.textContent = formatTime(videoPlayer.duration);
-                });
+        if (seekBar) {
+            seekBar.addEventListener('input', function() {
+                videoPlayer.currentTime = (seekBar.value / 100) * videoPlayer.duration;
+            });
 
-                videoPlayer.addEventListener('timeupdate', function() {
-                    seekBar.value = videoPlayer.currentTime;
-                    currentTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
-                });
-            }
+            videoPlayer.addEventListener('loadedmetadata', function() {
+                seekBar.max = videoPlayer.duration;
+                totalDurationDisplay.textContent = formatTime(videoPlayer.duration);
+            });
 
-        </script>
-    </main>
+            videoPlayer.addEventListener('timeupdate', function() {
+                seekBar.value = videoPlayer.currentTime;
+                currentTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
+            });
+        }
 
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return \`\${minutes}:\${remainingSeconds < 10 ? '0' : ''}\${remainingSeconds}\`;
+        }
+    </script>
     <footer id="FatFooter">
     <div class="wordWrapper">
         <h4>How to set up</h4>
