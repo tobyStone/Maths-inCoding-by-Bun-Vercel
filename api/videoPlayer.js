@@ -1,39 +1,30 @@
 const { parse } = require('url');
 const db = require('./database');
-const Video = require('../models/videoModel'); // Ensure this path matches your model file path
+const Video = require('../models/videoModel');
 
 module.exports = async (req, res) => {
-    await db.connectToDatabase();
-    const parsedUrl = parse(req.url, true);
-    const urlPath = parsedUrl.pathname;
-    const query = { 'page.url_stub': urlPath };
-
-
     try {
-        // Modify query to match how your documents are structured
-        const videoEntry = await Video.findOne(query).exec();
+        await db.connectToDatabase();
+        const parsedUrl = parse(req.url, true);
+        const urlPath = parsedUrl.pathname;
+        const query = { 'page.url_stub': urlPath };
 
+        const videoEntry = await Video.findOne(query).exec();
         if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
             console.error("Video data not found for URL:", urlPath);
             return res.status(404).send('Video not found');
         }
 
-
-        const video = videoEntry.page.videoData[0]; // Assuming the first video data is what you want to use
+        const video = videoEntry.page.videoData[0];
         const description = videoEntry.page.description || '';
-        let videoSrc_temp = video.video || '';
-        const videoSrc = videoSrc_temp.replace('public/', '/');
-        const timeStop = video.time_stop_1 || 0; // Update your model if timeStop is stored differently
-        const questionLink = video.link_questions_1 || '#'; // Provide a default fallback URL
-        let imageSrc_temp = video.imgSrc || '';
-        const imageSrc = imageSrc_temp.replace('public/', '/');
+        let videoSrc = video.video.replace('public/', '/');
+        const timeStop = video.time_stop_1 || 0;
+        const questionLink = video.link_questions_1 || '#';
+        let imageSrc = video.imgSrc.replace('public/', '/');
         const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
 
-   
-
-        videoSrc = videoSrc.startsWith('http') ? videoSrc : `${baseUrl}${videoSrc}`;
-        imageSrc = imageSrc.startsWith('http') ? imageSrc : `${baseUrl}${imageSrc}`;
-        console.log("TIMESTOP: ", timeStop, "QUESTIONLINK: ", questionLink, "VIDEOSRC: ", videoSrc)
+        videoSrc = baseUrl + videoSrc;
+        imageSrc = baseUrl + imageSrc;
 
 
 
@@ -58,8 +49,8 @@ module.exports = async (req, res) => {
         </header>
 
         <div class="video-container">
-           <video id="videoPlayer" controls preload="auto" poster="${imageSrc}">
-                <source src="${videoSrc}" type="video/mp4">
+           <video id="videoPlayer" controls preload="auto" poster="${baseUrl}${imageSrc}">
+                <source src="${baseUrl}${videoSrc}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -185,7 +176,7 @@ module.exports = async (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         res.status(200).send(html);
     } catch (error) {
-        console.error('Error fetching video:', error);
+        console.error('Error in processing request:', error);
         res.status(500).send('Internal Server Error');
     }
 };
