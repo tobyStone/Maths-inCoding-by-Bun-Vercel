@@ -28,21 +28,12 @@ module.exports = async (req, res) => {
         let imageSrc_temp = video.imgSrc || '';
         const imageSrc = imageSrc_temp.replace('public/', '/');
         const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
-        console.log("TIMESTOP: ", timeStop, "QUESTIONLINK: ", questionLink, "VIDEOSRC: ", videoSrc)
 
-        // Function to ensure the path is correctly formatted
-        function ensureCorrectPath(path) {
-            if (!path.startsWith('http://') && !path.startsWith('https://')) {
-                return path.startsWith('/') ? path : `/${path}`;
-            }
-            return path;
-        }
-
-        videoSrc = ensureCorrectPath(video.video.replace('public/', ''));
-        imageSrc = ensureCorrectPath(video.imgSrc.replace('public/', ''));
+   
 
         videoSrc = videoSrc.startsWith('http') ? videoSrc : `${baseUrl}${videoSrc}`;
         imageSrc = imageSrc.startsWith('http') ? imageSrc : `${baseUrl}${imageSrc}`;
+        console.log("TIMESTOP: ", timeStop, "QUESTIONLINK: ", questionLink, "VIDEOSRC: ", videoSrc)
 
 
 
