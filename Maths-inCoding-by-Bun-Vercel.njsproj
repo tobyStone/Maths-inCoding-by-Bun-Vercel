@@ -109,6 +109,7 @@
     <Content Include="public\videos\3Dgameengine.mp4" />
     <Content Include="public\videos\ratioWithDifferences.mp4" />
     <Content Include="README.md" />
+    <Content Include="scripts\updateMathsQuestionVideoUrls.js" />
     <Content Include="scripts\updateVideoUrls.js" />
     <Content Include="scripts\uploadVideos.js">
       <SubType>Code</SubType>

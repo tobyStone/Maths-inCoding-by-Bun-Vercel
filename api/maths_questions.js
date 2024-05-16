@@ -94,7 +94,6 @@ module.exports = async (req, res) => {
                 const scorePercentage = (score / totalQuestions) * 100;
 
                 if (scorePercentage <= 80) {
-                    alert(scorePercentage)
                     if (helpVideoExists) {
                         showHelpVideo();
                     } else {
