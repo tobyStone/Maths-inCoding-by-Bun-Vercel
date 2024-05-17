@@ -1,5 +1,5 @@
 const { parse } = require('url');
-const db = require('../database'); // Adjust the path as needed
+const db = require('./database'); 
 const Video = require('../models/videoModel');
 
 module.exports = async (req, res) => {
