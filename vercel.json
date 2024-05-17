@@ -3,23 +3,23 @@
   "rewrites": [
     {
       "source": "/:prefix*/videoPlayer/:slug*",
-      "destination": "/api/videoPlayer"
-    },
-    {
-      "source": "/:prefix*/videoStream/:slug*",
-      "destination": "/api/videoStream"
+      "destination": "/api/videoPlayer.js?prefix=:prefix&slug=:slug"
     },
     {
       "source": "/:prefix*/maths_questions/:slug*",
-      "destination": "/api/maths_questions"
+      "destination": "/api/maths_questions.js?prefix=:prefix&slug=:slug"
     },
     {
       "source": "/submit-feedback",
-      "destination": "/api/submit_feedback"
+      "destination": "/api/submit_feedback.js"
     },
     {
       "source": "/(.*)",
-      "destination": "/api/general_page"
+      "destination": "/api/general_page.js?path=$1"
+    },
+    {
+      "source": "/videoStream",
+      "destination": "/api/videoStream.js"
     }
   ]
 }

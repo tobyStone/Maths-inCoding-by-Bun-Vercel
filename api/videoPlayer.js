@@ -1,12 +1,12 @@
 const { parse } = require('url');
-const db = require('./database'); 
+const db = require('./database');
 const Video = require('../models/videoModel');
 
 module.exports = async (req, res) => {
     try {
         await db.connectToDatabase(); // Ensures a single connection
         const parsedUrl = parse(req.url, true);
-        const urlPath = parsedUrl.pathname; // Adjust path as needed
+        const urlPath = parsedUrl.pathname; // Gets the path part of the URL
         const query = { 'page.url_stub': urlPath };
 
         const videoEntry = await Video.findOne(query).exec();
@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
 
         <div class="video-container">
            <video id="videoPlayer" controls preload="auto" poster="${posterSrc}">
-                <source src="${videoSrc}" type="video/mp4">
+                <source src="${baseUrl}/api/videoStream?videoSrc=${encodeURIComponent(videoSrc)}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -94,7 +94,7 @@ module.exports = async (req, res) => {
         const totalDurationDisplay = document.getElementById('total-duration');
 
         if (playButton) {
-            playButton.addEventListener('click', function() {
+            playButton.addEventListener('click',
                 if (videoPlayer.paused || videoPlayer.ended) {
                     videoPlayer.play();
                     playButton.textContent = 'Pause';
@@ -175,4 +175,21 @@ module.exports = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
+    streamVideo: async (req, res) => {
+        try {
+            const parsedUrl = parse(req.url, true);
+            const videoSrc = parsedUrl.query.videoSrc;
+
+            if (!videoSrc) {
+                console.error("Video source not found in query parameters");
+                return res.status(400).send('Bad Request');
+            }
+
+            res.redirect(videoSrc);
+        } catch (error) {
+            console.error('Error in processing request:', error);
+            res.status(500).send('Internal Server Error');
+        }
+    };
 
