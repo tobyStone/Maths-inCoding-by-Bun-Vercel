@@ -44,7 +44,7 @@ module.exports = async (req, res) => {
                     return res.status(cdnRes.statusCode).send(`Error: ${cdnRes.statusCode}`);
                 }
 
-                res.writeHead(cdnRes.statusCode, {
+                res.writeHead(206, {
                     'Content-Range': `bytes ${start}-${end}/${contentLength}`,
                     'Accept-Ranges': 'bytes',
                     'Content-Length': chunksize,
