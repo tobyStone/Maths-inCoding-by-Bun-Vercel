@@ -1,6 +1,4 @@
 const { parse } = require('url');
-const path = require('path');
-const fs = require('fs');
 const db = require('./database');
 const Video = require('../models/videoModel');
 
@@ -19,11 +17,12 @@ module.exports = async (req, res) => {
 
         const video = videoEntry.page.videoData[0];
         const description = videoEntry.page.description || '';
-        const videoSrc = path.resolve(__dirname, '../public/videos', path.basename(video.video));  // Assuming video is stored locally
+        const videoSrc = video.video;  // Now using the full JSDelivr URL directly
         const timeStop = video.time_stop_1 || 0;
         const questionLink = video.link_questions_1 || '#';
         const imageSrc = video.imgSrc.replace('public/', '/');
         const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
+
         const posterSrc = baseUrl + imageSrc;
 
         const stat = fs.statSync(videoSrc);
@@ -60,7 +59,9 @@ module.exports = async (req, res) => {
             fs.createReadStream(videoSrc).pipe(res);
         }
 
-        // Generate HTML with video element
+
+
+
         const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -82,7 +83,7 @@ module.exports = async (req, res) => {
 
         <div class="video-container">
            <video id="videoPlayer" controls preload="auto" poster="${posterSrc}">
-                <source src="/api/videoPlayer?url=${encodeURIComponent(video.video)}" type="video/mp4">
+                <source src="${videoSrc}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
