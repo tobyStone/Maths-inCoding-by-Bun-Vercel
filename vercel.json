@@ -3,11 +3,7 @@
   "rewrites": [
     {
       "source": "/:prefix*/videoPlayer/:slug*",
-      "destination": "/api/videoPlayer.serveHtml?prefix=:prefix&slug=:slug"
-    },
-    {
-      "source": "/:prefix*/videoStream/:slug*",
-      "destination": "/api/videoPlayer.streamVideo?prefix=:prefix&slug=:slug"
+      "destination": "/api/videoPlayer.js?prefix=:prefix&slug=:slug"
     },
     {
       "source": "/:prefix*/maths_questions/:slug*",

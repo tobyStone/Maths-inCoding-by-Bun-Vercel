@@ -1,6 +1,4 @@
 const { parse } = require('url');
-const fs = require('fs');
-const path = require('path');
 const db = require('./database');
 const Video = require('../models/videoModel');
 
