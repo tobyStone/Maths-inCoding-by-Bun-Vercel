@@ -7,7 +7,7 @@ module.exports = {
         try {
             await db.connectToDatabase(); // Ensures a single connection
             const parsedUrl = parse(req.url, true);
-            const urlPath = parsedUrl.pathname.replace('/videoPlayer', ''); // Adjust path as needed
+            const urlPath = parsedUrl.pathname; // Adjust path as needed
             const query = { 'page.url_stub': urlPath };
 
             const videoEntry = await Video.findOne(query).exec();
