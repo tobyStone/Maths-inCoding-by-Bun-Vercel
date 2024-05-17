@@ -180,7 +180,7 @@ module.exports = {
     streamVideo: async (req, res) => {
         try {
             const parsedUrl = parse(req.url, true);
-            const urlPath = parsedUrl.pathname.replace('/videoStream', ''); // Adjust path as needed
+            const urlPath = parsedUrl.pathname; // Adjust path as needed
             const query = { 'page.url_stub': urlPath };
 
             const videoEntry = await Video.findOne(query).exec();
