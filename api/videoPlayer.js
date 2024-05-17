@@ -174,6 +174,5 @@ module.exports = async (req, res) => {
         console.error('Error in processing request:', error);
         res.status(500).send('Internal Server Error');
     }
-}
 };
 
