@@ -1,31 +1,30 @@
 const { parse } = require('url');
-const db = require('./database');
+const db = require('../database'); // Adjust the path as needed
 const Video = require('../models/videoModel');
 
-module.exports = {
-    serveHtml: async (req, res) => {
-        try {
-            await db.connectToDatabase(); // Ensures a single connection
-            const parsedUrl = parse(req.url, true);
-            const urlPath = parsedUrl.pathname; // Adjust path as needed
-            const query = { 'page.url_stub': urlPath };
+module.exports = async (req, res) => {
+    try {
+        await db.connectToDatabase(); // Ensures a single connection
+        const parsedUrl = parse(req.url, true);
+        const urlPath = parsedUrl.pathname; // Adjust path as needed
+        const query = { 'page.url_stub': urlPath };
 
-            const videoEntry = await Video.findOne(query).exec();
-            if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
-                console.error("Video data not found for URL:", urlPath);
-                return res.status(404).send('Video not found');
-            }
+        const videoEntry = await Video.findOne(query).exec();
+        if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
+            console.error("Video data not found for URL:", urlPath);
+            return res.status(404).send('Video not found');
+        }
 
-            const video = videoEntry.page.videoData[0];
-            const description = videoEntry.page.description || '';
-            const videoSrc = video.video;  // Use the video URL directly
-            const timeStop = video.time_stop_1 || 0;
-            const questionLink = video.link_questions_1 || '#';
-            const imageSrc = video.imgSrc.replace('public/', '/');
-            const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
-            const posterSrc = baseUrl + imageSrc;
+        const video = videoEntry.page.videoData[0];
+        const description = videoEntry.page.description || '';
+        const videoSrc = video.video;  // Use the video URL directly
+        const timeStop = video.time_stop_1 || 0;
+        const questionLink = video.link_questions_1 || '#';
+        const imageSrc = video.imgSrc.replace('public/', '/');
+        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
+        const posterSrc = baseUrl + imageSrc;
 
-            const html = `
+        const html = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -169,34 +168,12 @@ module.exports = {
 </body>
 </html>
             `;
-            res.setHeader('Content-Type', 'text/html');
-            res.status(200).send(html);
-        } catch (error) {
-            console.error('Error in processing request:', error);
-            res.status(500).send('Internal Server Error');
-        }
-    },
-
-    streamVideo: async (req, res) => {
-        try {
-            const parsedUrl = parse(req.url, true);
-            const urlPath = parsedUrl.pathname; // Adjust path as needed
-            const query = { 'page.url_stub': urlPath };
-
-            const videoEntry = await Video.findOne(query).exec();
-            if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
-                console.error("Video data not found for URL:", urlPath);
-                return res.status(404).send('Video not found');
-            }
-
-            const video = videoEntry.page.videoData[0];
-            const videoSrc = video.video;  // Use the video URL directly from the database
-
-            res.redirect(videoSrc);
-
-        } catch (error) {
-            console.error('Error in processing request:', error);
-            res.status(500).send('Internal Server Error');
-        }
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).send(html);
+    } catch (error) {
+        console.error('Error in processing request:', error);
+        res.status(500).send('Internal Server Error');
     }
+}
 };
+
