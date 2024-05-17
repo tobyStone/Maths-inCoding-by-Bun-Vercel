@@ -6,8 +6,9 @@ const Video = require('../models/videoModel');
 
 module.exports = async (req, res) => {
     try {
+        await db.connectToDatabase(); // Ensures a single connection
         const parsedUrl = parse(req.url, true);
-        const urlPath = parsedUrl.pathname.replace('/videoPlayer', ''); // Adjust path as needed
+        const urlPath = parsedUrl.pathname;
         const query = { 'page.url_stub': urlPath };
 
         const videoEntry = await Video.findOne(query).exec();
@@ -46,7 +47,7 @@ module.exports = async (req, res) => {
 
         <div class="video-container">
            <video id="videoPlayer" controls preload="auto" poster="${posterSrc}">
-                <source src="${baseUrl}/videoStream${urlPath}" type="video/mp4">
+                <source src="${baseUrl}/videoStream${videoSrc}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
