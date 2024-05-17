@@ -1,4 +1,6 @@
 const { parse } = require('url');
+const fs = require('fs');
+const path = require('path');
 const db = require('./database');
 const Video = require('../models/videoModel');
 
@@ -17,12 +19,11 @@ module.exports = async (req, res) => {
 
         const video = videoEntry.page.videoData[0];
         const description = videoEntry.page.description || '';
-        const videoSrc = video.video;  // Now using the full JSDelivr URL directly
+        const videoSrc = path.resolve(__dirname, '../public/videos', path.basename(video.video));  // Assuming video is stored locally
         const timeStop = video.time_stop_1 || 0;
         const questionLink = video.link_questions_1 || '#';
         const imageSrc = video.imgSrc.replace('public/', '/');
         const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
-
         const posterSrc = baseUrl + imageSrc;
 
         const stat = fs.statSync(videoSrc);
@@ -59,8 +60,34 @@ module.exports = async (req, res) => {
             fs.createReadStream(videoSrc).pipe(res);
         }
 
+    } catch (error) {
+        console.error('Error in processing request:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
+// Serve the HTML separately
+module.exports.serveHtml = async (req, res) => {
+    try {
+        await db.connectToDatabase();
+        const parsedUrl = parse(req.url, true);
+        const urlPath = parsedUrl.pathname.replace('/videoPlayer', ''); // Adjust path as needed
+        const query = { 'page.url_stub': urlPath };
 
+        const videoEntry = await Video.findOne(query).exec();
+        if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
+            console.error("Video data not found for URL:", urlPath);
+            return res.status(404).send('Video not found');
+        }
+
+        const video = videoEntry.page.videoData[0];
+        const description = videoEntry.page.description || '';
+        const videoSrc = video.video;  // Use the video URL directly
+        const timeStop = video.time_stop_1 || 0;
+        const questionLink = video.link_questions_1 || '#';
+        const imageSrc = video.imgSrc.replace('public/', '/');
+        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
+        const posterSrc = baseUrl + imageSrc;
 
         const html = `
 <!DOCTYPE html>
