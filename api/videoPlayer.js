@@ -6,70 +6,6 @@ const Video = require('../models/videoModel');
 
 module.exports = async (req, res) => {
     try {
-        await db.connectToDatabase();
-        const parsedUrl = parse(req.url, true);
-        const urlPath = parsedUrl.pathname;
-        const query = { 'page.url_stub': urlPath };
-
-        const videoEntry = await Video.findOne(query).exec();
-        if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
-            console.error("Video data not found for URL:", urlPath);
-            return res.status(404).send('Video not found');
-        }
-
-        const video = videoEntry.page.videoData[0];
-        const description = videoEntry.page.description || '';
-        const videoSrc = path.resolve(__dirname, '../public/videos', path.basename(video.video));  // Assuming video is stored locally
-        const timeStop = video.time_stop_1 || 0;
-        const questionLink = video.link_questions_1 || '#';
-        const imageSrc = video.imgSrc.replace('public/', '/');
-        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
-        const posterSrc = baseUrl + imageSrc;
-
-        const stat = fs.statSync(videoSrc);
-        const fileSize = stat.size;
-        const range = req.headers.range;
-
-        if (range) {
-            const parts = range.replace(/bytes=/, "").split("-");
-            const start = parseInt(parts[0], 10);
-            const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-
-            if (start >= fileSize) {
-                res.status(416).send('Requested range not satisfiable\n' + start + ' >= ' + fileSize);
-                return;
-            }
-
-            const chunksize = (end - start) + 1;
-            const file = fs.createReadStream(videoSrc, { start, end });
-            const head = {
-                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': chunksize,
-                'Content-Type': 'video/mp4',
-            };
-
-            res.writeHead(206, head);
-            file.pipe(res);
-        } else {
-            const head = {
-                'Content-Length': fileSize,
-                'Content-Type': 'video/mp4',
-            };
-            res.writeHead(200, head);
-            fs.createReadStream(videoSrc).pipe(res);
-        }
-
-    } catch (error) {
-        console.error('Error in processing request:', error);
-        res.status(500).send('Internal Server Error');
-    }
-};
-
-// Serve the HTML separately
-module.exports.serveHtml = async (req, res) => {
-    try {
-        await db.connectToDatabase();
         const parsedUrl = parse(req.url, true);
         const urlPath = parsedUrl.pathname.replace('/videoPlayer', ''); // Adjust path as needed
         const query = { 'page.url_stub': urlPath };
@@ -110,7 +46,7 @@ module.exports.serveHtml = async (req, res) => {
 
         <div class="video-container">
            <video id="videoPlayer" controls preload="auto" poster="${posterSrc}">
-                <source src="${videoSrc}" type="video/mp4">
+                <source src="${baseUrl}/videoStream${urlPath}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -241,5 +177,56 @@ module.exports.serveHtml = async (req, res) => {
     }
 };
 
+module.exports.streamVideo = async (req, res) => {
+    try {
+        const parsedUrl = parse(req.url, true);
+        const urlPath = parsedUrl.pathname.replace('/videoStream', ''); // Adjust path as needed
+        const query = { 'page.url_stub': urlPath };
 
-//hmmm
+        const videoEntry = await Video.findOne(query).exec();
+        if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
+            console.error("Video data not found for URL:", urlPath);
+            return res.status(404).send('Video not found');
+        }
+
+        const video = videoEntry.page.videoData[0];
+        const videoSrc = path.resolve(__dirname, '../public/videos', path.basename(video.video));  // Assuming video is stored locally
+
+        const stat = fs.statSync(videoSrc);
+        const fileSize = stat.size;
+        const range = req.headers.range;
+
+        if (range) {
+            const parts = range.replace(/bytes=/, "").split("-");
+            const start = parseInt(parts[0], 10);
+            const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+            if (start >= fileSize) {
+                res.status(416).send('Requested range not satisfiable\n' + start + ' >= ' + fileSize);
+                return;
+            }
+
+            const chunksize = (end - start) + 1;
+            const file = fs.createReadStream(videoSrc, { start, end });
+            const head = {
+                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunksize,
+                'Content-Type': 'video/mp4',
+            };
+
+            res.writeHead(206, head);
+            file.pipe(res);
+        } else {
+            const head = {
+                'Content-Length': fileSize,
+                'Content-Type': 'video/mp4',
+            };
+            res.writeHead(200, head);
+            fs.createReadStream(videoSrc).pipe(res);
+        }
+    } catch (error) {
+        console.error('Error in processing request:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
