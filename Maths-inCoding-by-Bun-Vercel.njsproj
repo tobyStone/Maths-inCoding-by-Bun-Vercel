@@ -29,6 +29,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".env" />
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
     <Content Include="api\database.js" />
@@ -109,17 +110,22 @@
     <Content Include="public\videos\3Dgameengine.mp4" />
     <Content Include="public\videos\ratioWithDifferences.mp4" />
     <Content Include="README.md" />
+    <Content Include="scripts\updateDatabase.js" />
     <Content Include="scripts\updateMathsQuestionVideoUrls.js" />
     <Content Include="scripts\updateVideoUrls.js" />
     <Content Include="scripts\uploadVideos.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="seeds\layoutData.json" />
+    <Content Include="seeds\mathsQuestionData.json" />
+    <Content Include="seeds\videoData.json" />
     <Content Include="vercel.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="api\" />
     <Folder Include="config\" />
     <Folder Include="models\" />
+    <Folder Include="seeds\" />
     <Folder Include="scripts\" />
     <Folder Include="public\" />
     <Folder Include="public\images\" />

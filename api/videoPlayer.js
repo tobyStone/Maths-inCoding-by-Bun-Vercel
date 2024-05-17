@@ -1,4 +1,6 @@
 const { parse } = require('url');
+const path = require('path');
+const fs = require('fs');
 const db = require('./database');
 const Video = require('../models/videoModel');
 
@@ -17,14 +19,48 @@ module.exports = async (req, res) => {
 
         const video = videoEntry.page.videoData[0];
         const description = videoEntry.page.description || '';
-        const videoSrc = video.video;  // Now using the full Blob URL directly
+        const videoSrc = path.resolve(__dirname, '../public/videos', path.basename(video.video));  // Assuming video is stored locally
         const timeStop = video.time_stop_1 || 0;
         const questionLink = video.link_questions_1 || '#';
         const imageSrc = video.imgSrc.replace('public/', '/');
         const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
-
         const posterSrc = baseUrl + imageSrc;
 
+        const stat = fs.statSync(videoSrc);
+        const fileSize = stat.size;
+        const range = req.headers.range;
+
+        if (range) {
+            const parts = range.replace(/bytes=/, "").split("-");
+            const start = parseInt(parts[0], 10);
+            const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+            if (start >= fileSize) {
+                res.status(416).send('Requested range not satisfiable\n' + start + ' >= ' + fileSize);
+                return;
+            }
+
+            const chunksize = (end - start) + 1;
+            const file = fs.createReadStream(videoSrc, { start, end });
+            const head = {
+                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunksize,
+                'Content-Type': 'video/mp4',
+            };
+
+            res.writeHead(206, head);
+            file.pipe(res);
+        } else {
+            const head = {
+                'Content-Length': fileSize,
+                'Content-Type': 'video/mp4',
+            };
+            res.writeHead(200, head);
+            fs.createReadStream(videoSrc).pipe(res);
+        }
+
+        // Generate HTML with video element
         const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -46,7 +82,7 @@ module.exports = async (req, res) => {
 
         <div class="video-container">
            <video id="videoPlayer" controls preload="auto" poster="${posterSrc}">
-                <source src="${videoSrc}" type="video/mp4">
+                <source src="/api/videoPlayer?url=${encodeURIComponent(video.video)}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -135,36 +171,36 @@ module.exports = async (req, res) => {
         }
     </script>
     <footer id="FatFooter">
-    <div class="wordWrapper">
-        <h4>How to set up</h4>
-    </div>
-    <div>
-        <a href="https://www.youtube.com/watch?v=F1LzrEUtcHI" target="_blank">
-            <div class="footerImgOne">
-                <img width="150" src="/images/scratch.webp" alt="Scratch">
-            </div>
-        </a>
-        <a href="https://www.youtube.com/watch?v=PcEbSoSGioY&t" target="_blank">
-            <div class="footerImgTwo">
-                <img width="195" height="125" src="/images/roblox.webp" alt="Roblox">
-            </div>
-        </a>
-        <a href="https://www.youtube.com/watch?v=NU-tSBCMfZw" target="_blank">
-            <div class="footerImgThree">
-                <img width="175" height="125" src="/images/minecraft_java.webp" alt="Unreal Engine">
-            </div>
-        </a>
-        <a href="https://www.youtube.com/watch?v=nCut7t2oNwA" target="_blank">
-            <div class="footerImgFour">
-                <img width="175" height="125" src="/images/visual_studio.webp" alt="Visual Studio">
-            </div>
-        </a>
-        <a href="https://www.youtube.com/watch?v=S5J2VnKiKP4" target="_blank">
-            <div class="footerImgOne">
-                <img width="150" src="/images/cave_engine.webp" alt="Scratch">
-            </div>
-        </a>
-    </div>
+        <div class="wordWrapper">
+            <h4>How to set up</h4>
+        </div>
+        <div>
+            <a href="https://www.youtube.com/watch?v=F1LzrEUtcHI" target="_blank">
+                <div class="footerImgOne">
+                    <img width="150" src="/images/scratch.webp" alt="Scratch">
+                </div>
+            </a>
+            <a href="https://www.youtube.com/watch?v=PcEbSoSGioY&t" target="_blank">
+                <div class="footerImgTwo">
+                    <img width="195" height="125" src="/images/roblox.webp" alt="Roblox">
+                </div>
+            </a>
+            <a href="https://www.youtube.com/watch?v=NU-tSBCMfZw" target="_blank">
+                <div class="footerImgThree">
+                    <img width="175" height="125" src="/images/minecraft_java.webp" alt="Unreal Engine">
+                </div>
+            </a>
+            <a href="https://www.youtube.com/watch?v=nCut7t2oNwA" target="_blank">
+                <div class="footerImgFour">
+                    <img width="175" height="125" src="/images/visual_studio.webp" alt="Visual Studio">
+                </div>
+            </a>
+            <a href="https://www.youtube.com/watch?v=S5J2VnKiKP4" target="_blank">
+                <div class="footerImgOne">
+                    <img width="150" src="/images/cave_engine.webp" alt="Scratch">
+                </div>
+            </a>
+        </div>
     </footer>
 </body>
 </html>
