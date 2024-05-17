@@ -1,23 +1,29 @@
 const { parse } = require('url');
-const Video = require('../models/videoModel');
+const https = require('https');
 
 module.exports = async (req, res) => {
     try {
         const parsedUrl = parse(req.url, true);
-        const urlPath = parsedUrl.pathname; // Adjust path as needed
-        const query = { 'page.url_stub': urlPath };
+        const videoSrc = parsedUrl.query.videoSrc;
 
-        const videoEntry = await Video.findOne(query).exec();
-        if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
-            console.error("Video data not found for URL:", urlPath);
-            return res.status(404).send('Video not found');
+        if (!videoSrc) {
+            return res.status(400).send('Missing videoSrc query parameter');
         }
 
-        const video = videoEntry.page.videoData[0];
-        const videoSrc = video.video;  // Use the video URL directly from the database
+        https.get(videoSrc, (cdnRes) => {
+            if (cdnRes.statusCode !== 200) {
+                return res.status(cdnRes.statusCode).send(`Error: ${cdnRes.statusCode}`);
+            }
 
-        res.redirect(videoSrc);
+            res.setHeader('Content-Type', 'video/mp4');
+            res.setHeader('Content-Length', cdnRes.headers['content-length']);
+            res.setHeader('Accept-Ranges', 'bytes');
 
+            cdnRes.pipe(res);
+        }).on('error', (err) => {
+            console.error('Error fetching video from CDN:', err);
+            res.status(500).send('Internal Server Error');
+        });
     } catch (error) {
         console.error('Error in processing request:', error);
         res.status(500).send('Internal Server Error');
