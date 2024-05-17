@@ -11,6 +11,7 @@ module.exports = async (req, res) => {
         }
 
         const range = req.headers.range;
+        console.log('Range header:', range);
 
         // Fetch the video's metadata first to get the content length
         https.get(videoSrc, { method: 'HEAD' }, (metaRes) => {
@@ -19,6 +20,8 @@ module.exports = async (req, res) => {
             }
 
             const contentLength = parseInt(metaRes.headers['content-length'], 10);
+            console.log('Content-Length:', contentLength);
+
             let start = 0;
             let end = contentLength - 1;
 
@@ -33,6 +36,8 @@ module.exports = async (req, res) => {
             }
 
             const chunksize = (end - start) + 1;
+            console.log('Start:', start, 'End:', end, 'Chunksize:', chunksize);
+
             const options = {
                 headers: {
                     'Range': `bytes=${start}-${end}`
@@ -43,6 +48,9 @@ module.exports = async (req, res) => {
                 if (cdnRes.statusCode !== 206 && cdnRes.statusCode !== 200) {
                     return res.status(cdnRes.statusCode).send(`Error: ${cdnRes.statusCode}`);
                 }
+
+                console.log('Content-Range:', cdnRes.headers['content-range']);
+                console.log('Content-Length:', cdnRes.headers['content-length']);
 
                 res.writeHead(206, {
                     'Content-Range': `bytes ${start}-${end}/${contentLength}`,
