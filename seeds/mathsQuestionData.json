@@ -187,7 +187,7 @@
 			"url_stub": "/maths_questions/ratio",
 			"description": "11_12 age range questions on ratios",
 			"helpVideo": {
-				"videoSrc": "https://arovpkdsqzukklqx.public.blob.vercel-storage.com/ratioWithDifferences-pdPv0cWtpzJHDUGV8mVRLDua5WCQeS.mp4",
+				"videoSrc": "public/videos/ratioWithDifferences.mp4",
 				"imgSrc": "/public/images/help_video_poster.jpg",
 				"videoTitle": "Understanding Angles"
 			},

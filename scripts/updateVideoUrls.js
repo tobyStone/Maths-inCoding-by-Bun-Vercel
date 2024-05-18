@@ -3,8 +3,10 @@ const mongoose = require('mongoose');
 const Video = require('../models/videoModel'); // Ensure the path is correct
 
 const videoBlobUrls = {
-    "https://arovpkdsqzukklqx.public.blob.vercel-storage.com/3Dgameengine-FsMeyOa7OlaRUs1eNdukjMUNDLP7IP.mp4": "https://cdn.jsdelivr.net/gh/tobyStone/Maths-inCoding-by-Bun/test/public/videos/3Dgameengine.mp4"
+    "https://cdn.jsdelivr.net/gh/tobyStone/Maths-inCoding-by-Bun/test/public/videos/3Dgameengine.mp4": "/public/videos/3Dgameengine.mp4"
 };
+
+
 
 async function updateVideoUrls() {
     const mongoUri = `mongodb+srv://${process.env.uname}:${process.env.pwd}@cluster0.ntuqn.mongodb.net/maths_through_coding?retryWrites=true&w=majority`;

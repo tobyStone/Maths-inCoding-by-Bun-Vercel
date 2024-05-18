@@ -1,5 +1,6 @@
 const { parse } = require('url');
-const https = require('https');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = async (req, res) => {
     try {
@@ -15,72 +16,36 @@ module.exports = async (req, res) => {
 
         console.log('Video source:', videoSrc);
 
+        const videoPath = path.join(__dirname, '..', 'public', 'videos', videoSrc);
         const range = req.headers.range;
         console.log('Range header:', range);
 
-        // Fetch the video's metadata first to get the content length
-        https.get(videoSrc, { method: 'HEAD' }, (metaRes) => {
-            if (metaRes.statusCode !== 200) {
-                console.log('Error fetching video metadata:', metaRes.statusCode);
-                return res.status(metaRes.statusCode).send(`Error: ${metaRes.statusCode}`);
-            }
+        if (!range) {
+            return res.status(416).send('Range not satisfiable');
+        }
 
-            const contentLength = parseInt(metaRes.headers['content-length'], 10);
-            console.log('Content length:', contentLength);
+        const videoSize = fs.statSync(videoPath).size;
+        const CHUNK_SIZE = 10 ** 6; // 1MB
+        const start = Number(range.replace(/\D/g, ""));
+        const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
+        const contentLength = end - start + 1;
 
-            let start = 0;
-            let end = contentLength - 1;
+        const headers = {
+            'Content-Range': `bytes ${start}-${end}/${videoSize}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': contentLength,
+            'Content-Type': 'video/mp4',
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+            'Pragma': 'no-cache'
+        };
 
-            if (range) {
-                const positions = range.replace(/bytes=/, "").split("-");
-                start = parseInt(positions[0], 10);
-                end = positions[1] ? parseInt(positions[1], 10) : end;
+        res.writeHead(206, headers);
 
-                if (start >= contentLength || end >= contentLength) {
-                    console.log('Requested range not satisfiable:', start, '>=', contentLength);
-                    return res.status(416).send('Requested range not satisfiable\n' + start + ' >= ' + contentLength);
-                }
-            }
+        const videoStream = fs.createReadStream(videoPath, { start, end });
+        videoStream.pipe(res);
 
-            const chunksize = (end - start) + 1;
-            console.log('Start:', start, 'End:', end, 'Chunk size:', chunksize);
-
-            const options = {
-                headers: {
-                    'Range': `bytes=${start}-${end}`
-                }
-            };
-
-            https.get(videoSrc, options, (cdnRes) => {
-                if (cdnRes.statusCode !== 206 && cdnRes.statusCode !== 200) {
-                    console.log('Error fetching video:', cdnRes.statusCode);
-                    return res.status(cdnRes.statusCode).send(`Error: ${cdnRes.statusCode}`);
-                }
-
-                console.log('Fetched video content, status code:', cdnRes.statusCode);
-                console.log('Response headers:', cdnRes.headers);
-
-                res.writeHead(206, {
-                    'Content-Range': `bytes ${start}-${end}/${contentLength}`,
-                    'Accept-Ranges': 'bytes',
-                    'Content-Length': chunksize,
-                    'Content-Type': 'video/mp4',
-                    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
-                    'Pragma': 'no-cache'
-                });
-
-                cdnRes.pipe(res).on('finish', () => {
-                    console.log('Streamed video successfully');
-                });
-
-            }).on('error', (err) => {
-                console.error('Error fetching video from CDN:', err);
-                res.status(500).send('Internal Server Error');
-            });
-
-        }).on('error', (err) => {
-            console.error('Error fetching video metadata from CDN:', err);
-            res.status(500).send('Internal Server Error');
+        videoStream.on('end', () => {
+            console.log('Streamed video successfully');
         });
 
     } catch (error) {

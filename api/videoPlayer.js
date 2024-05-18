@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
 
         <div class="video-container">
            <video id="videoPlayer" controls preload="auto" poster="${posterSrc}">
-                <source src="${baseUrl}/api/videoStream?videoSrc=${encodeURIComponent(videoSrc)}" type="video/mp4">
+                <source src="/videos/${videoSrc}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -122,7 +122,7 @@ module.exports = async (req, res) => {
             });
 
             videoPlayer.addEventListener('timeupdate', function() {
-                seekBar.value = videoPlayer.currentTime;
+                seekBar.value = (videoPlayer.currentTime / videoPlayer.duration) * 100;
                 currentTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
             });
         }
@@ -167,7 +167,7 @@ module.exports = async (req, res) => {
     </footer>
 </body>
 </html>
-        `;
+            `;
         res.setHeader('Content-Type', 'text/html');
         res.status(200).send(html);
     } catch (error) {
