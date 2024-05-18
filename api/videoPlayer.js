@@ -94,7 +94,7 @@ module.exports = async (req, res) => {
         const totalDurationDisplay = document.getElementById('total-duration');
 
         if (playButton) {
-            playButton.addEventListener('click',
+            playButton.addEventListener('click', function() {
                 if (videoPlayer.paused || videoPlayer.ended) {
                     videoPlayer.play();
                     playButton.textContent = 'Pause';
@@ -167,7 +167,7 @@ module.exports = async (req, res) => {
     </footer>
 </body>
 </html>
-            `;
+        `;
         res.setHeader('Content-Type', 'text/html');
         res.status(200).send(html);
     } catch (error) {
@@ -175,21 +175,3 @@ module.exports = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-
-    streamVideo: async (req, res) => {
-        try {
-            const parsedUrl = parse(req.url, true);
-            const videoSrc = parsedUrl.query.videoSrc;
-
-            if (!videoSrc) {
-                console.error("Video source not found in query parameters");
-                return res.status(400).send('Bad Request');
-            }
-
-            res.redirect(videoSrc);
-        } catch (error) {
-            console.error('Error in processing request:', error);
-            res.status(500).send('Internal Server Error');
-        }
-    };
-
