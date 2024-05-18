@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
 
         <div class="video-container">
            <video id="videoPlayer" controls preload="auto" poster="${posterSrc}">
-                <source src="/videos/${videoSrc}" type="video/mp4">
+                <source src="${videoSrc}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
