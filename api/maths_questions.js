@@ -33,9 +33,9 @@ module.exports = async (req, res) => {
             `;
         }).join('');
 
-        const videoSrc = pageData.page.helpVideo.videoSrc; // Directly use the Blob URL
-        const posterSrc = pageData.page.helpVideo.poster; // Assuming the poster image URL is also stored directly
-
+        const videoSrc_temp = pageData.page.helpVideo.videoSrc; // Directly use the Blob URL
+        const videoSrc = videoSrc_temp.replace('public/', '/')
+ 
         // Define helpVideoExists based on whether the video HTML is generated
         const helpVideoExists = !!pageData.page.helpVideo;
         console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists)
@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
         const videoHtml = pageData.page.helpVideo ? `
             <div id="help-video-container" class="video-container" style="display:none;">
                 <video id="help-video" controls>
-                    <source src="${videoSrc}" type="video/mp4">
+                    <source src="${baseUrl}${videoSrc}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
                 <div class="video-controls">
