@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const QuestionModel = require('../models/mathQuestionsModel'); // Ensure the path is correct
 
 const videoBlobUrls = {
-    "https://arovpkdsqzukklqx.public.blob.vercel-storage.com/ratioWithDifferences-pdPv0cWtpzJHDUGV8mVRLDua5WCQeS.mp4": "https://cdn.jsdelivr.net/gh/tobyStone/Maths-inCoding-by-Bun/test/public/videos/ratioWithDifferences.mp4"
+    "https://cdn.jsdelivr.net/gh/tobyStone/Maths-inCoding-by-Bun/test/public/videos/ratioWithDifferences.mp4": "/videos/ratioWithDifferences.mp4"
 };
 
 async function updateVideoUrls() {
