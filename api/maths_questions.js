@@ -33,6 +33,7 @@ module.exports = async (req, res) => {
             `;
         }).join('');
 
+        //update path
         const videoSrc_temp = pageData.page.helpVideo.videoSrc; // Directly use the Blob URL
         const videoSrc = videoSrc_temp.replace('public/', '/')
  
