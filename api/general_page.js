@@ -1,5 +1,3 @@
-import { geolocation } from '@vercel/edge';
-
 const { parse } = require('url');
 const db = require('./database');
 const Layout = require('../models/linkedPage'); // Ensure path is correct
@@ -22,6 +20,12 @@ module.exports = async (req, res) => {
 
         // Make sure to test thoroughly and replace placeholders appropriately.
         const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
+
+        // Manually read the geolocation headers
+        const country = req.headers['x-vercel-ip-country'];
+        const city = req.headers['x-vercel-ip-city'];
+
+        console.log(`Geolocation - Country: ${country}, City: ${city}`);
 
     
         const sectionElements = sections.page.sections.map(section => {
@@ -56,10 +60,7 @@ module.exports = async (req, res) => {
             //}
             //console.log(`Geo location for IP ${ip}: `, geo);
 
-            // Get geolocation from Vercel's headers
-            const { city, country } = geolocation(req);
-
-            let locality = (country === 'GB') ? 'UK' : 'US';
+           let locality = (country === 'GB') ? 'UK' : 'US';
             let yearGroup = locality === 'UK' ? section.UK_yearGroup : section.US_yearGroup;
             let title = yearGroup ? section.title.replace(/Age \d{2}-\d{2}/, yearGroup) : section.title;
 
