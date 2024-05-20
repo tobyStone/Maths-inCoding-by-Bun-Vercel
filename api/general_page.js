@@ -1,7 +1,7 @@
 const { parse } = require('url');
 const db = require('./database');
 const Layout = require('../models/linkedPage'); // Ensure path is correct
-//const geoip = require('geoip-lite'); // GeoIP for location-based content
+const geoip = require('geoip-lite'); // GeoIP for location-based content
 
 
 
@@ -41,26 +41,27 @@ module.exports = async (req, res) => {
 
 
 
-            // localhost test usage of geoip... 8.8.8.8 for US
-//            const testIP = '81.2.69.160'; // Public IP example UK
-//            const geo = geoip.lookup(testIP);
-//            console.log(`Geo location for IP ${testIP}: `, geo);
+            //// localhost test usage of geoip... 8.8.8.8 for US
+            //// localhost test usage of geoip... 81.2.69.160 for UK
+            //const testIP = '8.8.8.8'; // Public IP example UK
+            //const geo = geoip.lookup(testIP);
+            //console.log(`Geo location for IP ${testIP}: `, geo);
 
             ////production geolocation
-            //const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            //const geo = geoip.lookup(ip);
-            //if (!geo) {
-            //    console.error('GeoIP lookup failed for IP:', ip);
-            //}
-            //console.log(`Geo location for IP ${ip}: `, geo);
+            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            const geo = geoip.lookup(ip);
+            if (!geo) {
+                console.error('GeoIP lookup failed for IP:', ip);
+            }
+            console.log(`Geo location for IP ${ip}: `, geo);
 
 
-            //let locality = (geo && geo.country === 'GB') ? 'UK' : 'US';
-            //let yearGroup = locality === 'UK' ? section.UK_yearGroup : section.US_yearGroup;
-            //let title = yearGroup ? section.title.replace(/Age \d{2}-\d{2}/, yearGroup) : section.title;
-
-            let yearGroup = section.UK_yearGroup;
+            let locality = (geo && geo.country === 'GB') ? 'UK' : 'US';
+            let yearGroup = locality === 'UK' ? section.UK_yearGroup : section.US_yearGroup;
             let title = yearGroup ? section.title.replace(/Age \d{2}-\d{2}/, yearGroup) : section.title;
+
+            //let yearGroup = section.UK_yearGroup;
+            //let title = yearGroup ? section.title.replace(/Age \d{2}-\d{2}/, yearGroup) : section.title;
 
 
             return `
