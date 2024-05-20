@@ -318,7 +318,7 @@
 				{
 					"Qnumber": 1,
 					"imgSrc": "public/images/question_images/mental_maths_1.webp",
-					"imgAlt": "11_12_ratio_question_1",
+					"imgAlt": "11_12_mental_maths_question_1",
 					"questionText": "Which is the correct answer?",
 					"answer": "a",
 					"choices": [ "a", "b", "c", "d" ]
@@ -326,7 +326,7 @@
 				{
 					"Qnumber": 2,
 					"imgSrc": "public/images/question_images/mental_maths_2.webp",
-					"imgAlt": "11_12_ratio_question_2",
+					"imgAlt": "11_12_mental_maths_question_2",
 					"questionText": "Which is the correct answer?",
 					"answer": "b",
 					"choices": [ "a", "b", "c", "d" ]
@@ -334,7 +334,7 @@
 				{
 					"Qnumber": 3,
 					"imgSrc": "public/images/question_images/mental_maths_3.webp",
-					"imgAlt": "11_12_ratio_question_3",
+					"imgAlt": "11_12_mental_maths_question_3",
 					"questionText": "Which is the correct answer?",
 					"answer": "c",
 					"choices": [ "a", "b", "c", "d" ]
@@ -342,7 +342,7 @@
 				{
 					"Qnumber": 4,
 					"imgSrc": "public/images/question_images/mental_maths_4.webp",
-					"imgAlt": "11_12_ratio_question_4",
+					"imgAlt": "11_12_mental_maths_question_4",
 					"questionText": "Which is the correct answer?",
 					"answer": "c",
 					"choices": [ "a", "b", "c", "d" ]
@@ -350,7 +350,7 @@
 				{
 					"Qnumber": 5,
 					"imgSrc": "public/images/question_images/mental_maths_5.webp",
-					"imgAlt": "11_12_ratio_question_5",
+					"imgAlt": "11_12_mental_maths_question_5",
 					"questionText": "Which is the correct answer?",
 					"answer": "a",
 					"choices": [ "a", "b", "c", "d" ]
@@ -358,7 +358,7 @@
 				{
 					"Qnumber": 6,
 					"imgSrc": "public/images/question_images/mental_maths_6.webp",
-					"imgAlt": "11_12_ratio_question_6",
+					"imgAlt": "11_12_mental_maths_question_6",
 					"questionText": "Which is the correct answer?",
 					"answer": "b",
 					"choices": [ "a", "b", "c", "d" ]
