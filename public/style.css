@@ -184,7 +184,7 @@ h4 {
     height: auto; /* Adjusted to 'auto' for a normal button height */
     padding: 10px 20px; /* Added padding for visual appeal */
     border: none;
-    background-color: #6d7bab; /* Adjusted to match the header color */
+    background-color: #003366; /* Adjusted to match the header color */
     color: white; /* Text color */
     font-size: 16px; /* Text size */
     cursor: pointer; /* Changes cursor to indicate it's clickable */
@@ -192,12 +192,17 @@ h4 {
     margin-top: 20px; /* Space above the button */
     text-transform: uppercase; /* Uppercase text */
     font-weight: bold; /* Bold text */
-    box-shadow: 2px 4px rgba(0,0,0,0.2); /* Shadow for depth /
-transition: background-color 0.3s; / Smooth transition for hover effect */
+    box-shadow: 2px 4px rgba(0,0,0,0.2); /* Shadow for depth */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
 }
 
-.myButton:hover {
-background-color: #575f8a; /* Darker shade on hover */
+    .myButton:hover {
+        background-color: #002244; /* Darker shade on hover */
+    }
+
+.myButton:focus {
+    outline: 2px solid #ffffff; /* White outline to indicate focus */
+    outline-offset: 2px;
 }
 
 
