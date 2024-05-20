@@ -2,30 +2,25 @@ const mongoose = require('mongoose');
 const config = require('../config'); // Adjust the path as needed
 const express = require('express');
 const app = express();
-//const path = require('path');
 
-//const geoDBPath = path.join(__dirname, '../public/geoip/GeoLite2-City.mmdb');
-//geoip.startWatchingDataUpdate({
-//    database: geoDBPath,
-//    watchForUpdates: true // Optional: set to true if you want auto-updates
-//});
-
-console.log(process.cwd())
+console.log(process.cwd());
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
-
-
-
 const db = {
     connection: null,
 
+    /**
+     * Connects to the database if not already connected.
+     *
+     * @returns {Promise<Connection>} The MongoDB connection.
+     */
     connectToDatabase: async function () {
         if (this.connection) {
             return this.connection;
         }
-        const dbUri = config.getDbConnectionString(); // Ensure this returns the correct string
+        const dbUri = config.getDbConnectionString();
         this.connection = await mongoose.connect(dbUri, {
             useNewUrlParser: true,
             useUnifiedTopology: true
@@ -33,12 +28,6 @@ const db = {
         console.log("Database connected successfully.");
         return this.connection;
     },
-
-    //   getGeolocation: function (ip) {
-    //    const geo = geoip.lookup(ip);
-    //    console.log(`Geo location for IP ${ip}: `, geo);
-    //    return geo;
-    //}
 };
 
 module.exports = db;

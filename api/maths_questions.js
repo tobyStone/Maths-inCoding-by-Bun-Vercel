@@ -2,6 +2,12 @@ const { parse } = require('url');
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel'); // Adjust model path and name as necessary
 
+/**
+ * Handles incoming requests, fetches question data from the database, and generates HTML content.
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ */
 module.exports = async (req, res) => {
     await db.connectToDatabase(); // Ensures a single connection
     const parsedUrl = parse(req.url, true);
@@ -15,11 +21,15 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
+            : 'http://localhost:3000/';
 
         const questionsHtml = pageData.page.questionData.map((question, i) => {
-            const imagePath_temp = question.imgSrc.startsWith('/maths_questions/public/') ? question.imgSrc.replace('/maths_questions/public/', '/') : question.imgSrc;
-            const imagePath = imagePath_temp.replace('public/', '/')
+            const imagePath_temp = question.imgSrc.startsWith('/maths_questions/public/')
+                ? question.imgSrc.replace('/maths_questions/public/', '/')
+                : question.imgSrc;
+            const imagePath = imagePath_temp.replace('public/', '/');
             const choicesHtml = question.choices.map((choice, j) =>
                 `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
                 <label for="choice${i}-${j}">${choice}</label>`
@@ -33,13 +43,14 @@ module.exports = async (req, res) => {
             `;
         }).join('');
 
-        //update path
+        // Update path
         const videoSrc_temp = pageData.page.helpVideo.videoSrc; // Directly use the Blob URL
-        const videoSrc = videoSrc_temp.replace('public/', '/')
- 
+        const videoSrc = videoSrc_temp.replace('public/', '/');
+
         // Define helpVideoExists based on whether the video HTML is generated
         const helpVideoExists = !!pageData.page.helpVideo;
-        console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists)
+        console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc,
+            "HELPVIDEOEXISTS: ", helpVideoExists);
 
         const videoHtml = pageData.page.helpVideo ? `
             <div id="help-video-container" class="video-container" style="display:none;">
@@ -65,7 +76,7 @@ module.exports = async (req, res) => {
                     video.play();
                     video.addEventListener('ended', function() {
                         videoContainer.style.display = 'none';
-                        questionsContainer.style.display = 'block';  // This line will show the questions again
+                        questionsContainer.style.display = 'block';  // Show the questions again
                     });
                 }
             }
@@ -73,7 +84,7 @@ module.exports = async (req, res) => {
             function redirectToPreviousVideo() {
                 const previousVideoURL = localStorage.getItem('previousVideoURL');
                 const previousVideoTimestamp = localStorage.getItem('previousVideoTimestamp');
-                console.log("PREVIOUS VIDEO: ", previousVideoURL, "TIMESTAMP: ", previousVideoTimestamp)
+                console.log("PREVIOUS VIDEO: ", previousVideoURL, "TIMESTAMP: ", previousVideoTimestamp);
                 window.location.href = previousVideoURL + '?t=' + previousVideoTimestamp;
             }
 
@@ -98,7 +109,7 @@ module.exports = async (req, res) => {
                     if (helpVideoExists) {
                         showHelpVideo();
                     } else {
-                        alert("Not found video")
+                        alert("Not found video");
                         window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
                     }
                 } else {
@@ -123,7 +134,8 @@ module.exports = async (req, res) => {
                 <main>
                     <header>
                         <header class="SiteHeader">
-                            <h1>Maths inCoding<img style="float: right;" width="120" height="120" src="/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
+                            <h1>Maths inCoding<img style="float: right;" width="120" height="120" 
+                                   src="/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
                             <h3>... learning maths through coding computer games</h3>
                         </header>
                     </header>

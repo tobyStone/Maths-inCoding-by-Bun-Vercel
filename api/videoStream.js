@@ -2,6 +2,12 @@ const { parse } = require('url');
 const fs = require('fs');
 const path = require('path');
 
+/**
+ * Handles incoming requests for video streaming.
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ */
 module.exports = async (req, res) => {
     try {
         console.log('Received request for video stream');
@@ -49,5 +55,7 @@ module.exports = async (req, res) => {
     } catch (error) {
         console.error('Error in processing request:', error);
         res.status(500).send('Internal Server Error');
+    }
+};
     }
 //};

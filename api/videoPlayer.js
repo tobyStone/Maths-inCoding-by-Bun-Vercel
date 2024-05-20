@@ -2,6 +2,12 @@ const { parse } = require('url');
 const db = require('./database');
 const Video = require('../models/videoModel');
 
+/**
+ * Handles incoming requests, fetches video data from the database, and generates HTML content.
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ */
 module.exports = async (req, res) => {
     try {
         await db.connectToDatabase(); // Ensures a single connection
@@ -10,7 +16,8 @@ module.exports = async (req, res) => {
         const query = { 'page.url_stub': urlPath };
 
         const videoEntry = await Video.findOne(query).exec();
-        if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData || videoEntry.page.videoData.length === 0) {
+        if (!videoEntry || !videoEntry.page || !videoEntry.page.videoData ||
+            videoEntry.page.videoData.length === 0) {
             console.error("Video data not found for URL:", urlPath);
             return res.status(404).send('Video not found');
         }
@@ -22,7 +29,9 @@ module.exports = async (req, res) => {
         const timeStop = video.time_stop_1 || 0;
         const questionLink = video.link_questions_1 || '#';
         const imageSrc = video.imgSrc.replace('public/', '');
-        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://maths-in-coding-by-bun-vercel.vercel.app' : 'http://localhost:3000/';
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
+            : 'http://localhost:3000/';
         const posterSrc = baseUrl + imageSrc;
 
         const html = `
@@ -40,7 +49,8 @@ module.exports = async (req, res) => {
 <body>
     <main>
         <header class="SiteHeader">
-            <h1>Maths inCoding<img style="float: right;" width="120" height="120" src="/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
+            <h1>Maths inCoding<img style="float: right;" width="120" height="120" 
+                                   src="/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
             <h3>... learning maths through coding computer games</h3>
         </header>
 
@@ -128,6 +138,12 @@ module.exports = async (req, res) => {
             });
         }
 
+        /**
+         * Formats time in seconds to minutes and seconds.
+         *
+         * @param {number} seconds - The time in seconds.
+         * @returns {string} The formatted time string.
+         */
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60);
@@ -168,7 +184,7 @@ module.exports = async (req, res) => {
     </footer>
 </body>
 </html>
-            `;
+        `;
         res.setHeader('Content-Type', 'text/html');
         res.status(200).send(html);
     } catch (error) {
