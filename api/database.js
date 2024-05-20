@@ -6,7 +6,7 @@ const path = require('path');
 const geoip = require('geoip-lite');
 
 
-const geoDBPath = path.join(__dirname, '../data/geoip/GeoLite2-City.mmdb');
+const geoDBPath = path.join(__dirname, '../public/geoip/GeoLite2-City.mmdb');
 geoip.startWatchingDataUpdate({
     database: geoDBPath,
     watchForUpdates: true // Optional: set to true if you want auto-updates
