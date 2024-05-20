@@ -4,6 +4,7 @@
   "description": "The Vercel serverless version of my maths inCoding website",
   "dependencies": {
     "@vercel/blob": "^0.23.2",
+    "@vercel/edge": "^1.1.1",
     "dotenv": "^16.4.5",
     "escape-html": "^1.0.3",
     "express": "^4.19.2",

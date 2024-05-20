@@ -1,7 +1,8 @@
+import { geolocation } from '@vercel/edge';
+
 const { parse } = require('url');
 const db = require('./database');
 const Layout = require('../models/linkedPage'); // Ensure path is correct
-const geoip = require('geoip-lite'); // GeoIP for location-based content
 
 
 
@@ -48,15 +49,17 @@ module.exports = async (req, res) => {
             //console.log(`Geo location for IP ${testIP}: `, geo);
 
             ////production geolocation
-            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            const geo = geoip.lookup(ip);
-            if (!geo) {
-                console.error('GeoIP lookup failed for IP:', ip);
-            }
-            console.log(`Geo location for IP ${ip}: `, geo);
+            //const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            //const geo = geoip.lookup(ip);
+            //if (!geo) {
+            //    console.error('GeoIP lookup failed for IP:', ip);
+            //}
+            //console.log(`Geo location for IP ${ip}: `, geo);
 
+            // Get geolocation from Vercel's headers
+            const { city, country } = geolocation(req);
 
-            let locality = (geo && geo.country === 'GB') ? 'UK' : 'US';
+            let locality = (country === 'GB') ? 'UK' : 'US';
             let yearGroup = locality === 'UK' ? section.UK_yearGroup : section.US_yearGroup;
             let title = yearGroup ? section.title.replace(/Age \d{2}-\d{2}/, yearGroup) : section.title;
 
