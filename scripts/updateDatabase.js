@@ -7,19 +7,18 @@ const layoutData = require('../seeds/layoutData.json');
 const videoData = require('../seeds/videoData.json');
 const mathsQuestionsData = require('../seeds/mathsQuestionData.json');
 
-console.log('Script execution started'); // Very first logging statement
-console.log('Modules imported successfully'); // Logging after imports
+console.log('Script execution started');
+console.log('Modules imported successfully');
 
 // Connect to the database and update data
 async function connectAndUpdate() {
-    console.log('In connectAndUpdate function...'); // Early logging inside function
-
+    console.log('In connectAndUpdate function...');
     const connectionString = getDbConnectionString();
-    console.log('Connection string obtained:', connectionString); // Log connection string
+    console.log('Connection string obtained:', connectionString);
 
     try {
         if (mongoose.connection.readyState === 0) {
-            console.log('Attempting to connect to MongoDB...'); // Log before connection
+            console.log('Attempting to connect to MongoDB...');
             await mongoose.connect(connectionString, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true
@@ -29,15 +28,24 @@ async function connectAndUpdate() {
             console.log('Already connected to MongoDB');
         }
 
+        console.log('Clearing existing data from collections...');
+
+        // Clear existing data
+        await Layout.deleteMany({});
+        await Videos.deleteMany({});
+        await Questions.deleteMany({});
+
+        console.log('Existing data cleared.');
+
         console.log('Updating database...');
 
-        // Update Layout data
+        // Insert Layout data
         for (let layout of layoutData) {
-            console.log('Processing Layout:', layout); // Log layout data being processed
+            console.log('Processing Layout:', layout);
             try {
                 const result = await Layout.updateOne(
-                    { "page.url_stub": layout.page.url_stub }, // Matching criteria
-                    layout,
+                    { "page.url_stub": layout.page.url_stub },
+                    { $set: layout },
                     { upsert: true }
                 );
                 console.log(`Updated Layout: ${layout.page.url_stub}, Matched: ${result.n}, Modified: ${result.nModified}`);
@@ -46,22 +54,30 @@ async function connectAndUpdate() {
             }
         }
 
-        // Update Video data
+        // Insert Video data
         for (let video of videoData) {
-            console.log('Processing Video:', video); // Log video data being processed
+            console.log('Processing Video:', video);
             try {
-                const result = await Videos.updateOne({ _id: video._id }, video, { upsert: true });
+                const result = await Videos.updateOne(
+                    { _id: video._id || new mongoose.Types.ObjectId() },
+                    { $set: video },
+                    { upsert: true }
+                );
                 console.log(`Updated Video: ${video._id}, Matched: ${result.n}, Modified: ${result.nModified}`);
             } catch (error) {
                 console.error(`Error updating Video: ${video._id}`, error);
             }
         }
 
-        // Update Math Questions data
+        // Insert Math Questions data
         for (let question of mathsQuestionsData) {
-            console.log('Processing Question:', question); // Log question data being processed
+            console.log('Processing Question:', question);
             try {
-                const result = await Questions.updateOne({ _id: question._id }, question, { upsert: true });
+                const result = await Questions.updateOne(
+                    { _id: question._id || new mongoose.Types.ObjectId() },
+                    { $set: question },
+                    { upsert: true }
+                );
                 console.log(`Updated Question: ${question._id}, Matched: ${result.n}, Modified: ${result.nModified}`);
             } catch (error) {
                 console.error(`Error updating Question: ${question._id}`, error);
@@ -69,12 +85,11 @@ async function connectAndUpdate() {
         }
 
         console.log('Data update completed.');
-
         return mongoose.connection;
     } catch (error) {
-        const errorMessage = 'Connection failed.'; // Use a fixed error message
-        console.error(`${errorMessage} Error during database update:`, error);
-        throw new Error(errorMessage); // Throw a new Error with the fixed message
+        const errorMessage = 'Connection failed. Error during database update:';
+        console.error(errorMessage, error);
+        throw new Error(errorMessage);
     } finally {
         await mongoose.disconnect();
         console.log('Disconnected from MongoDB');
@@ -84,15 +99,15 @@ async function connectAndUpdate() {
 exports.updateDatabase = connectAndUpdate;
 
 exports.init = async function (app) {
-    console.log('Initializing updateDatabase script...'); // Logging at init
+    console.log('Initializing updateDatabase script...');
     try {
         await connectAndUpdate();
     } catch (error) {
-        const errorMessage = 'Connection failed.'; // Use a fixed error message
-        console.error(`${errorMessage} Error during database update:`, error);
-        throw new Error(errorMessage); // Throw a new Error with the fixed message
+        const errorMessage = 'Connection failed. Error during database update:';
+        console.error(errorMessage, error);
+        throw new Error(errorMessage);
     }
 };
 
-console.log('Calling updateDatabase.init()...'); // Log before init call
+console.log('Calling updateDatabase.init()...');
 exports.init();
