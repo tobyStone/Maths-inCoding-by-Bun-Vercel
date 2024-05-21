@@ -8,6 +8,7 @@ const Layout = require('../models/linkedPage'); // Ensure path is correct
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
  */
+
 module.exports = async (req, res) => {
     await db.connectToDatabase(); // Ensures a single connection
     const parsedUrl = parse(req.url, true);
@@ -34,15 +35,12 @@ module.exports = async (req, res) => {
 
         const sectionElements = sections.page.sections.map(section => {
             if (!section || !section.title || !section.imgSrc) {
-                // If essential properties are missing, skip this section
                 return '';
             }
 
             section.imgSrc = section.imgSrc.replace('public/', '/');
 
-            // Assuming the image source may not be complete or needs modification
             if (!section.imgSrc.startsWith('http')) {
-                // Prepend base URL only if it's not a complete URL
                 section.imgSrc = `${baseUrl}${section.imgSrc}`;
             }
 
@@ -57,7 +55,7 @@ module.exports = async (req, res) => {
                         <div class="imgWrap">
                             <a href="${section.link || '#'}">
                                 <img id="${section.id}_img" class="imgToHover" src="${section.imgSrc}" 
-                                     alt="${section.imgAlt || 'Image'}">
+                                     alt="${section.imgAlt || 'Image'}" loading="lazy">
                             </a>
                         </div>
                     </section>
@@ -101,27 +99,27 @@ module.exports = async (req, res) => {
         <div>
             <a href="https://www.youtube.com/watch?v=F1LzrEUtcHI" target="_blank">
                 <div class="footerImgOne">
-                    <img width="150" src="/images/scratch.webp" alt="Scratch">
+                    <img width="150" src="/images/scratch.webp" alt="Scratch" loading="lazy">
                 </div>
             </a>
             <a href="https://www.youtube.com/watch?v=PcEbSoSGioY&t" target="_blank">
                 <div class="footerImgTwo">
-                    <img width="195" height="125" src="/images/roblox.webp" alt="Roblox">
+                    <img width="195" height="125" src="/images/roblox.webp" alt="Roblox" loading="lazy">
                 </div>
             </a>
             <a href="https://www.youtube.com/watch?v=NU-tSBCMfZw" target="_blank">
                 <div class="footerImgThree">
-                    <img width="175" height="125" src="/images/minecraft_java.webp" alt="Unreal Engine">
+                    <img width="175" height="125" src="/images/minecraft_java.webp" alt="Unreal Engine" loading="lazy">
                 </div>
             </a>
             <a href="https://www.youtube.com/watch?v=nCut7t2oNwA" target="_blank">
                 <div class="footerImgFour">
-                    <img width="175" height="125" src="/images/visual_studio.webp" alt="Visual Studio">
+                    <img width="175" height="125" src="/images/visual_studio.webp" alt="Visual Studio" loading="lazy">
                 </div>
             </a>
             <a href="https://www.youtube.com/watch?v=S5J2VnKiKP4" target="_blank">
                 <div class="footerImgOne">
-                    <img width="150" src="/images/cave_engine.webp" alt="Scratch">
+                    <img width="150" src="/images/cave_engine.webp" alt="Scratch" loading="lazy">
                 </div>
             </a>
         </div>
