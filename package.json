@@ -1,17 +1,18 @@
 {
   "name": "Maths-inCoding-by-Bun-Vercel",
   "version": "1.0.0",
-  "description": "The serverless version of my maths inCoding website",
+  "description": "The Vercel serverless version of my maths inCoding website",
   "dependencies": {
     "@vercel/blob": "^0.23.2",
     "@vercel/edge": "^1.1.1",
     "axios": "^0.27.2",
+    "dotenv": "^16.4.5",
     "escape-html": "^1.0.3",
-    "otenv": "^0.9.12",
+    "express": "^4.19.2",
     "mongoose": "^5.13.22"
   },
   "scripts": {
-    "update-urls": "bun run scripts/updateVideoUrls.js"
+    "update-urls": "node scripts/updateVideoUrls.js"
   },
   "engines": {
     "bun": ">=0.1.0"
