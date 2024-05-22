@@ -1,20 +1,20 @@
 {
   "name": "Maths-inCoding-by-Bun-Vercel",
   "version": "1.0.0",
-  "description": "The Vercel serverless version of my maths inCoding website",
+  "description": "The serverless version of my maths inCoding website",
   "dependencies": {
     "@vercel/blob": "^0.23.2",
-    "@vercel/edge": "^1.1.1",
-    "dotenv": "^16.4.5",
+    "@vercel/edge": "^4.1.1",
+    "axios": "^0.27.2",
     "escape-html": "^1.0.3",
-    "express": "^4.19.2",
+    "otenv": "^0.9.12",
     "mongoose": "^5.13.22"
   },
   "scripts": {
-    "update-urls": "node scripts/updateVideoUrls.js"
+    "update-urls": "bun run scripts/updateVideoUrls.js"
   },
   "engines": {
-    "node": ">=14"
+    "bun": ">=0.1.0"
   },
   "author": "Toby Stone",
   "license": "ISC"
