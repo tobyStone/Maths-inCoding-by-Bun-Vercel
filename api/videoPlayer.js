@@ -24,15 +24,15 @@ module.exports = async (req, res) => {
 
         const video = videoEntry.page.videoData[0];
         const description = videoEntry.page.description || '';
-        const videoSrc_temp = video.video;  // Use the video URL directly
-        const videoSrc = videoSrc_temp.replace('public/', '');
+        const videoSrc = video.video;  // Use the video URL directly
+//        const videoSrc = videoSrc_temp.replace('public/', '');
         const timeStop = video.time_stop_1 || 0;
         const questionLink = video.link_questions_1 || '#';
-        const imageSrc = video.imgSrc.replace('public/', '');
+//        const imageSrc = video.imgSrc.replace('public/', '');
         const baseUrl = process.env.NODE_ENV === 'production'
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
             : 'http://localhost:3000/';
-        const posterSrc = baseUrl + imageSrc;
+        const posterSrc = baseUrl + video.imgSrc;
 
         const html = `
 <!DOCTYPE html>

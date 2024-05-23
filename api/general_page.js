@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
                 return '';
             }
 
-            section.imgSrc = section.imgSrc.replace('public/', '/');
+//            section.imgSrc = section.imgSrc.replace('public/', '/');
 
             if (!section.imgSrc.startsWith('http')) {
                 section.imgSrc = `${baseUrl}${section.imgSrc}`;

@@ -26,10 +26,10 @@ module.exports = async (req, res) => {
             : 'http://localhost:3000/';
 
         const questionsHtml = pageData.page.questionData.map((question, i) => {
-            const imagePath_temp = question.imgSrc.startsWith('/maths_questions/public/')
+            const imagePath = question.imgSrc.startsWith('/maths_questions/public/')
                 ? question.imgSrc.replace('/maths_questions/public/', '/')
                 : question.imgSrc;
-            const imagePath = imagePath_temp.replace('public/', '/');
+ //           const imagePath = imagePath_temp.replace('public/', '/');
             const choicesHtml = question.choices.map((choice, j) =>
                 `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
                 <label for="choice${i}-${j}">${choice}</label>`
