@@ -38,7 +38,6 @@ module.exports = async (req, res) => {
                 return '';
             }
 
-//            section.imgSrc = section.imgSrc.replace('public/', '/');
 
             if (!section.imgSrc.startsWith('http')) {
                 section.imgSrc = `${baseUrl}${section.imgSrc}`;
@@ -72,65 +71,8 @@ module.exports = async (req, res) => {
     <meta name="description" content="${sections.page.description}">
     <title>Maths inCoding</title>
     <link rel="icon" type="image/png" href="/images/linux_site_logo.webp" sizes="32x32">
-    <style>
-        /* Critical CSS inlined */
-        body {
-            font-family: 'Open Sans', sans-serif;
-            font-size: 16px;
-            line-height: 1.5;
-            background-color: #82a2c2;
-            color: #333;
-        }
-        header.SiteHeader {
-            background-color: #6d7bab;
-            padding: 20px 0;
-            text-align: center;
-            color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        header.SiteHeader h1 {
-            font-family: 'Roboto Slab', serif;
-            font-size: 4em;
-            margin-bottom: 0.5em;
-            font-weight: 700;
-        }
-        .container {
-            width: calc(33.33% - 20px);
-            margin: 10px;
-            margin-bottom: 20px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        .imgWrap {
-            display: inline-block;
-            border: 1px solid transparent;
-            transition: transform 0.3s;
-            width: 100%;
-            max-height: 200px;
-            overflow: hidden;
-        }
-        .imgWrap img {
-            width: 100%;
-            height: auto;
-        }
-        .imgWrap:hover {
-            transform: scale(1.05);
-        }
-        h1 {
-            font-size: 2.5em;
-            font-weight: 700;
-        }
-    </style>
-        <link href="/style.css" rel="stylesheet" media="print" onload="this.onload=null;this.removeAttribute('media');">
-        <noscript><link rel="stylesheet" href="/style.css"></noscript>
-    </head>
+    <link href="/style.css" rel="stylesheet">
+</head>
 <body>
     <main>
         <header class="SiteHeader">
