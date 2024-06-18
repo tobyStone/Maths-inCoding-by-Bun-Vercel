@@ -245,10 +245,10 @@
 	},
 	{
 		"page": {
-			"url_stub": "https://storage.googleapis.com/maths_incoding/sinewave.mp4",
+			"url_stub": "/maths_questions/sine_wave",
 			"description": "11_12 age range questions on sine waves",
 			"helpVideo": {
-				"videoSrc": "/videos/sinewave.mp4",
+				"videoSrc": "https://storage.googleapis.com/maths_incoding/sinewave.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
 				"videoTitle": "Understanding the sine wave"
 			},
@@ -307,10 +307,10 @@
 
 	{
 		"page": {
-			"url_stub": "https://storage.googleapis.com/maths_incoding/mental_math_tricks.mp4",
+			"url_stub": "/maths_questions/mental_maths1",
 			"description": "11_12 age range questions on mental maths",
 			"helpVideo": {
-				"videoSrc": "/videos/mental_math_tricks.mp4",
+				"videoSrc": "https://storage.googleapis.com/maths_incoding/mental_math_tricks.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
 				"videoTitle": "Methods to help with mental maths"
 			},

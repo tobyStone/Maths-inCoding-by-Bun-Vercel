@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
         const videoHtml = pageData.page.helpVideo ? `
             <div id="help-video-container" class="video-container" style="display:none;">
                 <video id="help-video" controls>
-                    <source src="${baseUrl}${videoSrc}" type="video/mp4">
+                    <source src="${videoSrc}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
                 <div class="video-controls">
