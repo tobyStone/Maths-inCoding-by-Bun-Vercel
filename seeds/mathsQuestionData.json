@@ -4,7 +4,7 @@
 			"url_stub": "/maths_questions/angles1",
 			"description": "11_12 age range questions on angles",
 			"helpVideo": {
-				"videoSrc": "/videos/HelpWithAngles.mp4",
+				"videoSrc": "https://storage.googleapis.com/maths_incoding/HelpWithAngles.mp4",
 				"imgSrc": "/images/help_video_poster.webp",
 				"videoTitle": "Understanding Angles"
 			},
@@ -65,7 +65,7 @@
 			"url_stub": "/maths_questions/angles2",
 			"description": "12_13 age range questions on angles",
 			"helpVideo": {
-				"videoSrc": "/videos/HelpWithAngles.mp4",
+				"videoSrc": "https://storage.googleapis.com/maths_incoding/HelpWithAngles.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
 				"videoTitle": "Understanding Angles"
 			},
@@ -126,7 +126,7 @@
 			"url_stub": "/maths_questions/angles3",
 			"description": "13_14 age range questions on angles",
 			"helpVideo": {
-				"videoSrc": "/videos/HelpWithAngles.mp4",
+				"videoSrc": "https://storage.googleapis.com/maths_incoding/HelpWithAngles.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
 				"videoTitle": "Understanding Angles"
 			},
@@ -187,7 +187,7 @@
 			"url_stub": "/maths_questions/ratio",
 			"description": "11_12 age range questions on ratios",
 			"helpVideo": {
-				"videoSrc": "/videos/ratioWithDifferences.mp4",
+				"videoSrc": "https://storage.googleapis.com/maths_incoding/ratioWithDifferences.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
 				"videoTitle": "Understanding Angles"
 			},
@@ -245,7 +245,7 @@
 	},
 	{
 		"page": {
-			"url_stub": "/maths_questions/sine_wave",
+			"url_stub": "https://storage.googleapis.com/maths_incoding/sinewave.mp4",
 			"description": "11_12 age range questions on sine waves",
 			"helpVideo": {
 				"videoSrc": "/videos/sinewave.mp4",
@@ -307,7 +307,7 @@
 
 	{
 		"page": {
-			"url_stub": "/maths_questions/mental_maths1",
+			"url_stub": "https://storage.googleapis.com/maths_incoding/mental_math_tricks.mp4",
 			"description": "11_12 age range questions on mental maths",
 			"helpVideo": {
 				"videoSrc": "/videos/mental_math_tricks.mp4",
