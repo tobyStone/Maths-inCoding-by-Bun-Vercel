@@ -2116,14 +2116,14 @@
       "description": "An egg hatching game in Roblox that uses probability",
       "videoData": [
         {
-          "video": "https://storage.googleapis.com/maths_incoding/eggHatching.mp4",
-          "time_stop_1": 10,
+          "video": "https://storage.googleapis.com/maths_incoding/Egg%20Hatching%20Game.mp4",
+          "time_stop_1": 724,
           "time_stop_2": null,
           "time_stop_3": null,
           "poster": "egg_hatching",
           "imgSrc": "/images/eggHatching.webp",
           "imgAlt": "egg_hatching",
-          "link_questions_1": "/maths_questions/angles1",
+          "link_questions_1": "/maths_questions/probability_1",
           "link_questions_2": null,
           "link_questions_3": null
         }
@@ -2190,6 +2190,27 @@
       ]
     }
   },
+  {
+    "page": {
+      "url_stub": "/probability/11_12_age_maths/videoPlayer/egg_hatching.js",
+      "description": "An egg hatching game in Roblox that uses probability",
+      "videoData": [
+        {
+          "video": "https://storage.googleapis.com/maths_incoding/Egg%20Hatching%20Game.mp4",
+          "time_stop_1": 724,
+          "time_stop_2": null,
+          "time_stop_3": null,
+          "poster": "egg_hatching",
+          "imgSrc": "/images/eggHatching.webp",
+          "imgAlt": "egg_hatching",
+          "link_questions_1": "/maths_questions/probability_1",
+          "link_questions_2": null,
+          "link_questions_3": null
+        }
+      ]
+    }
+  },
+
   {
     "page": {
       "url_stub": "/probability/13_14_age_maths/videoPlayer/3D_game_engine_Scratch.js",

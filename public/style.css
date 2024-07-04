@@ -70,13 +70,29 @@ header.SiteHeader {
     padding: 8px 15px;
     background: #445577;
     border-radius: 4px;
-    margin-left: 20px;
+    margin-right: 20px;
 }
 
     .about-us-link:hover {
         background: #2c3e50;
         text-decoration: underline;
     }
+
+.how-it-works-link {
+    font-size: 1em;
+    color: white;
+    text-decoration: none;
+    padding: 8px 15px;
+    background: #445577;
+    border-radius: 4px;
+    margin-left: 20px;
+}
+
+    .how-it-works-link:hover {
+        background: #2c3e50;
+        text-decoration: underline;
+    }
+
 
 .containerImg {
     width: 75%;

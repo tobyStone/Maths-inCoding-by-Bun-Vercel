@@ -365,5 +365,67 @@
 				}
 			]
 		}
+	},
+
+	{
+		"page": {
+			"url_stub": "/maths_questions/probability_1",
+			"description": "11_12 age range questions on probability",
+			"helpVideo": {
+				"videoSrc": "https://storage.googleapis.com/maths_incoding/ProbabilityBasic%20-%20Corbettmaths.mp4",
+				"imgSrc": "/images/help_video_poster.jpg",
+				"videoTitle": "Understanding the concepts behind probability"
+			},
+			"questionData": [
+				{
+					"Qnumber": 1,
+					"imgSrc": "/images/question_images/independent_probability_1.webp",
+					"imgAlt": "11_12_probability_question_1",
+					"questionText": "Which is the correct answer?",
+					"answer": "d",
+					"choices": [ "a", "b", "c", "d" ]
+				},
+				{
+					"Qnumber": 2,
+					"imgSrc": "/images/question_images/independent_probability_2.webp",
+					"imgAlt": "11_12_probability_question_2",
+					"questionText": "Which is the correct answer?",
+					"answer": "c",
+					"choices": [ "a", "b", "c", "d" ]
+				},
+				{
+					"Qnumber": 3,
+					"imgSrc": "/images/question_images/independent_probability_3.webp",
+					"imgAlt": "11_12_probability_question_3",
+					"questionText": "Which is the correct answer?",
+					"answer": "a",
+					"choices": [ "a", "b", "c", "d" ]
+				},
+				{
+					"Qnumber": 4,
+					"imgSrc": "/images/question_images/independent_probability_4.webp",
+					"imgAlt": "11_12_probability_question_4",
+					"questionText": "Which is the correct answer?",
+					"answer": "d",
+					"choices": [ "a", "b", "c", "d" ]
+				},
+				{
+					"Qnumber": 5,
+					"imgSrc": "/images/question_images/independent_probability_5.webp",
+					"imgAlt": "11_12_probability_question_5",
+					"questionText": "Which is the correct answer?",
+					"answer": "d",
+					"choices": [ "a", "b", "c", "d" ]
+				},
+				{
+					"Qnumber": 6,
+					"imgSrc": "/images/question_images/independent_probability_6.webp",
+					"imgAlt": "11_12_probability_question_6",
+					"questionText": "Which is the correct answer?",
+					"answer": "b",
+					"choices": [ "a", "b", "c", "d" ]
+				}
+			]
+		}
 	}
 ]

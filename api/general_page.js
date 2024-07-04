@@ -82,6 +82,7 @@ module.exports = async (req, res) => {
             </h1>
             <h3>... learning maths through coding computer games</h3>
             <nav class="header-bottom">
+                <a href="/how_it_works.html" class="how-it-works-link">How it Works</a>
                 <a href="/about_us.html" class="about-us-link">About Us</a>
             </nav>
         </header>
