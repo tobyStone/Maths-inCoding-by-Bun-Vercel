@@ -51,48 +51,27 @@ header.SiteHeader {
     }
 
 .header-bottom {
-    align-self: flex-start;
-    margin-left: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
     margin-bottom: 10px;
 }
 
-.image-and-heading-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.about-us-link {
+.about-us-link, .how-it-works-link {
     font-size: 1em;
     color: white;
     text-decoration: none;
     padding: 8px 15px;
     background: #445577;
     border-radius: 4px;
-    margin-right: 20px;
 }
 
-    .about-us-link:hover {
+    .about-us-link:hover, .how-it-works-link:hover {
         background: #2c3e50;
         text-decoration: underline;
     }
-
-.how-it-works-link {
-    font-size: 1em;
-    color: white;
-    text-decoration: none;
-    padding: 8px 15px;
-    background: #445577;
-    border-radius: 4px;
-    margin-left: 20px;
-}
-
-    .how-it-works-link:hover {
-        background: #2c3e50;
-        text-decoration: underline;
-    }
-
 
 .containerImg {
     width: 75%;
