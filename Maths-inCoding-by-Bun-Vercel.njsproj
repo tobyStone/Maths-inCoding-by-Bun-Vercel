@@ -46,6 +46,9 @@
     <Content Include="package.json" />
     <Content Include="public\about_us.html" />
     <Content Include="public\feedback_form.html" />
+    <Content Include="public\how_it_works.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="public\images\3D_game_engine.webp" />
     <Content Include="public\images\age11_12.webp" />
     <Content Include="public\images\age12_13.webp" />
