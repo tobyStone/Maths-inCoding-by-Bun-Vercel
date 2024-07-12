@@ -1,6 +1,8 @@
 const { parse } = require('url');
 const db = require('./database');
-const QuestionModel = require('../models/mathQuestionsModel'); // Adjust model path and name as necessary
+const QuestionModel = require('../models/mathQuestionsModel');
+const axios = require('axios');
+require('dotenv').config();
 
 /**
  * Handles incoming requests, fetches question data from the database, and generates HTML content.
@@ -9,9 +11,9 @@ const QuestionModel = require('../models/mathQuestionsModel'); // Adjust model p
  * @param {Object} res - The HTTP response object.
  */
 module.exports = async (req, res) => {
-    await db.connectToDatabase(); // Ensures a single connection
+    await db.connectToDatabase();
     const parsedUrl = parse(req.url, true);
-    const urlPath = parsedUrl.pathname; // Gets the path part of the URL
+    const urlPath = parsedUrl.pathname;
     const query = { 'page.url_stub': urlPath };
 
     try {
@@ -43,14 +45,11 @@ module.exports = async (req, res) => {
             `;
         }).join('');
 
-        // Update path
-        const videoSrc_temp = pageData.page.helpVideo.videoSrc; // Directly use the Blob URL
+        const videoSrc_temp = pageData.page.helpVideo.videoSrc;
         const videoSrc = videoSrc_temp.replace('public/', '/');
 
-        // Define helpVideoExists based on whether the video HTML is generated
         const helpVideoExists = !!pageData.page.helpVideo;
-        console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc,
-            "HELPVIDEOEXISTS: ", helpVideoExists);
+        console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists);
 
         const videoHtml = pageData.page.helpVideo ? `
             <div id="help-video-container" class="video-container" style="display:none;">
@@ -64,8 +63,27 @@ module.exports = async (req, res) => {
             </div>
         ` : '';
 
-        // JavaScript functions to handle the video visibility and controls
         const script = `
+            async function sendToAITutor() {
+                const input = document.getElementById('ai-tutor-input').value;
+                const responseDiv = document.getElementById('ai-tutor-response');
+
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ prompt: input })
+                    });
+                    const data = await response.json();
+                    const reply = data.choices[0].text;
+                    responseDiv.innerHTML = \`<p><strong>AI Tutor:</strong> \${reply}</p>\`;
+                } catch (error) {
+                    responseDiv.innerHTML = \`<p><strong>Error:</strong> Could not retrieve response from AI Tutor</p>\`;
+                }
+            }
+
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
                 const questionsContainer = document.getElementById('questions-container');
@@ -76,7 +94,7 @@ module.exports = async (req, res) => {
                     video.play();
                     video.addEventListener('ended', function() {
                         videoContainer.style.display = 'none';
-                        questionsContainer.style.display = 'block';  // Show the questions again
+                        questionsContainer.style.display = 'block';
                     });
                 }
             }
@@ -90,7 +108,7 @@ module.exports = async (req, res) => {
 
             const correctAnswers = ${JSON.stringify(pageData.page.questionData.map(q => q.answer))};
             const totalQuestions = correctAnswers.length;
-            const helpVideoExists = ${helpVideoExists}; // Pass this from server-side to client-side
+            const helpVideoExists = ${helpVideoExists};
 
             document.getElementById('question-form').addEventListener('submit', function(event) {
                 event.preventDefault();
@@ -150,6 +168,12 @@ module.exports = async (req, res) => {
                         </form>
                     </div>
                     ${videoHtml}
+                    <div id="ai-tutor-container">
+                        <h2>Ask the AI Tutor</h2>
+                        <textarea id="ai-tutor-input" rows="4" cols="50" placeholder="Type your question here..."></textarea>
+                        <button onclick="sendToAITutor()">Ask</button>
+                        <div id="ai-tutor-response"></div>
+                    </div>
                 </main>
                 <script>${script}</script>
             </body>
@@ -160,6 +184,35 @@ module.exports = async (req, res) => {
         res.status(200).send(html);
     } catch (error) {
         console.error('Error fetching page data:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+/**
+ * Handles AI Tutor requests by interacting with the OpenAI API.
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ */
+module.exports.apiChat = async (req, res) => {
+    const { prompt } = req.body;
+
+    try {
+        const response = await axios.post('https://api.openai.com/v1/engines/davinci-codex/completions', {
+            prompt: prompt,
+            max_tokens: 150,
+            n: 1,
+            stop: null,
+            temperature: 0.7
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+            }
+        });
+
+        res.status(200).json(response.data);
+    } catch (error) {
+        console.error('Error interacting with OpenAI API:', error);
         res.status(500).send('Internal Server Error');
     }
 };
