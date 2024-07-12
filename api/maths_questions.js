@@ -68,7 +68,7 @@ module.exports = async (req, res) => {
                 const responseDiv = document.getElementById('ai-tutor-response');
 
                 try {
-                    const response = await fetch('/chat', {
+                    const response = await fetch('./chat', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
