@@ -20,6 +20,10 @@
     {
       "source": "/videoStream",
       "destination": "/api/videoStream.js"
+    },
+    {
+      "source": "/api/chat",
+      "destination": "/api/chat.js"
     }
   ]
 }
