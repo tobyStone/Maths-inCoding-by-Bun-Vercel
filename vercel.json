@@ -22,7 +22,7 @@
       "destination": "/api/videoStream.js"
     },
     {
-      "source": "/api/chat",
+      "source": "/chat",
       "destination": "/api/chat.js"
     }
   ]
