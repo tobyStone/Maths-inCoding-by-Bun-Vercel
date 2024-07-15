@@ -63,7 +63,7 @@ module.exports = async (req, res) => {
         ` : '';
 
         const script = `
-            async function sendToAITutor() {
+        async function sendToAITutor() {
                 const input = document.getElementById('ai-tutor-input').value;
                 const responseDiv = document.getElementById('ai-tutor-response');
 
@@ -76,12 +76,13 @@ module.exports = async (req, res) => {
                         body: JSON.stringify({ prompt: input })
                     });
                     const data = await response.json();
-                    const reply = data.choices[0].text;
+                    const reply = data.choices[0].message.content; // Correctly access the message content
                     responseDiv.innerHTML = \`<p><strong>AI Tutor:</strong> \${reply}</p>\`;
                 } catch (error) {
                     responseDiv.innerHTML = \`<p><strong>Error:</strong> Could not retrieve response from AI Tutor</p>\`;
                 }
             }
+
 
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
