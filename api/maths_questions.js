@@ -191,7 +191,7 @@ module.exports = async (req, res) => {
                         </form>
                     </div>
                     ${videoHtml}
-                    <div id="ai-tutor-container" style="display:none;">
+                    <div id="ai-tutor-container" style="display: 'none';">
                         <h2>Ask the AI Tutor</h2>
                         <textarea id="ai-tutor-input" rows="4" cols="50" placeholder="Type your question here..."></textarea>
                         <button onclick="sendToAITutor()">Ask</button>
