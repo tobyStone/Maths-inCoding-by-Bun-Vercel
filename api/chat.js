@@ -1,19 +1,17 @@
 const axios = require('axios');
 require('dotenv').config();
 
-module.exports = async (req, res) => {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-
-    const { prompt } = req.body;
-
-    console.log('Received prompt:', prompt); // Log the received prompt
-
+/**
+ * Function to interact with OpenAI API
+ *
+ * @param {string} prompt - The prompt/question to send to OpenAI API.
+ * @returns {Promise<Object>} - A promise that resolves to the API response.
+ */
+async function getAIResponse(prompt) {
     try {
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: 'gpt-3.5-turbo', // Use a valid model name
-            messages: [{ role: 'user', content: prompt }], // Correctly format the prompt as a message
+            model: 'gpt-3.5-turbo',
+            messages: [{ role: 'user', content: prompt }],
             max_tokens: 150,
             temperature: 0.7
         }, {
@@ -22,15 +20,11 @@ module.exports = async (req, res) => {
             }
         });
 
-        console.log('OpenAI response:', response.data); // Log the OpenAI response
-        res.status(200).json(response.data);
+        return response.data;
     } catch (error) {
         console.error('Error interacting with OpenAI API:', error.response ? error.response.data : error.message);
-
-        if (error.response && error.response.status === 429) {
-            res.status(429).send('Quota exceeded. Please check your OpenAI plan and billing details.');
-        } else {
-            res.status(500).send('Internal Server Error');
-        }
+        throw error;
     }
-};
+}
+
+module.exports = { getAIResponse };
