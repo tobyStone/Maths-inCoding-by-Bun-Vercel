@@ -1,36 +1,7 @@
 const { parse } = require('url');
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel');
-const axios = require('axios');
 require('dotenv').config();
-
-/**
- * Generate predefined questions based on the video description.
- *
- * @param {string} description - The description of the video.
- * @returns {Promise<string[]>} - A promise that resolves to an array of questions.
- */
-async function generateQuestions(description) {
-    try {
-        const response = await axios.post('https://api.openai.com/v1/completions', {
-            model: 'text-davinci-003', // or the appropriate model
-            prompt: `Generate a list of questions based on the following video description: "${description}"`,
-            max_tokens: 100,
-            n: 5,
-            stop: null,
-            temperature: 0.7
-        }, {
-            headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-            }
-        });
-
-        return response.data.choices.map(choice => choice.text.trim());
-    } catch (error) {
-        console.error('Error generating questions with OpenAI API:', error.response ? error.response.data : error.message);
-        return [];
-    }
-}
 
 /**
  * Handles incoming requests, fetches question data from the database, and generates HTML content.
@@ -75,16 +46,9 @@ module.exports = async (req, res) => {
 
         const videoSrc_temp = pageData.page.helpVideo.videoSrc;
         const videoSrc = videoSrc_temp.replace('public/', '/');
-        const videoDescription = pageData.page.description;
 
         const helpVideoExists = !!pageData.page.helpVideo;
         console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists);
-
-        const predefinedQuestions = await generateQuestions(videoDescription);
-
-        const predefinedQuestionsHtml = predefinedQuestions.map((question, i) => `
-            <button onclick="sendToAITutor('${question}')">${question}</button>
-        `).join('');
 
         const videoHtml = pageData.page.helpVideo ? `
             <div id="help-video-container" class="video-container" style="display:none;">
@@ -99,17 +63,20 @@ module.exports = async (req, res) => {
         ` : '';
 
         const script = `
-            async function sendToAITutor(question) {
+        async function sendToAITutor() {
+                const input = document.getElementById('ai-tutor-input').value;
                 const responseDiv = document.getElementById('ai-tutor-response');
                 const askButton = document.querySelector('#ai-tutor-container button');
 
-                if (!question.trim()) {
-                    responseDiv.innerHTML = '<p><strong>Error:</strong> Please select a question.</p>';
+                if (!input.trim()) {
+                    responseDiv.innerHTML = '<p><strong>Error:</strong> Please enter a question.</p>';
                     return;
                 }
 
                 askButton.disabled = true;
                 askButton.textContent = 'Asking...';
+
+
 
                 try {
                     const response = await fetch('/api/chat', {
@@ -117,12 +84,12 @@ module.exports = async (req, res) => {
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ prompt: question })
+                        body: JSON.stringify({ prompt: input })
                     });
 
                     if (!response.ok) {
-                        throw new Error('Failed to fetch the response from AI Tutor');
-                    }
+                    throw new Error('Failed to fetch the response from AI Tutor');
+                }
 
                     const data = await response.json();
                     const reply = data.choices[0].message.content; // Correctly access the message content
@@ -132,8 +99,9 @@ module.exports = async (req, res) => {
                 } finally {
                     askButton.disabled = false;
                     askButton.textContent = 'Ask';
-                }
+        }
             }
+
 
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
@@ -225,9 +193,8 @@ module.exports = async (req, res) => {
                     ${videoHtml}
                     <div id="ai-tutor-container" style="display: none;">
                         <h2>Ask the AI Tutor</h2>
-                        <div id="predefined-questions">
-                            ${predefinedQuestionsHtml}
-                        </div>
+                        <textarea id="ai-tutor-input" rows="4" cols="50" placeholder="Type your question here..."></textarea>
+                        <button onclick="sendToAITutor()">Ask</button>
                         <div id="ai-tutor-response"></div>
                     </div>
                 </main>
