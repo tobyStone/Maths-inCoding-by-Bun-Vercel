@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
 
     try {
         const response = await axios.post('https://api.openai.com/v1/completions', {
-            model: 'gpt-3.5', // Use a valid model name
+            model: 'gpt-3.5-turbo', // Use a valid model name
             prompt: prompt,
             max_tokens: 150,
             n: 1,
