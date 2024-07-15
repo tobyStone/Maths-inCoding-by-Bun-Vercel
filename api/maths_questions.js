@@ -110,13 +110,14 @@ module.exports = async (req, res) => {
 
                 if (videoContainer) {
                     questionsContainer.style.display = 'none';
+                    aiTutorContainer.style.display = 'block'; // Show AI tutor when video starts
                     videoContainer.style.display = 'block';
                     const video = document.getElementById('help-video');
                     video.play();
                     video.addEventListener('ended', function() {
                         videoContainer.style.display = 'none';
                         questionsContainer.style.display = 'block';
-                        aiTutorContainer.style.display = 'block'; // Show AI tutor after video ends
+                        aiTutorContainer.style.display = none; // Hide AI tutor after video ends
                     });
                 }
             }
