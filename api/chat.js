@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     console.log('Received prompt:', prompt); // Log the received prompt
 
     try {
-        const response = await axios.post('https://api.openai.com/v1/engines/davinci-codex/completions', {
+        const response = await axios.post('https://api.openai.com/v1/engines/gpt-4/completions', { 
             prompt: prompt,
             max_tokens: 150,
             n: 1,
