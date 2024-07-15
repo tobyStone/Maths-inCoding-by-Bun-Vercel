@@ -4,8 +4,6 @@ const QuestionModel = require('../models/mathQuestionsModel');
 const { getAIResponse } = require('./chat');
 require('dotenv').config();
 
-
-
 /**
  * Generate predefined questions based on the video description.
  *
@@ -69,8 +67,6 @@ module.exports = async (req, res) => {
             <button onclick="sendToAITutor('${question}')">${question}</button>
         `).join('');
 
-
-
         const helpVideoExists = !!pageData.page.helpVideo;
         console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists);
 
@@ -87,17 +83,11 @@ module.exports = async (req, res) => {
         ` : '';
 
         const script = `
-             async function sendToAITutor(question) {
+            async function sendToAITutor(question) {
                 const responseDiv = document.getElementById('ai-tutor-response');
-                const askButton = document.querySelector('#ai-tutor-container button');
+                const askButtons = document.querySelectorAll('#ai-tutor-container button');
 
-                if (!question.trim()) {
-                    responseDiv.innerHTML = '<p><strong>Error:</strong> Please select a question.</p>';
-                    return;
-                }
-
-                askButton.disabled = true;
-                askButton.textContent = 'Asking...';
+                askButtons.forEach(button => button.disabled = true);
 
                 try {
                     const response = await fetch('/api/chat', {
@@ -118,10 +108,10 @@ module.exports = async (req, res) => {
                 } catch (error) {
                     responseDiv.innerHTML = \`<p><strong>Error:</strong> Could not retrieve response from AI Tutor</p>\`;
                 } finally {
-                    askButton.disabled = false;
-                    askButton.textContent = 'Ask';
+                    askButtons.forEach(button => button.disabled = false);
                 }
             }
+
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
                 const questionsContainer = document.getElementById('questions-container');
@@ -212,8 +202,9 @@ module.exports = async (req, res) => {
                     ${videoHtml}
                     <div id="ai-tutor-container" style="display: none;">
                         <h2>Ask the AI Tutor</h2>
-                        <textarea id="ai-tutor-input" rows="4" cols="50" placeholder="Type your question here..."></textarea>
-                        <button onclick="sendToAITutor()">Ask</button>
+                        <div id="predefined-questions">
+                            ${predefinedQuestionsHtml}
+                        </div>
                         <div id="ai-tutor-response"></div>
                     </div>
                 </main>
