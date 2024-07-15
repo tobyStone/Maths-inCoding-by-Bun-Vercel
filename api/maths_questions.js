@@ -66,6 +66,17 @@ module.exports = async (req, res) => {
         async function sendToAITutor() {
                 const input = document.getElementById('ai-tutor-input').value;
                 const responseDiv = document.getElementById('ai-tutor-response');
+                const askButton = document.querySelector('#ai-tutor-container button');
+
+                if (!input.trim()) {
+                    responseDiv.innerHTML = '<p><strong>Error:</strong> Please enter a question.</p>';
+                    return;
+                }
+
+                askButton.disabled = true;
+                askButton.textContent = 'Asking...';
+
+
 
                 try {
                     const response = await fetch('/api/chat', {
@@ -75,18 +86,28 @@ module.exports = async (req, res) => {
                         },
                         body: JSON.stringify({ prompt: input })
                     });
+
+                    if (!response.ok) {
+                    throw new Error('Failed to fetch the response from AI Tutor');
+                }
+
                     const data = await response.json();
                     const reply = data.choices[0].message.content; // Correctly access the message content
                     responseDiv.innerHTML = \`<p><strong>AI Tutor:</strong> \${reply}</p>\`;
                 } catch (error) {
                     responseDiv.innerHTML = \`<p><strong>Error:</strong> Could not retrieve response from AI Tutor</p>\`;
-                }
+                } finally {
+                    askButton.disabled = false;
+                    askButton.textContent = 'Ask';
+        }
             }
 
 
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
                 const questionsContainer = document.getElementById('questions-container');
+                const aiTutorContainer = document.getElementById('ai-tutor-container');
+
                 if (videoContainer) {
                     questionsContainer.style.display = 'none';
                     videoContainer.style.display = 'block';
@@ -95,6 +116,7 @@ module.exports = async (req, res) => {
                     video.addEventListener('ended', function() {
                         videoContainer.style.display = 'none';
                         questionsContainer.style.display = 'block';
+                        aiTutorContainer.style.display = 'block'; // Show AI tutor after video ends
                     });
                 }
             }
@@ -168,7 +190,7 @@ module.exports = async (req, res) => {
                         </form>
                     </div>
                     ${videoHtml}
-                    <div id="ai-tutor-container">
+                    <div id="ai-tutor-container" style="display:none;">
                         <h2>Ask the AI Tutor</h2>
                         <textarea id="ai-tutor-input" rows="4" cols="50" placeholder="Type your question here..."></textarea>
                         <button onclick="sendToAITutor()">Ask</button>
