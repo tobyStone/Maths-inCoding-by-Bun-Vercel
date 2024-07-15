@@ -13,10 +13,8 @@ module.exports = async (req, res) => {
     try {
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
             model: 'gpt-3.5-turbo', // Use a valid model name
-            prompt: prompt,
+            messages: [{ role: 'user', content: prompt }], // Correctly format the prompt as a message
             max_tokens: 150,
-            n: 1,
-            stop: null,
             temperature: 0.7
         }, {
             headers: {
