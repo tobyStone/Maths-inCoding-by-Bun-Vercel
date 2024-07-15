@@ -64,7 +64,7 @@ module.exports = async (req, res) => {
         const predefinedQuestions = await generateQuestions(videoDescription);
 
         const predefinedQuestionsHtml = predefinedQuestions.map((question, i) => `
-            <button onclick="sendToAITutor('${question}')">${question}</button>
+            <button onclick="sendToAITutor('${question.replace(/'/g, "\\'")}')">${question}</button>
         `).join('');
 
         const helpVideoExists = !!pageData.page.helpVideo;
@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
         const script = `
             async function sendToAITutor(question) {
                 const responseDiv = document.getElementById('ai-tutor-response');
-                const askButtons = document.querySelectorAll('#ai-tutor-container button');
+                const askButtons = document.querySelectorAll('#predefined-questions button');
 
                 askButtons.forEach(button => button.disabled = true);
 
