@@ -1,7 +1,22 @@
 const { parse } = require('url');
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel');
+const { getAIResponse } = require('./chat');
 require('dotenv').config();
+
+
+
+/**
+ * Generate predefined questions based on the video description.
+ *
+ * @param {string} description - The description of the video.
+ * @returns {Promise<string[]>} - A promise that resolves to an array of questions.
+ */
+async function generateQuestions(description) {
+    const prompt = `Generate a list of questions based on the following video description: "${description}"`;
+    const data = await getAIResponse(prompt);
+    return data.choices.map(choice => choice.message.content.trim());
+}
 
 /**
  * Handles incoming requests, fetches question data from the database, and generates HTML content.
@@ -46,6 +61,15 @@ module.exports = async (req, res) => {
 
         const videoSrc_temp = pageData.page.helpVideo.videoSrc;
         const videoSrc = videoSrc_temp.replace('public/', '/');
+        const videoDescription = pageData.page.description;
+
+        const predefinedQuestions = await generateQuestions(videoDescription);
+
+        const predefinedQuestionsHtml = predefinedQuestions.map((question, i) => `
+            <button onclick="sendToAITutor('${question}')">${question}</button>
+        `).join('');
+
+
 
         const helpVideoExists = !!pageData.page.helpVideo;
         console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists);
@@ -63,20 +87,17 @@ module.exports = async (req, res) => {
         ` : '';
 
         const script = `
-        async function sendToAITutor() {
-                const input = document.getElementById('ai-tutor-input').value;
+             async function sendToAITutor(question) {
                 const responseDiv = document.getElementById('ai-tutor-response');
                 const askButton = document.querySelector('#ai-tutor-container button');
 
-                if (!input.trim()) {
-                    responseDiv.innerHTML = '<p><strong>Error:</strong> Please enter a question.</p>';
+                if (!question.trim()) {
+                    responseDiv.innerHTML = '<p><strong>Error:</strong> Please select a question.</p>';
                     return;
                 }
 
                 askButton.disabled = true;
                 askButton.textContent = 'Asking...';
-
-
 
                 try {
                     const response = await fetch('/api/chat', {
@@ -84,12 +105,12 @@ module.exports = async (req, res) => {
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ prompt: input })
+                        body: JSON.stringify({ prompt: question })
                     });
 
                     if (!response.ok) {
-                    throw new Error('Failed to fetch the response from AI Tutor');
-                }
+                        throw new Error('Failed to fetch the response from AI Tutor');
+                    }
 
                     const data = await response.json();
                     const reply = data.choices[0].message.content; // Correctly access the message content
@@ -99,10 +120,8 @@ module.exports = async (req, res) => {
                 } finally {
                     askButton.disabled = false;
                     askButton.textContent = 'Ask';
-        }
+                }
             }
-
-
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
                 const questionsContainer = document.getElementById('questions-container');
