@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
 
         const predefinedQuestionsHtml = predefinedQuestions.map((question, i) => `
             <button class="question-button" onclick="sendToAITutor('${question.replace(/'/g, "\\'")}')">${question}</button>
-        `).join('');
+            `).join('');
 
         const helpVideoExists = !!pageData.page.helpVideo;
         console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists);
@@ -173,7 +173,6 @@ module.exports = async (req, res) => {
                 }
             });
         `;
-
         const html = `
             <!DOCTYPE html>
             <html lang="en">
@@ -205,12 +204,12 @@ module.exports = async (req, res) => {
                         </form>
                     </div>
                     ${videoHtml}
-                    <div id="ai-tutor-container" style="display: none;">
-                        <h2>Ask the AI Tutor</h2>
-                        <div id="predefined-questions">${predefinedQuestionsHtml}</div>
-                        <div id="ai-tutor-response"></div>
-                    </div>
-                </main>
+                 <div id="ai-tutor-container" style="display: none;">
+                    <h2>Ask the AI Tutor</h2>
+                    <div id="predefined-questions">${predefinedQuestionsHtml}</div>
+                    <div id="ai-tutor-response"></div>
+                </div>
+               </main>
                 <script>${script}</script>
             </body>
             </html>
