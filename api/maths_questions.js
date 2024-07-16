@@ -64,7 +64,7 @@ module.exports = async (req, res) => {
         const predefinedQuestions = await generateQuestions(videoDescription);
 
         const predefinedQuestionsHtml = predefinedQuestions.map((question, i) => `
-            <button onclick="sendToAITutor('${question.replace(/'/g, "\\'")}')">${question}</button>
+            <button onclick="sendToAITutor('${question}')">${question}</button>
         `).join('');
 
         const helpVideoExists = !!pageData.page.helpVideo;
@@ -84,33 +84,39 @@ module.exports = async (req, res) => {
 
         const script = `
             async function sendToAITutor(question) {
-                const responseDiv = document.getElementById('ai-tutor-response');
-                const askButtons = document.querySelectorAll('#predefined-questions button');
+            const responseDiv = document.getElementById('ai-tutor-response');
+            const askButtons = document.querySelectorAll('#ai-tutor-container button');
 
-                askButtons.forEach(button => button.disabled = true);
-
-                try {
-                    const response = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ prompt: question })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch the response from AI Tutor');
-                    }
-
-                    const data = await response.json();
-                    const reply = data.choices[0].message.content; // Correctly access the message content
-                    responseDiv.innerHTML = \`<p><strong>AI Tutor:</strong> \${reply}</p>\`;
-                } catch (error) {
-                    responseDiv.innerHTML = \`<p><strong>Error:</strong> Could not retrieve response from AI Tutor</p>\`;
-                } finally {
-                    askButtons.forEach(button => button.disabled = false);
-                }
+            if (!question.trim()) {
+                responseDiv.innerHTML = '<p><strong>Error:</strong> Please select a question.</p>';
+                return;
             }
+
+            askButtons.forEach(button => button.disabled = true);
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: question })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch the response from AI Tutor');
+                }
+
+                const data = await response.json();
+                const reply = data.choices[0].message.content; // Correctly access the message content
+                responseDiv.innerHTML = \`<p><strong>AI Tutor:</strong> \${reply}</p>\`;
+            } catch (error) {
+                responseDiv.innerHTML = \`<p><strong>Error:</strong> Could not retrieve response from AI Tutor</p>\`;
+            } finally {
+                askButtons.forEach(button => button.disabled = false);
+            }
+            }
+
 
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
@@ -200,14 +206,12 @@ module.exports = async (req, res) => {
                         </form>
                     </div>
                     ${videoHtml}
-                    <div id="ai-tutor-container" style="display: none;">
-                        <h2>Ask the AI Tutor</h2>
-                        <div id="predefined-questions">
-                            ${predefinedQuestionsHtml}
-                        </div>
-                        <div id="ai-tutor-response"></div>
-                    </div>
-                </main>
+                 <div id="ai-tutor-container" style="display: none;">
+                <h2>Ask the AI Tutor</h2>
+                <div>${predefinedQuestionsHtml}</div>
+                <div id="ai-tutor-response"></div>
+            </div>
+          </main>
                 <script>${script}</script>
             </body>
             </html>
