@@ -16,7 +16,7 @@ async function generateQuestions(description) {
     return response.split('\n').filter(q => q); // Assuming each question is on a new line
 }
 
-module.exports = async handleRequest(req, res) => {
+async function handleRequest(req, res) {
     if (req.method === 'POST' && req.url === '/api/chat') {
         try {
             const { question } = req.body;
