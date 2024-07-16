@@ -20,6 +20,10 @@ async function getAIResponse(prompt) {
             }
         });
 
+        // Log token usage
+        const usage = response.data.usage;
+        console.log(`Prompt tokens: ${usage.prompt_tokens}, Completion tokens: ${usage.completion_tokens}, Total tokens: ${usage.total_tokens}`);
+
         return response.data;
     } catch (error) {
         console.error('Error interacting with OpenAI API:', error.response ? error.response.data : error.message);
