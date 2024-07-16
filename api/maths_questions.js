@@ -23,39 +23,49 @@ async function generateQuestions(description) {
  * @param {Object} res - The HTTP response object.
  */
 module.exports = async (req, res) => {
-    await db.connectToDatabase();
-    const parsedUrl = parse(req.url, true);
-    const urlPath = parsedUrl.pathname;
-    const query = { 'page.url_stub': urlPath };
-
-    try {
-        const pageData = await QuestionModel.findOne(query).exec();
-        if (!pageData || !pageData.page || !pageData.page.questionData) {
-            res.status(404).send('Page not found');
-            return;
+    if (req.method === 'POST' && req.url === '/api/chat') {
+        try {
+            const { question } = req.body;
+            const answer = await getAIResponse(question);
+            res.status(200).json({ answer });
+        } catch (error) {
+            console.error('Error getting AI response:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
+    } else {
+        await db.connectToDatabase();
+        const parsedUrl = parse(req.url, true);
+        const urlPath = parsedUrl.pathname;
+        const query = { 'page.url_stub': urlPath };
 
-        const baseUrl = process.env.NODE_ENV === 'production'
-            ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
-            : 'http://localhost:3000/';
+        try {
+            const pageData = await QuestionModel.findOne(query).exec();
+            if (!pageData || !pageData.page || !pageData.page.questionData) {
+                res.status(404).send('Page not found');
+                return;
+            }
 
-        const questionsHtml = pageData.page.questionData.map((question, i) => {
-            const imagePath = question.imgSrc.startsWith('/maths_questions/public/')
-                ? question.imgSrc.replace('/maths_questions/public/', '/')
-                : question.imgSrc;
+            const baseUrl = process.env.NODE_ENV === 'production'
+                ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
+                : 'http://localhost:3000/';
 
-            const choicesHtml = question.choices.map((choice, j) =>
-                `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
-                <label for="choice${i}-${j}">${choice}</label>`
-            ).join('');
+            const questionsHtml = pageData.page.questionData.map((question, i) => {
+                const imagePath = question.imgSrc.startsWith('/maths_questions/public/')
+                    ? question.imgSrc.replace('/maths_questions/public/', '/')
+                    : question.imgSrc;
 
-            return `
-                <div class="question-block">
-                    <img src="${imagePath}" alt="${question.imgAlt}" width="525" height="350" />
-                    <div class="choices">${choicesHtml}</div>
-                </div>
-            `;
-        }).join('');
+                const choicesHtml = question.choices.map((choice, j) =>
+                    `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
+                    <label for="choice${i}-${j}">${choice}</label>`
+                ).join('');
+
+                return `
+                    <div class="question-block">
+                        <img src="${imagePath}" alt="${question.imgAlt}" width="525" height="350" />
+                        <div class="choices">${choicesHtml}</div>
+                    </div>
+                `;
+            }).join('');
 
         const videoSrc_temp = pageData.page.helpVideo.videoSrc;
         const videoSrc = videoSrc_temp.replace('public/', '/');
@@ -70,7 +80,32 @@ module.exports = async (req, res) => {
         const helpVideoExists = !!pageData.page.helpVideo;
         console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists);
 
-        const videoHtml = pageData.page.helpVideo ? `
+            const videoHtml = pageData.page.helpVideo ? `
+                  async function fetchAIResponse(question) {
+                        try {
+                            const response = await fetch('/api/chat', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ question })
+                            });
+
+                            const data = await response.json();
+                            document.getElementById('ai-tutor-response').innerText = data.answer;
+                        } catch (error) {
+                            console.error('Error fetching AI response:', error);
+                        }
+                    }
+
+                    document.addEventListener('DOMContentLoaded', function() {
+                        document.querySelectorAll('.question-button').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const question = this.textContent;
+                                fetchAIResponse(question);
+                            });
+                        });
+                    });
             <div id="help-video-container" class="video-container" style="display:none;">
                 <video id="help-video" controls>
                     <source src="${videoSrc}" type="video/mp4">
@@ -83,40 +118,6 @@ module.exports = async (req, res) => {
         ` : '';
 
         const script = `
-            //async function sendToAITutor(question) {
-            //    const responseDiv = document.getElementById('ai-tutor-response');
-            //    const askButtons = document.querySelectorAll('#predefined-questions button');
-
-            //    if (!question.trim()) {
-            //        responseDiv.innerHTML = '<p><strong>Error:</strong> Please select a question.</p>';
-            //        return;
-            //    }
-
-            //    askButtons.forEach(button => button.disabled = true);
-
-            //    try {
-            //        const response = await fetch('/api/chat', {
-            //            method: 'POST',
-            //            headers: {
-            //                'Content-Type': 'application/json'
-            //            },
-            //            body: JSON.stringify({ prompt: question })
-            //        });
-
-            //        if (!response.ok) {
-            //            throw new Error('Failed to fetch the response from AI Tutor');
-            //        }
-
-            //        const data = await response.json();
-            //        const reply = data.choices[0].message.content; // Correctly access the message content
-            //        responseDiv.innerHTML = \`<p><strong>AI Tutor:</strong> \${reply}</p>\`;
-            //    } catch (error) {
-            //        responseDiv.innerHTML = \`<p><strong>Error:</strong> Could not retrieve response from AI Tutor</p>\`;
-            //    } finally {
-            //        askButtons.forEach(button => button.disabled = false);
-            //    }
-            //}
-
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
                 const questionsContainer = document.getElementById('questions-container');
