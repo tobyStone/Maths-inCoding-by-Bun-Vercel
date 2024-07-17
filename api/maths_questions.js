@@ -40,10 +40,6 @@ module.exports = async (req, res) => {
                 return;
             }
 
-            const baseUrl = process.env.NODE_ENV === 'production'
-                ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
-                : 'http://localhost:3000/';
-
             const questionsHtml = pageData.page.questionData.map((question, i) => {
                 const imagePath = question.imgSrc.startsWith('/maths_questions/public/')
                     ? question.imgSrc.replace('/maths_questions/public/', '/')
@@ -69,7 +65,7 @@ module.exports = async (req, res) => {
             const predefinedQuestions = await generateQuestions(videoDescription);
 
             const predefinedQuestionsHtml = predefinedQuestions.map((question, i) => `
-                <button class="question-button" onclick="handleQuestionButtonClick('${question.replace(/'/g, "\\'")}')">${question}</button>
+                <button class="question-button" onclick="fetchAIResponse('${question.replace(/'/g, "\\'")}')">${question}</button>
             `).join('');
 
             const helpVideoExists = !!pageData.page.helpVideo;
@@ -88,15 +84,32 @@ module.exports = async (req, res) => {
             ` : '';
 
             const script = `
-                async function handleQuestionButtonClick(question) {
+                async function fetchAIResponse(question) {
                     try {
                         console.log('Button pressed, question:', question); // Log button press
-                        const response = await axios.post('/api/chat', { question });
-                        document.getElementById('ai-tutor-response').innerText = response.data.answer;
+                        const response = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ question })
+                        });
+
+                        const data = await response.json();
+                        document.getElementById('ai-tutor-response').innerText = data.answer;
                     } catch (error) {
                         console.error('Error fetching AI response:', error);
                     }
                 }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('.question-button').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const question = this.textContent;
+                            fetchAIResponse(question);
+                        });
+                    });
+                });
 
                 function showHelpVideo() {
                     const videoContainer = document.getElementById('help-video-container');
@@ -191,11 +204,7 @@ module.exports = async (req, res) => {
                         <div id="ai-tutor-response"></div>
                     </div>
                    </main>
-                    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-                    <script>
-                        ${script}
-                        window.handleQuestionButtonClick = handleQuestionButtonClick; // Make the function accessible globally
-                    </script>
+                    <script>${script}</script>
                 </body>
                 </html>
             `;
@@ -208,3 +217,4 @@ module.exports = async (req, res) => {
         }
     }
 };
+
