@@ -91,8 +91,8 @@ module.exports = async (req, res) => {
                 async function handleQuestionButtonClick(question) {
                     try {
                         console.log('Button pressed, question:', question); // Log button press
-                        const response = await getAIResponse(question);
-                        document.getElementById('ai-tutor-response').innerText = response;
+                        const response = await axios.post('/api/chat', { question });
+                        document.getElementById('ai-tutor-response').innerText = response.data.answer;
                     } catch (error) {
                         console.error('Error fetching AI response:', error);
                     }
@@ -192,7 +192,10 @@ module.exports = async (req, res) => {
                     </div>
                    </main>
                     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-                    <script>${script}</script>
+                    <script>
+                        ${script}
+                        window.handleQuestionButtonClick = handleQuestionButtonClick; // Make the function accessible globally
+                    </script>
                 </body>
                 </html>
             `;
