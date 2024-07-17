@@ -11,7 +11,7 @@ require('dotenv').config();
  * @returns {Promise<string[]>} - A promise that resolves to an array of questions.
  */
 async function generateQuestions(description) {
-    const prompt = `Generate a list of questions based on the following video description: "${description}"`;
+    const prompt = `Generate a list of seven questions based on the following video description: "${description}"`;
     const response = await getAIResponse(prompt);
     return response.split('\n').filter(q => q); // Assuming each question is on a new line
 }
