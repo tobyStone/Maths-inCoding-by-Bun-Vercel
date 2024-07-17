@@ -198,7 +198,7 @@ module.exports = async (req, res) => {
                     </div>
                     ${videoHtml}
                  <div id="ai-tutor-container" style="display: none;">
-                    <h2>Ask the AI Tutor</h2>
+                    <h3>Ask the AI Tutor</h3>
                     <div id="predefined-questions">${predefinedQuestionsHtml}</div>
                     <div id="ai-tutor-response"></div>
                 </div>
