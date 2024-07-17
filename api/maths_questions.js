@@ -16,7 +16,7 @@ async function generateQuestions(description) {
     return response.split('\n').filter(q => q); // Assuming each question is on a new line
 }
 
-async function handleRequest(req, res) {
+module.exports = async (req, res) => {
     if (req.method === 'POST' && req.url === '/api/chat') {
         try {
             const { question } = req.body;
@@ -69,7 +69,7 @@ async function handleRequest(req, res) {
             const predefinedQuestions = await generateQuestions(videoDescription);
 
             const predefinedQuestionsHtml = predefinedQuestions.map((question, i) => `
-                <button class="question-button" onclick="fetchAIResponse('${question.replace(/'/g, "\\'")}')">${question}</button>
+                <button class="question-button" onclick="handleQuestionButtonClick('${question.replace(/'/g, "\\'")}')">${question}</button>
             `).join('');
 
             const helpVideoExists = !!pageData.page.helpVideo;
@@ -88,32 +88,15 @@ async function handleRequest(req, res) {
             ` : '';
 
             const script = `
-                async function fetchAIResponse(question) {
+                async function handleQuestionButtonClick(question) {
                     try {
                         console.log('Button pressed, question:', question); // Log button press
-                        const response = await fetch('/api/chat', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ question })
-                        });
-
-                        const data = await response.json();
-                        document.getElementById('ai-tutor-response').innerText = data.answer;
+                        const response = await getAIResponse(question);
+                        document.getElementById('ai-tutor-response').innerText = response;
                     } catch (error) {
                         console.error('Error fetching AI response:', error);
                     }
                 }
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('.question-button').forEach(button => {
-                        button.addEventListener('click', function() {
-                            const question = this.textContent;
-                            fetchAIResponse(question);
-                        });
-                    });
-                });
 
                 function showHelpVideo() {
                     const videoContainer = document.getElementById('help-video-container');
@@ -208,6 +191,7 @@ async function handleRequest(req, res) {
                         <div id="ai-tutor-response"></div>
                     </div>
                    </main>
+                    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
                     <script>${script}</script>
                 </body>
                 </html>
@@ -221,5 +205,3 @@ async function handleRequest(req, res) {
         }
     }
 };
-
-module.exports = handleRequest;
