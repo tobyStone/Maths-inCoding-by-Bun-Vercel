@@ -10,7 +10,7 @@ require('dotenv').config();
 async function getAIResponse(prompt) {
     try {
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4o-mini',
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 150,
             temperature: 0.7
