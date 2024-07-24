@@ -11,7 +11,7 @@ require('dotenv').config();
  * @returns {Promise<string[]>} - A promise that resolves to an array of questions.
  */
 async function generateQuestions(description) {
-    const prompt = `Generate a list of seven questions a student of the age of the numbers in the following description could ask about the topic based on the following video description: "${description}"`;
+    const prompt = `Generate a list of seven questions - and only the questionsd themselves - a student of the age of the numbers in the following description could ask about the topic based on the following video description: "${description}"`;
     const response = await getAIResponse(prompt);
     return response.split('\n').filter(q => q); // Assuming each question is on a new line
 }
@@ -80,7 +80,8 @@ module.exports = async (req, res) => {
             async function handleQuestionButtonClick(question) {
                 try {
                     console.log('Button pressed, question:', question); // Log button press
-                    const response = await getAIResponse(question); // Direct call to getAIResponse
+                    const ageAppropriatePrompt = \`Answer the following question in a manner appropriate for students of the age group indicated in the following description: "\${description}". Question: "\${question}"\`;
+                    const response = await getAIResponse(ageAppropriatePrompt); // Direct call to getAIResponse
                     document.getElementById('ai-tutor-response').innerText = response;
                 } catch (error) {
                     console.error('Error fetching AI response:', error);
