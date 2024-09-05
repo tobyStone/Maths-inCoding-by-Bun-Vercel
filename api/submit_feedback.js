@@ -44,14 +44,17 @@ module.exports = async (req, res) => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Thank You!</title>
-            <link rel="icon" type="image/png" href="/public/images/linux_site_logo.PNG" sizes="32x32">
-            <link href="/public/style.css" rel="stylesheet">
-        </head>
+            <link rel="icon" type="image/png" href="/images/linux_site_logo.webp" sizes="32x32">
+            <link href="/style.css" rel="stylesheet">
+       </head>
         <body>
-            <header class="SiteHeader">
-                <h1>Maths inCoding<img style="float: right;" width="120" height="120" src="/public/images/linux_site_logo.PNG" alt="Pi with numbers"></h1>
-                <h3>... learning maths through coding computer games</h3>
-            </header>
+        <header class="SiteHeader">
+            <h1>Maths inCoding
+                <img style="float: right;" width="120" height="120" src="/images/linux_site_logo.webp"
+                     alt="Pi with numbers">
+            </h1>
+            <h3>... learning maths through coding computer games</h3>
+        </header>
             <main class="thank-you-container">
                 <h1>Thank you for your feedback, ${feedbackName}!</h1>
                 <a href="/" class="myButton">Return to the Landing Page</a>
