@@ -1,6 +1,6 @@
 const { parse } = require('url');
 const db = require('./database');
-const Layout = require('../models/linkedPage'); // Ensure path is correct
+const Layout = require('../models/linkedPage'); 
 
 /**
  * Handles incoming requests, fetches data from the database, and generates HTML content.

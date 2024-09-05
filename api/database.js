@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('../config'); // Adjust the path as needed
+const config = require('../config'); 
 const express = require('express');
 const app = express();
 

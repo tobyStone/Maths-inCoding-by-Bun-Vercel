@@ -111,7 +111,6 @@
     <Content Include="public\images\toby.webp" />
     <Content Include="public\images\visual_studio.webp" />
     <Content Include="public\images\water_bucket.webp" />
-    <Content Include="public\images\younger_bill_gates.webp" />
     <Content Include="public\style.css" />
     <Content Include="public\VideoPlayer.css" />
     <Content Include="public\videos\3Dgameengine.mp4" />
