@@ -75,8 +75,6 @@ module.exports = async (req, res) => {
                 time_stops: ${JSON.stringify(timeStops)}, // Array of time stops
                 question_links: ${JSON.stringify(questionLinks)} // Array of question links
 
-//                time_stop: ${timeStop},
-//                link_questions: "${questionLink}"
             };
 
             // Example to handle URL parameters to start video at specific time
@@ -104,12 +102,6 @@ module.exports = async (req, res) => {
                     }
                 });
 
-//                const questionsAnswered = localStorage.getItem('questionsAnswered');
-//                if (videoPlayer.currentTime >= videoData.time_stop && !questionsAnswered) {
-//                    videoPlayer.pause();
-//                    console.log('Video paused at the time stop.');
-//                    window.location.href = videoData.link_questions; // Redirect to a new URL
-//                }
             });
 
             // Storing video information in localStorage
