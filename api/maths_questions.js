@@ -11,7 +11,7 @@ require('dotenv').config();
  * @returns {Promise<string[]>} - A promise that resolves to an array of questions.
  */
 async function generateQuestions(description) {
-    const prompt = `Generate a list of seven questions - and only the questionsd themselves - a child could ask about the topic based on the following video description: "${description}"`;
+    const prompt = `Generate a list of seven questions - and only the questions themselves - a child could ask about the topic based on the following video description: "${description}"`;
     const response = await getAIResponse(prompt);
     return response.split('\n').filter(q => q); // Assuming each question is on a new line
 }
@@ -44,7 +44,7 @@ module.exports = async (req, res) => {
             ).join('');
 
             return `
-                <div class="question-block">
+                <div class="question-block" data-question-index="${i}">
                     <img src="${imagePath}" alt="${question.imgAlt}" width="525" height="350" />
                     <div class="choices">${choicesHtml}</div>
                 </div>
@@ -108,6 +108,13 @@ module.exports = async (req, res) => {
                 }
             }
 
+            function markQuestionsAsAnswered(index) {
+                const questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || [];
+                questionsAnswered[index] = true; // Mark the question set at this index as answered
+                localStorage.setItem('questionsAnswered', JSON.stringify(questionsAnswered));
+            }
+
+
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
                 const questionsContainer = document.getElementById('questions-container');
@@ -150,6 +157,10 @@ module.exports = async (req, res) => {
                 });
 
                 const scorePercentage = (score / totalQuestions) * 100;
+               // Determine the current question set by finding the closest .question-block and its data-question-index
+                const questionBlock = inputs[0].closest('.question-block'); // Find the parent .question-block
+                const questionIndex = parseInt(questionBlock.getAttribute('data-question-index'), 10); // Get the question index
+
 
                 if (scorePercentage <= 80) {
                     if (helpVideoExists) {
@@ -159,7 +170,8 @@ module.exports = async (req, res) => {
                         window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
                     }
                 } else {
-                    localStorage.setItem('questionsAnswered', 'true');
+                    //finding and flagging the array position of question answered
+                    markQuestionsAsAnswered(questionIndex); // Mark the current question set as answered
                     redirectToPreviousVideo();
                 }
             });

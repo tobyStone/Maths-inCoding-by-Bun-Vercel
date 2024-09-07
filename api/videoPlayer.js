@@ -25,8 +25,11 @@ module.exports = async (req, res) => {
         const video = videoEntry.page.videoData[0];
         const description = videoEntry.page.description || '';
         const videoSrc = video.video;  // Use the video URL directly
-        const timeStop = video.time_stop_1 || 0;
-        const questionLink = video.link_questions_1 || '#';
+        const timeStops = [video.time_stop_1, video.time_stop_2, video.time_stop_3].filter(ts => ts !== null); // Handle multiple time stops
+        const questionLinks = [video.link_questions_1, video.link_questions_2, video.link_questions_3].filter(ql => ql !== null);
+
+//        const timeStop = video.time_stop_1 || 0;
+//        const questionLink = video.link_questions_1 || '#';
         const baseUrl = process.env.NODE_ENV === 'production'
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
             : 'http://localhost:3000/';
@@ -69,8 +72,11 @@ module.exports = async (req, res) => {
         document.addEventListener('DOMContentLoaded', function() {
             const videoPlayer = document.getElementById('videoPlayer');
             const videoData = {
-                time_stop: ${timeStop}, 
-                link_questions: "${questionLink}"
+                time_stops: ${JSON.stringify(timeStops)}, // Array of time stops
+                question_links: ${JSON.stringify(questionLinks)} // Array of question links
+
+//                time_stop: ${timeStop},
+//                link_questions: "${questionLink}"
             };
 
             // Example to handle URL parameters to start video at specific time
@@ -82,18 +88,34 @@ module.exports = async (req, res) => {
 
             // Listen for time updates to handle time stops
             videoPlayer.addEventListener('timeupdate', function() {
-                const questionsAnswered = localStorage.getItem('questionsAnswered');
-                if (videoPlayer.currentTime >= videoData.time_stop && !questionsAnswered) {
-                    videoPlayer.pause();
-                    console.log('Video paused at the time stop.');
-                    window.location.href = videoData.link_questions; // Redirect to a new URL
-                }
+                const currentTime = videoPlayer.currentTime;
+                let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(videoData.time_stops.length).fill(false);
+
+
+                // Iterate through each time stop to check if the video should pause
+                videoData.time_stops.forEach((stop, index) => {
+                    // If the current time passes a stop and the corresponding question set hasn't been answered
+                    if (currentTime >= stop && !questionsAnswered[index]) {
+                        videoPlayer.pause();
+                        console.log(\`Video paused at time stop: \${stop} seconds.\`);
+
+                        // Redirect to the corresponding question link
+                        window.location.href = videoData.question_links[index];
+                    }
+                });
+
+//                const questionsAnswered = localStorage.getItem('questionsAnswered');
+//                if (videoPlayer.currentTime >= videoData.time_stop && !questionsAnswered) {
+//                    videoPlayer.pause();
+//                    console.log('Video paused at the time stop.');
+//                    window.location.href = videoData.link_questions; // Redirect to a new URL
+//                }
             });
 
             // Storing video information in localStorage
             localStorage.setItem("previousVideoURL", window.location.pathname);
-            localStorage.setItem("previousVideoTimestamp", videoData.time_stop.toString());
-        });
+            localStorage.setItem("previousVideoTimestamp", videoPlayer.currentTime.toString());
+       });
 
         // Additional video controls
         const playButton = document.getElementById('play-pause-btn');
@@ -190,3 +212,5 @@ module.exports = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
+
