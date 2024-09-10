@@ -109,10 +109,11 @@ module.exports = async (req, res) => {
             }
 
             function markQuestionsAsAnswered(index) {
-                const questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || [];
+                let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
                 questionsAnswered[index] = true; // Mark the question set at this index as answered
                 localStorage.setItem('questionsAnswered', JSON.stringify(questionsAnswered));
-            }
+                console.log('Questions answered updated:', questionsAnswered);
+         }
 
 
             function showHelpVideo() {
