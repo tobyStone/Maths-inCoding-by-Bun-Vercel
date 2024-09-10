@@ -143,7 +143,7 @@ module.exports = async (req, res) => {
             }
 
             const correctAnswers = ${JSON.stringify(pageData.page.questionData.map(q => q.answer))};
-            const totalQuestions = correctAnswers.length;
+            const totalQuestions = ${pageData.page.questionData.length};
             const helpVideoExists = ${helpVideoExists};
 
             document.getElementById('question-form').addEventListener('submit', function(event) {
