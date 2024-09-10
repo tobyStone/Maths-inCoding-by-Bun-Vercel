@@ -110,6 +110,8 @@ module.exports = async (req, res) => {
 
             function markQuestionsAsAnswered(index) {
                 let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
+                console.log('Before updating, questionsAnswered:', questionsAnswered); // Log state before update
+
                 questionsAnswered[index] = true; // Mark the question set at this index as answered
                 localStorage.setItem('questionsAnswered', JSON.stringify(questionsAnswered));
                 console.log('Questions answered updated:', questionsAnswered);
@@ -139,8 +141,10 @@ module.exports = async (req, res) => {
                 const previousVideoURL = localStorage.getItem('previousVideoURL');
                 const previousVideoTimestamp = localStorage.getItem('previousVideoTimestamp');
                 console.log("PREVIOUS VIDEO: ", previousVideoURL, "TIMESTAMP: ", previousVideoTimestamp);
-                window.location.href = previousVideoURL + '?t=' + previousVideoTimestamp;
-            }
+                       setTimeout(() => { // Adding a short delay
+                            window.location.href = previousVideoURL + '?t=' + previousVideoTimestamp;
+                        }, 500); // 500ms should be enough to ensure localStorage updates
+                }
 
             const correctAnswers = ${JSON.stringify(pageData.page.questionData.map(q => q.answer))};
             const totalQuestions = ${pageData.page.questionData.length};

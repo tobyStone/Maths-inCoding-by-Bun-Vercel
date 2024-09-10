@@ -92,6 +92,10 @@ module.exports = async (req, res) => {
 
                 // Iterate through each time stop to check if the video should pause
                 videoData.time_stops.forEach((stop, index) => {
+
+                    // Log the current time and questionsAnswered state
+                    console.log('Checking time stop:', stop, 'Current time:', currentTime, 'Question answered:', questionsAnswered[index]);
+
                     // If the current time passes a stop and the corresponding question set hasn't been answered
                     if (currentTime >= stop && !questionsAnswered[index]) {
                         videoPlayer.pause();
