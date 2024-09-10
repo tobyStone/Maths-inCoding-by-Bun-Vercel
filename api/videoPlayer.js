@@ -96,6 +96,10 @@ module.exports = async (req, res) => {
                     if (currentTime >= stop && !questionsAnswered[index]) {
                         videoPlayer.pause();
                         console.log(\`Video paused at time stop: \${stop} seconds.\`);
+                        // Storing video information in localStorage
+                        localStorage.setItem("previousVideoURL", window.location.pathname);
+                        localStorage.setItem("previousVideoTimestamp", currentTime.toString());
+
 
                         // Redirect to the corresponding question link
                         window.location.href = videoData.question_links[index];
@@ -104,9 +108,6 @@ module.exports = async (req, res) => {
 
             });
 
-            // Storing video information in localStorage
-            localStorage.setItem("previousVideoURL", window.location.pathname);
-            localStorage.setItem("previousVideoTimestamp", videoPlayer.currentTime.toString());
        });
 
         // Additional video controls
