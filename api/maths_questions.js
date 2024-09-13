@@ -114,19 +114,12 @@ module.exports = async (req, res) => {
 
             function markQuestionsAsAnswered(index) {
 
-               let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered'));
-                if (!questionsAnswered) {
-                    questionsAnswered = new Array(totalQuestions).fill(false);
-                    console.log('Initializing questionsAnswered:', questionsAnswered);
-                } else {
-                    console.log('Retrieved questionsAnswered from localStorage:', questionsAnswered);
-                }
+                let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
+                console.log('Before updating, questionsAnswered:', questionsAnswered); // Log state before update
 
-                questionsAnswered[index] = true;
-
+                questionsAnswered[index] = true; // Mark the question set at this index as answered
                 localStorage.setItem('questionsAnswered', JSON.stringify(questionsAnswered));
-                console.log('Updated questionsAnswered:', questionsAnswered);
-
+                console.log('Questions answered updated:', questionsAnswered);
          }
 
 
@@ -175,7 +168,7 @@ module.exports = async (req, res) => {
 
                 const scorePercentage = (score / totalQuestions) * 100;
                // Determine the current question set by finding the closest .question-block and its data-question-index
-                const questionBlock = document.querySelector('.question-block');
+                const questionBlock = inputs[0].closest('.question-block'); // Find the parent .question-block
                 console.log('Selected question block element:', questionBlock);
                 const questionIndex = parseInt(questionBlock.getAttribute('data-question-index'), 10); // Get the question index
 
