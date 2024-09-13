@@ -27,9 +27,6 @@ module.exports = async (req, res) => {
         const videoSrc = video.video;  // Use the video URL directly
         const timeStops = [video.time_stop_1, video.time_stop_2, video.time_stop_3].filter(ts => ts !== null); // Handle multiple time stops
         const questionLinks = [video.link_questions_1, video.link_questions_2, video.link_questions_3].filter(ql => ql !== null);
-
-//        const timeStop = video.time_stop_1 || 0;
-//        const questionLink = video.link_questions_1 || '#';
         const baseUrl = process.env.NODE_ENV === 'production'
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
             : 'http://localhost:3000/';
