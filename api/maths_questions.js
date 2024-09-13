@@ -108,13 +108,26 @@ module.exports = async (req, res) => {
                 }
             }
 
-            function markQuestionsAsAnswered(index) {
-                let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
-                console.log('Before updating, questionsAnswered:', questionsAnswered); // Log state before update
 
-                questionsAnswered[index] = true; // Mark the question set at this index as answered
+
+
+
+            function markQuestionsAsAnswered(index) {
+
+               let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered'));
+                if (!questionsAnswered) {
+                    questionsAnswered = new Array(totalQuestions).fill(false);
+                    console.log('Initializing questionsAnswered:', questionsAnswered);
+                } else {
+                    console.log('Retrieved questionsAnswered from localStorage:', questionsAnswered);
+                }
+
+                console.log('Marking question at index ${ index } as answered.');
+                questionsAnswered[index] = true;
+
                 localStorage.setItem('questionsAnswered', JSON.stringify(questionsAnswered));
-                console.log('Questions answered updated:', questionsAnswered);
+                console.log('Updated questionsAnswered:', questionsAnswered);
+
          }
 
 
@@ -163,7 +176,7 @@ module.exports = async (req, res) => {
 
                 const scorePercentage = (score / totalQuestions) * 100;
                // Determine the current question set by finding the closest .question-block and its data-question-index
-                const questionBlock = inputs[0].closest('.question-block'); // Find the parent .question-block
+                const questionBlock = document.querySelector('.question-block');
                 console.log('Selected question block element:', questionBlock);
                 const questionIndex = parseInt(questionBlock.getAttribute('data-question-index'), 10); // Get the question index
 
