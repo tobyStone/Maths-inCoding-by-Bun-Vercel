@@ -122,7 +122,6 @@ module.exports = async (req, res) => {
                     console.log('Retrieved questionsAnswered from localStorage:', questionsAnswered);
                 }
 
-                console.log('Marking question at index ${ index } as answered.');
                 questionsAnswered[index] = true;
 
                 localStorage.setItem('questionsAnswered', JSON.stringify(questionsAnswered));
