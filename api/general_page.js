@@ -23,7 +23,9 @@ module.exports = async (req, res) => {
             return res.status(404).send('Page not found');
         }
 
-        const baseUrl = process.env.NODE_ENV === 'production'
+        // If the request is made via HTTPS, ensure assets are loaded via HTTPS
+        const protocol = req.headers['x-forwarded-proto'] || 'http'; // Use 'x-forwarded-proto' for determining the protocol
+        const baseUrl = protocol === 'https'
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
             : 'http://localhost:3000/';
 
