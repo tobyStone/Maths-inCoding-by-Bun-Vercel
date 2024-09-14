@@ -27,10 +27,12 @@ module.exports = async (req, res) => {
         const videoSrc = video.video;  // Use the video URL directly
         const timeStops = [video.time_stop_1, video.time_stop_2, video.time_stop_3].filter(ts => ts !== null); // Handle multiple time stops
         const questionLinks = [video.link_questions_1, video.link_questions_2, video.link_questions_3].filter(ql => ql !== null);
-        const baseUrl = process.env.NODE_ENV === 'production'
+        // If the request is made via HTTPS, ensure assets are loaded via HTTPS
+        const protocol = req.headers['x-forwarded-proto'] || 'http'; // Use 'x-forwarded-proto' for determining the protocol
+        const baseUrl = protocol === 'https'
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
             : 'http://localhost:3000/';
-        const posterSrc = baseUrl + video.imgSrc;
+      const posterSrc = baseUrl + video.imgSrc;
 
         const html = `
 <!DOCTYPE html>
