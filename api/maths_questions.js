@@ -166,11 +166,17 @@ module.exports = async (req, res) => {
                     }
                 });
 
+
+                function getQueryParameter(name) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get(name);
+                }
+
+
                 const scorePercentage = (score / totalQuestions) * 100;
                // Determine the current question set by finding the closest .question-block and its data-question-index
-                const questionBlock = inputs[0].closest('.question-block'); // Find the parent .question-block
-                console.log('Selected question block element:', questionBlock);
-                const questionIndex = parseInt(questionBlock.getAttribute('data-question-index'), 10); // Get the question index
+
+                const questionIndex = parseInt(getQueryParameter('index'), 10);
 
 
                 if (scorePercentage <= 80) {

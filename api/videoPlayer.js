@@ -103,7 +103,8 @@ module.exports = async (req, res) => {
 
 
                         // Redirect to the corresponding question link
-                        window.location.href = videoData.question_links[index];
+                        window.location.href = videoData.question_links[index] + "?index=" + index;
+
                     }
                 });
 
