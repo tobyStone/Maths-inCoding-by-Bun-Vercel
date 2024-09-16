@@ -11,9 +11,15 @@ require('dotenv').config();
  * @returns {Promise<string[]>} - A promise that resolves to an array of questions.
  */
 async function generateQuestions(description) {
-    const prompt = `Generate a list of seven questions - and only the questions themselves - a child could ask about the topic based on the following video description: "${description}"`;
+    const prompt = `Generate a list of seven questions - and only the questions themselves - 
+                    a child could ask about the topic based on the following video description: 
+                    "${description}"`;
+
     const response = await getAIResponse(prompt);
-    return response.split('\n').filter(q => q); // Assuming each question is on a new line
+
+    return response
+        .split('\n')
+        .filter(q => q); // Assuming each question is on a new line
 }
 
 module.exports = async (req, res) => {
@@ -91,7 +97,9 @@ module.exports = async (req, res) => {
                 try {
                     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
                         model: 'gpt-4o-mini',
-                        messages: [{ role: 'user', content: prompt }],
+                        messages: [{ role: 'system', content: 'You are a helpful assistant that explains things in simple terms a child can understand.' },
+                                   { role: 'user', content: prompt }
+                    ],
                         max_tokens: 150,
                         temperature: 0.7
                     }, {

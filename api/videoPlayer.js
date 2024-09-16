@@ -25,9 +25,30 @@ module.exports = async (req, res) => {
         const video = videoEntry.page.videoData[0];
         const description = videoEntry.page.description || '';
         const videoSrc = video.video;  // Use the video URL directly
-        const timeStops = [video.time_stop_1, video.time_stop_2, video.time_stop_3, video.time_stop_4, video.time_stop_5, video.time_stop_6, video.time_stop_7].filter(ts => ts !== null); // Handle multiple time stops
-        const questionLinks = [video.link_questions_1, video.link_questions_2, video.link_questions_3, video.link_questions_4, video.link_questions_5, video.link_questions_6, video.link_questions_7].filter(ql => ql !== null);
-        // If the request is made via HTTPS, ensure assets are loaded via HTTPS
+
+        //MAGIC NUMBERS
+        const timeStops = [
+            video.time_stop_1,
+            video.time_stop_2,
+            video.time_stop_3,
+            video.time_stop_4,
+            video.time_stop_5,
+            video.time_stop_6,
+            video.time_stop_7
+        ].filter(ts => ts !== null); // Handle multiple time stops
+
+        const questionLinks = [
+            video.link_questions_1,
+            video.link_questions_2,
+            video.link_questions_3,
+            video.link_questions_4,
+            video.link_questions_5,
+            video.link_questions_6,
+            video.link_questions_7
+        ].filter(ql => ql !== null); // Handle multiple question links
+
+
+       // If the request is made via HTTPS, ensure assets are loaded via HTTPS
         const protocol = req.headers['x-forwarded-proto'] || 'http'; // Use 'x-forwarded-proto' for determining the protocol
         const baseUrl = protocol === 'https'
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
