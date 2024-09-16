@@ -2140,12 +2140,14 @@
           "time_stop_1": 5,
           "time_stop_2": 20,
           "time_stop_3": 35,
+          "time_stop_4": 50,
           "poster": "projectile",
           "imgSrc": "/images/projectile.webp",
           "imgAlt": "projectile game",
           "link_questions_1": "/maths_questions/angles1",
           "link_questions_2": "/maths_questions/ratio",
-          "link_questions_3": "/maths_questions/sine_wave"
+          "link_questions_3": "/maths_questions/sine_wave",
+          "link_questions_4": "/maths_questions/probability_1"
         }
       ]
     }

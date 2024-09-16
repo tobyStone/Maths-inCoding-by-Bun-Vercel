@@ -4,16 +4,19 @@ const { Schema } = mongoose;
 
 const videoSchema = new Schema({
     video: String,
-    time_stop_1: String,
-    time_stop_2: String,
-    time_stop_3: String,
+    time_stops: {
+        type: [String], // Array of time stops
+        default: [] // Default to an empty array if not provided
+    },
     poster: String,
     imgSrc: String,
     imgAlt: String,
-    link_questions_1: String,
-    link_questions_2: String,
-    link_questions_3: String,
+    question_links: {
+        type: [String], // Array of question links
+        default: [] // Default to an empty array if not provided
+    }
 });
+
 
 const pageSchema = new Schema({
     url_stub: String,
