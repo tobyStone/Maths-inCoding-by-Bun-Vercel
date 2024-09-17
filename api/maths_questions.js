@@ -215,6 +215,7 @@ module.exports = async (req, res) => {
                         <form id="question-form">
                             ${questionsHtml}
                             <button type="submit" class="myButton">Submit Answers</button>
+                          </div>
                         </form>
                     </div>
                     ${videoHtml}
