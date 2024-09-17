@@ -44,29 +44,17 @@ module.exports = async (req, res) => {
                 ? question.imgSrc.replace('/maths_questions/public/', '/')
                 : question.imgSrc;
 
-            // Free-form vs Multiple-choice handling
-            if (question.answer === "free-form") {
-                return `
-                    <div class="question-block" data-question-index="${i}">
-                        <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
-                        <p>${question.questionText}</p>
-                        <textarea id="student-response-${i}" name="response${i}" rows="4" cols="50"></textarea>
-                    </div>
-                `;
-            } else {
-                const choicesHtml = question.choices.map((choice, j) =>
-                    `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
-                    <label for="choice${i}-${j}">${choice}</label>`
-                ).join('');
+            const choicesHtml = question.choices.map((choice, j) =>
+                `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
+                <label for="choice${i}-${j}">${choice}</label>`
+            ).join('');
 
-                return `
-                    <div class="question-block" data-question-index="${i}">
-                        <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
-                        <p>${question.questionText}</p>
-                        <div class="choices">${choicesHtml}</div>
-                    </div>
-                `;
-            }
+            return `
+                <div class="question-block" data-question-index="${i}">
+                    <img src="${imagePath}" alt="${question.imgAlt}" width="525" height="350" />
+                    <div class="choices">${choicesHtml}</div>
+                </div>
+            `;
         }).join('');
 
         const videoSrc_temp = pageData.page.helpVideo.videoSrc;
@@ -80,20 +68,25 @@ module.exports = async (req, res) => {
         `).join('');
 
         const helpVideoExists = !!pageData.page.helpVideo;
+        console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists);
+
         const videoHtml = pageData.page.helpVideo ? `
             <div id="help-video-container" class="video-container" style="display:none;">
                 <video id="help-video" controls>
                     <source src="${videoSrc}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
+                <div class="video-controls">
+                    <!-- Example: Custom control buttons -->
+                </div>
             </div>
         ` : '';
 
         const script = `
             async function handleQuestionButtonClick(question) {
                 try {
-                    console.log('Button pressed, question:', question); 
-                    const response = await getAIResponse(question); 
+                    console.log('Button pressed, question:', question); // Log button press
+                    const response = await getAIResponse(question); // Direct call to getAIResponse
                     document.getElementById('ai-tutor-response').innerText = response;
                 } catch (error) {
                     console.error('Error fetching AI response:', error);
@@ -123,14 +116,22 @@ module.exports = async (req, res) => {
                 }
             }
 
-            function markQuestionsAsAnswered(index) {
-                let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
-                console.log('Before updating, questionsAnswered:', questionsAnswered); 
 
-                questionsAnswered[index] = true; 
+
+
+
+            function markQuestionsAsAnswered(index) {
+
+                let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
+                console.log('Before updating, questionsAnswered:', questionsAnswered); // Log state before update
+
+                questionsAnswered[index] = true; // Mark the question set at this index as answered
                 localStorage.setItem('questionsAnswered', JSON.stringify(questionsAnswered));
                 console.log('Questions answered updated:', questionsAnswered);
-            }
+         }
+
+
+
 
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
@@ -139,14 +140,14 @@ module.exports = async (req, res) => {
 
                 if (videoContainer) {
                     questionsContainer.style.display = 'none';
-                    aiTutorContainer.style.display = 'block'; 
+                    aiTutorContainer.style.display = 'block'; // Show AI tutor when video starts
                     videoContainer.style.display = 'block';
                     const video = document.getElementById('help-video');
                     video.play();
                     video.addEventListener('ended', function() {
                         videoContainer.style.display = 'none';
                         questionsContainer.style.display = 'block';
-                        aiTutorContainer.style.display = 'none';
+                        aiTutorContainer.style.display = 'none'; // Hide AI tutor after video ends
                     });
                 }
             }
@@ -155,10 +156,10 @@ module.exports = async (req, res) => {
                 const previousVideoURL = localStorage.getItem('previousVideoURL');
                 const previousVideoTimestamp = localStorage.getItem('previousVideoTimestamp');
                 console.log("PREVIOUS VIDEO: ", previousVideoURL, "TIMESTAMP: ", previousVideoTimestamp);
-                setTimeout(() => {
-                    window.location.href = previousVideoURL + '?t=' + previousVideoTimestamp;
-                }, 500);
-            }
+                       setTimeout(() => { // Adding a short delay
+                            window.location.href = previousVideoURL + '?t=' + previousVideoTimestamp;
+                        }, 500); // 500ms should be enough to ensure localStorage updates
+                }
 
             const correctAnswers = ${JSON.stringify(pageData.page.questionData.map(q => q.answer))};
             const totalQuestions = ${pageData.page.questionData.length};
@@ -166,18 +167,27 @@ module.exports = async (req, res) => {
 
             document.getElementById('question-form').addEventListener('submit', function(event) {
                 event.preventDefault();
+                const inputs = document.querySelectorAll('input[type="radio"]:checked');
                 let score = 0;
 
-                const inputs = document.querySelectorAll('input[type="radio"]:checked');
                 inputs.forEach((input, index) => {
                     if (correctAnswers[index] === input.value) {
                         score++;
                     }
                 });
 
+
+                function getQueryParameter(name) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get(name);
+                }
+
+
                 const scorePercentage = (score / totalQuestions) * 100;
+               // Determine the current question set by finding the closest .question-block and its data-question-index
 
                 const questionIndex = parseInt(getQueryParameter('index'), 10);
+
 
                 if (scorePercentage <= 80) {
                     if (helpVideoExists) {
@@ -187,12 +197,14 @@ module.exports = async (req, res) => {
                         window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
                     }
                 } else {
-                    markQuestionsAsAnswered(questionIndex);
+                    //finding and flagging the array position of question answered
+                    markQuestionsAsAnswered(questionIndex); // Mark the current question set as answered
                     redirectToPreviousVideo();
                 }
             });
-        `;
 
+            window.handleQuestionButtonClick = handleQuestionButtonClick; // Make the function accessible globally
+        `;
         const html = `
             <!DOCTYPE html>
             <html lang="en">
@@ -206,27 +218,34 @@ module.exports = async (req, res) => {
             </head>
             <body>
                 <main>
-                    <header class="SiteHeader">
-                        <h1>Maths inCoding<img style="float: right;" width="120" height="120" 
-                            src="/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
-                        <h3>... learning maths through coding computer games</h3>
+                    <header>
+                        <header class="SiteHeader">
+                            <h1>Maths inCoding<img style="float: right;" width="120" height="120" 
+                                   src="/images/linux_site_logo.webp" alt="Pi with numbers"></h1>
+                            <h3>... learning maths through coding computer games</h3>
+                        </header>
                     </header>
-                    <div id="questions-container">
+                    <div id="questions-container" class="video-container">
                         <form id="question-form">
-                            ${questionsHtml}
-                            <button type="submit" class="myButton">Submit Answers</button>
-                          </div>
+                            <div class="question-block">
+                                <div class="choices">
+                                    ${questionsHtml}
+                                </div>
+                                <button type="submit" class="myButton">Send answer</button>
+                            </div>
                         </form>
                     </div>
                     ${videoHtml}
-                    <div id="ai-tutor-container" style="display: none;">
-                        <h3>Ask the AI Tutor</h3>
-                        <div id="predefined-questions">${predefinedQuestionsHtml}</div>
-                        <div id="ai-tutor-response"></div>
-                    </div>
-                </main>
+                 <div id="ai-tutor-container" style="display: none;">
+                    <h3>Ask the AI Tutor</h3>
+                    <div id="predefined-questions">${predefinedQuestionsHtml}</div>
+                    <div id="ai-tutor-response"></div>
+                </div>
+               </main>
                 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-                <script>${script}</script>
+                <script>
+                    ${script}
+                </script>
             </body>
             </html>
         `;
