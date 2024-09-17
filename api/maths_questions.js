@@ -91,6 +91,9 @@ module.exports = async (req, res) => {
         ` : '';
 
         const script = `
+            const pageData = ${JSON.stringify(pageData)};
+
+
             async function handleQuestionButtonClick(question) {
                 try {
                     console.log('Button pressed, question:', question); 
