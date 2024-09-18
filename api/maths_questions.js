@@ -39,22 +39,31 @@ module.exports = async (req, res) => {
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
             : 'http://localhost:3000/';
 
-        const questionsHtml = pageData.page.questionData.map((question, i) => {
-            const imagePath = question.imgSrc.startsWith('/maths_questions/public/')
-                ? question.imgSrc.replace('/maths_questions/public/', '/')
-                : question.imgSrc;
+        // Updated logic to handle both free-form and multiple-choice questions
+        let questionsHtml;
+        questionsHtml = pageData.page.questionData.map((question, i) => {
+            if (question.answer === "free-form") {
+                return `
+                    <div class="question-block" data-question-index="${i}">
+                        <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
+                        <p>${question.questionText}</p>
+                        <textarea id="student-response-${i}" name="response${i}" rows="4" cols="50"></textarea>
+                    </div>
+                `;
+            } else {
+                const choicesHtml = question.choices.map((choice, j) =>
+                    `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
+                    <label for="choice${i}-${j}">${choice}</label>`
+                ).join('');
 
-            const choicesHtml = question.choices.map((choice, j) =>
-                `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
-                <label for="choice${i}-${j}">${choice}</label>`
-            ).join('');
-
-            return `
-                <div class="question-block" data-question-index="${i}">
-                    <img src="${imagePath}" alt="${question.imgAlt}" width="525" height="350" />
-                    <div class="choices">${choicesHtml}</div>
-                </div>
-            `;
+                return `
+                    <div class="question-block" data-question-index="${i}">
+                        <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
+                        <p>${question.questionText}</p>
+                        <div class="choices">${choicesHtml}</div>
+                    </div>
+                `;
+            }
         }).join('');
 
         const videoSrc_temp = pageData.page.helpVideo.videoSrc;
@@ -68,7 +77,6 @@ module.exports = async (req, res) => {
         `).join('');
 
         const helpVideoExists = !!pageData.page.helpVideo;
-        console.log("HELPVIDEO: ", pageData.page.helpVideo, "VIDEOSRC: ", videoSrc, "HELPVIDEOEXISTS: ", helpVideoExists);
 
         const videoHtml = pageData.page.helpVideo ? `
             <div id="help-video-container" class="video-container" style="display:none;">
@@ -76,17 +84,17 @@ module.exports = async (req, res) => {
                     <source src="${videoSrc}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
-                <div class="video-controls">
-                    <!-- Example: Custom control buttons -->
-                </div>
             </div>
         ` : '';
 
         const script = `
+            const pageData = ${JSON.stringify(pageData)};
+
+
             async function handleQuestionButtonClick(question) {
                 try {
-                    console.log('Button pressed, question:', question); // Log button press
-                    const response = await getAIResponse(question); // Direct call to getAIResponse
+                    console.log('Button pressed, question:', question); 
+                    const response = await getAIResponse(question); 
                     document.getElementById('ai-tutor-response').innerText = response;
                 } catch (error) {
                     console.error('Error fetching AI response:', error);
@@ -116,21 +124,14 @@ module.exports = async (req, res) => {
                 }
             }
 
-
-
-
-
             function markQuestionsAsAnswered(index) {
-
                 let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
-                console.log('Before updating, questionsAnswered:', questionsAnswered); // Log state before update
+                console.log('Before updating, questionsAnswered:', questionsAnswered); 
 
-                questionsAnswered[index] = true; // Mark the question set at this index as answered
+                questionsAnswered[index] = true; 
                 localStorage.setItem('questionsAnswered', JSON.stringify(questionsAnswered));
                 console.log('Questions answered updated:', questionsAnswered);
-         }
-
-
+            }
 
             function showHelpVideo() {
                 const videoContainer = document.getElementById('help-video-container');
@@ -139,14 +140,14 @@ module.exports = async (req, res) => {
 
                 if (videoContainer) {
                     questionsContainer.style.display = 'none';
-                    aiTutorContainer.style.display = 'block'; // Show AI tutor when video starts
+                    aiTutorContainer.style.display = 'block'; 
                     videoContainer.style.display = 'block';
                     const video = document.getElementById('help-video');
                     video.play();
                     video.addEventListener('ended', function() {
                         videoContainer.style.display = 'none';
                         questionsContainer.style.display = 'block';
-                        aiTutorContainer.style.display = 'none'; // Hide AI tutor after video ends
+                        aiTutorContainer.style.display = 'none';
                     });
                 }
             }
@@ -155,10 +156,15 @@ module.exports = async (req, res) => {
                 const previousVideoURL = localStorage.getItem('previousVideoURL');
                 const previousVideoTimestamp = localStorage.getItem('previousVideoTimestamp');
                 console.log("PREVIOUS VIDEO: ", previousVideoURL, "TIMESTAMP: ", previousVideoTimestamp);
-                       setTimeout(() => { // Adding a short delay
-                            window.location.href = previousVideoURL + '?t=' + previousVideoTimestamp;
-                        }, 500); // 500ms should be enough to ensure localStorage updates
-                }
+                setTimeout(() => {
+                    window.location.href = previousVideoURL + '?t=' + previousVideoTimestamp;
+                }, 500);
+            }
+
+            function getQueryParameter(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
 
             const correctAnswers = ${JSON.stringify(pageData.page.questionData.map(q => q.answer))};
             const totalQuestions = ${pageData.page.questionData.length};
@@ -166,27 +172,33 @@ module.exports = async (req, res) => {
 
             document.getElementById('question-form').addEventListener('submit', function(event) {
                 event.preventDefault();
-                const inputs = document.querySelectorAll('input[type="radio"]:checked');
+                let responses = [];
                 let score = 0;
 
-                inputs.forEach((input, index) => {
-                    if (correctAnswers[index] === input.value) {
-                        score++;
+                // Iterate over the questions to gather the responses
+                pageData.page.questionData.forEach((question, i) => {
+                    if (question.answer === "free-form") {
+                        const response = document.getElementById('student-response-' + i).value;
+                        responses.push({ question: question.questionText, response });
+                    } else {
+                        const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
+                        if (selectedChoice) {
+                            responses.push({ question: question.questionText, response: selectedChoice.value });
+                            // Check if the answer is correct (for multiple-choice questions)
+                            if (correctAnswers[i] === selectedChoice.value) {
+                                score++;
+                            }
+                        }
                     }
                 });
 
+                console.log('Responses:', responses);
 
-                function getQueryParameter(name) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    return urlParams.get(name);
-                }
-
-
+                // Calculate the percentage score based on total questions and correct answers
                 const scorePercentage = (score / totalQuestions) * 100;
-               // Determine the current question set by finding the closest .question-block and its data-question-index
 
+                // Determine the current question set by finding the closest .question-block and its data-question-index
                 const questionIndex = parseInt(getQueryParameter('index'), 10);
-
 
                 if (scorePercentage <= 80) {
                     if (helpVideoExists) {
@@ -196,14 +208,14 @@ module.exports = async (req, res) => {
                         window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
                     }
                 } else {
-                    //finding and flagging the array position of question answered
-                    markQuestionsAsAnswered(questionIndex); // Mark the current question set as answered
+                    markQuestionsAsAnswered(questionIndex);
                     redirectToPreviousVideo();
                 }
             });
 
-            window.handleQuestionButtonClick = handleQuestionButtonClick; // Make the function accessible globally
+            window.handleQuestionButtonClick = handleQuestionButtonClick;
         `;
+
         const html = `
             <!DOCTYPE html>
             <html lang="en">
@@ -226,25 +238,19 @@ module.exports = async (req, res) => {
                     </header>
                     <div id="questions-container" class="video-container">
                         <form id="question-form">
-                            <div class="question-block">
-                                <div class="choices">
-                                    ${questionsHtml}
-                                </div>
-                                <button type="submit" class="myButton">Send answer</button>
-                            </div>
+                            ${questionsHtml}
+                            <button type="submit" class="myButton">Send answer</button>
                         </form>
                     </div>
                     ${videoHtml}
-                 <div id="ai-tutor-container" style="display: none;">
-                    <h3>Ask the AI Tutor</h3>
-                    <div id="predefined-questions">${predefinedQuestionsHtml}</div>
-                    <div id="ai-tutor-response"></div>
-                </div>
+                    <div id="ai-tutor-container" style="display: none;">
+                        <h3>Ask the AI Tutor</h3>
+                        <div id="predefined-questions">${predefinedQuestionsHtml}</div>
+                        <div id="ai-tutor-response"></div>
+                    </div>
                </main>
                 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-                <script>
-                    ${script}
-                </script>
+                <script>${script}</script>
             </body>
             </html>
         `;
@@ -256,3 +262,5 @@ module.exports = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
+
