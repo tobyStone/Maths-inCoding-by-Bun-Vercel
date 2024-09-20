@@ -90,30 +90,39 @@ module.exports = async (req, res) => {
         const script = `
             const pageData = ${JSON.stringify(pageData)};
 
-        async function handleQuestionButtonClick(question) {
-            try {
-                console.log('Button pressed, question:', question);
 
-                // Fetch call to the AI API through your server
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ question })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    document.getElementById('ai-tutor-response').innerText = result.answer;
-                } else {
-                    throw new Error('Failed to fetch AI response');
+            async function handleQuestionButtonClick(question) {
+                try {
+                    console.log('Button pressed, question:', question); 
+                    const response = await getAIResponse(question); 
+                    document.getElementById('ai-tutor-response').innerText = response;
+                } catch (error) {
+                    console.error('Error fetching AI response:', error);
                 }
-            } catch (error) {
-                console.error('Error fetching AI response:', error);
             }
-        }
 
+            async function getAIResponse(prompt) {
+                try {
+                    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+                        model: 'gpt-4o-mini',
+                        messages: [{ role: 'system', content: 'You are a helpful assistant that explains things in simple terms a child can understand and keeps the explanation to 100 words.' },
+                                   { role: 'user', content: prompt }
+                    ],
+                        max_tokens: 150,
+                        temperature: 0.7
+                    }, {
+                        headers: {
+                            'Authorization': \`Bearer ${process.env.OPENAI_API_KEY}\`
+                        }
+                    });
+
+                    const data = response.data.choices[0].message.content.trim();
+                    return data;
+                } catch (error) {
+                    console.error('Error interacting with OpenAI API:', error.response ? error.response.data : error.message);
+                    throw error;
+                }
+            }
 
             function markQuestionsAsAnswered(index) {
                 let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
