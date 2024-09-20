@@ -23,7 +23,7 @@
     },
     {
       "source": "/api/chat",
-      "destination": "/api/maths_questions.js"
+      "destination": "/api/chat.js"
     }
   ]
 }
