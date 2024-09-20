@@ -425,7 +425,34 @@
 					"answer": "b",
 					"choices": [ "a", "b", "c", "d" ]
 				}
-			]
+
+		
+]
 		}
-	}
+	},
+
+
+				{
+					"page": {
+						"url_stub": "/maths_questions/free_form_probability_1",
+						"description": "11_12 age range questions on probability",
+						"helpVideo": {
+							"videoSrc": "https://storage.googleapis.com/maths_incoding/ProbabilityBasic%20-%20Corbettmaths.mp4",
+							"imgSrc": "/images/help_video_poster.jpg",
+							"videoTitle": "Understanding the concepts behind probability"
+						},
+						"questionData": [
+							{
+								"Qnumber": null,
+								"imgSrc": "/images/question_images/independent_probability_6.webp",
+								"imgAlt": "11_12_probability_question_6",
+								"questionText": "How would you explain what independent probability is?",
+								"answer": "free-form",
+								"choices": [ null ]
+							}
+
+						]
+					}
+				}
+		
 ]
