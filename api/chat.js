@@ -35,6 +35,3 @@ async function getAIResponse(prompt, systemMessage = 'You are a helpful assistan
 
 module.exports = { getAIResponse };
 
-
-
-module.exports = { getAIResponse };

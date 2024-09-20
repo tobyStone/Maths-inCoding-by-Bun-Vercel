@@ -90,16 +90,30 @@ module.exports = async (req, res) => {
         const script = `
             const pageData = ${JSON.stringify(pageData)};
 
+        async function handleQuestionButtonClick(question) {
+            try {
+                console.log('Button pressed, question:', question);
 
-            async function handleQuestionButtonClick(question) {
-                try {
-                    console.log('Button pressed, question:', question); 
-                    const response = await getAIResponse(question); 
-                    document.getElementById('ai-tutor-response').innerText = response;
-                } catch (error) {
-                    console.error('Error fetching AI response:', error);
+                // Fetch call to the AI API through your server
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    document.getElementById('ai-tutor-response').innerText = result.answer;
+                } else {
+                    throw new Error('Failed to fetch AI response');
                 }
+            } catch (error) {
+                console.error('Error fetching AI response:', error);
             }
+        }
+
 
             function markQuestionsAsAnswered(index) {
                 let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
