@@ -74,22 +74,26 @@ module.exports = async (req, res) => {
                 // Check if form data is posted (POST request)
                 if (req.method === 'POST') {
                     const studentResponse = req.body[`response${i}`]; // Get the student's typed answer
-                    const similarityScore = cosineSimilarity(studentResponse, aiAnswer); // Compare with AI answer
+                    if (studentResponse) {
+                        const similarityScore = cosineSimilarity(studentResponse, aiAnswer); // Compare with AI answer
+                        console.log(`Cosine similarity score between AI and student response for question ${i}: ${similarityScore}`);
 
-                    console.log(`Cosine similarity score between AI and student response: ${similarityScore}`);
-
-                    // Handle similarity score threshold
-                    if (similarityScore < 0.7) {
-                        // Show the helper video or AI tutor since the score is below the threshold
-                        freeFormHtml += `
-                            <p>Score below threshold! Showing helper video or AI Tutor.</p>
-                            <button onclick="showHelpVideo()">Show Help Video</button>
-                        `;
+                        // Handle similarity score threshold
+                        if (similarityScore < 0.7) {
+                            console.log(`Similarity below 70% for question ${i}, showing help.`);
+                            freeFormHtml += `
+                                <p>Score below threshold! Showing helper video or AI Tutor.</p>
+                                <button onclick="showHelpVideo()">Show Help Video</button>
+                            `;
+                        } else {
+                            console.log(`Similarity 70% or above for question ${i}, marking as answered.`);
+                            markQuestionsAsAnswered(i);
+                            freeFormHtml += `<p>Cosine Similarity: ${similarityScore.toFixed(2)}</p>`;
+                        }
                     } else {
-                        // Mark the question as answered if the score is 70% or higher
-                        markQuestionsAsAnswered(i);
-                        freeFormHtml += `<p>Cosine Similarity: ${similarityScore.toFixed(2)}</p>`;
+                        console.log(`No student response found for question ${i}.`);
                     }
+
                 }
 
                 return freeFormHtml;
