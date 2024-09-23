@@ -35,6 +35,9 @@
     <Content Include="api\chat.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="api\cosine_similarity.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="api\database.js" />
     <Content Include="api\general_page.js" />
     <Content Include="api\maths_questions.js" />

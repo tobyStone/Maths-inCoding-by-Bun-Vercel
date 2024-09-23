@@ -2,6 +2,7 @@ const { parse } = require('url');
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel');
 const { getAIResponse } = require('./chat');
+const cosineSimilarity = require('./cosine_similarity');
 require('dotenv').config();
 
 /**
@@ -22,6 +23,21 @@ async function generateQuestions(description) {
         .filter(q => q); // Assuming each question is on a new line
 }
 
+/**
+ * Generate AI Answer for the free-form question
+ *
+ * @param {string} questionText - The free-form question text.
+ * @returns {Promise<string>} - A promise that resolves to the AI-generated answer.
+ */
+async function getAIFreeFormAnswer(questionText) {
+    const prompt = `Answer the following question in simple terms for a 12-year-old student: "${questionText}"`;
+    const aiAnswer = await getAIResponse(prompt); // This calls the AI with the specific question
+
+    return aiAnswer;
+}
+
+
+
 module.exports = async (req, res) => {
     await db.connectToDatabase();
     const parsedUrl = parse(req.url, true);
@@ -40,16 +56,40 @@ module.exports = async (req, res) => {
             : 'http://localhost:3000/';
 
         // Updated logic to handle both free-form and multiple-choice questions
-        let questionsHtml;
-        questionsHtml = pageData.page.questionData.map((question, i) => {
+        let questionsHtml = await Promise.all(pageData.page.questionData.map(async (question, i) => {
             if (question.answer === "free-form") {
-                return `
-                    <div class="question-block" data-question-index="${i}">
-                        <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
-                        <p>${question.questionText}</p>
-                        <textarea id="student-response-${i}" name="response${i}" rows="4" cols="50"></textarea>
-                    </div>
-                `;
+                const aiAnswer = await getAIFreeFormAnswer(question.questionText); // Retrieve AI answer
+                question.aiAnswer = aiAnswer; // Store the AI answer (you can store it in memory or save it elsewhere)
+
+                // Compare student response with AI response using cosine similarity
+                const studentResponse = req.body[`response${i}`]; // Assuming student response is sent as form data
+                const similarityScore = cosineSimilarity(studentResponse, aiAnswer);
+
+                console.log(`Cosine similarity score between AI and student response: ${similarityScore}`);
+
+
+                // Handle below 70% similarity logic
+                if (similarityScore < 0.7) {
+                    // Load helper video/AI
+                    return `
+                        <div class="question-block" data-question-index="${i}">
+                            <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
+                            <p>${question.questionText}</p>
+                            <p>Score below threshold! Showing helper video or AI Tutor.</p>
+                            <!-- Logic for displaying the helper video -->
+                            <button onclick="showHelpVideo()">Show Help Video</button>
+                        </div>
+                    `;
+                } else {
+                    // Mark question as correct if similarity score is sufficient
+                    return `
+                        <div class="question-block" data-question-index="${i}">
+                            <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
+                            <p>${question.questionText}</p>
+                            <p>Cosine Similarity: ${similarityScore.toFixed(2)}</p>
+                        </div>
+                    `;
+                }
             } else {
                 const choicesHtml = question.choices.map((choice, j) =>
                     `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
@@ -64,7 +104,9 @@ module.exports = async (req, res) => {
                     </div>
                 `;
             }
-        }).join('');
+        }));
+
+        questionsHtml = questionsHtml.join('');
 
         const videoSrc_temp = pageData.page.helpVideo.videoSrc;
         const videoSrc = videoSrc_temp.replace('public/', '/');
