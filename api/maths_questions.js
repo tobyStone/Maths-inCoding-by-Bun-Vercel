@@ -32,6 +32,8 @@ async function generateQuestions(description) {
 async function getAIFreeFormAnswer(questionText) {
     const prompt = `Answer the following question in simple terms for a 12-year-old student: "${questionText}"`;
     const aiAnswer = await getAIResponse(prompt); // This calls the AI with the specific question
+    console.log(`AI Response for question "${questionText}": ${aiAnswer}`);  // Log the AI response for clarity
+
 
     return aiAnswer;
 }
@@ -68,6 +70,7 @@ module.exports = async (req, res) => {
                         <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
                         <p>${question.questionText}</p>
                         <textarea id="student-response-${i}" name="response${i}" rows="4" cols="50"></textarea>
+                       <p><strong>AI Generated Answer:</strong> ${aiAnswer}</p> <!-- Display AI answer -->
                     </div>
                 `;
 
