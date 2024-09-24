@@ -74,6 +74,10 @@ module.exports = async (req, res) => {
                     </div>
                 `;
 
+                console.log('Request method:', req.method);
+                console.log('Request body:', req.body);
+
+
                 // Check if form data is posted (POST request)
                 if (req.method === 'POST') {
                     const studentResponse = req.body[`response${i}`]; // Get the student's typed answer
@@ -293,8 +297,8 @@ module.exports = async (req, res) => {
                         </header>
                     </header>
                     <div id="questions-container" class="video-container">
-                      <form id="question-form" action="/submit-answers" method="POST">
-                              ${questionsHtml}
+                            <form id="question-form" action="/submit-answers" method="POST" enctype="application/x-www-form-urlencoded">
+                             ${questionsHtml}
                             <button type="submit" class="myButton">Send answer</button>
                         </form>
                     </div>
