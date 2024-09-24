@@ -77,6 +77,7 @@ module.exports = async (req, res) => {
                 // Check if form data is posted (POST request)
                 if (req.method === 'POST') {
                     const studentResponse = req.body[`response${i}`]; // Get the student's typed answer
+                    console.log('Student response is: ', studentResponse);
                     if (studentResponse) {
                         const similarityScore = cosineSimilarity(studentResponse, aiAnswer); // Compare with AI answer
                         console.log(`Cosine similarity score between AI and student response for question ${i}: ${similarityScore}`);
