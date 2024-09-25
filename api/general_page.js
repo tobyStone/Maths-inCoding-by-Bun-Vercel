@@ -10,7 +10,7 @@ const Layout = require('../models/linkedPage');
  */
 
 module.exports = async (req, res) => {
-//    await db.connectToDatabase(); // Ensures a single connection
+    await db.connectToDatabase(); // Ensures a single connection
     const parsedUrl = parse(req.url, true);
     const urlPath = parsedUrl.pathname; // Gets the path part of the URL
     const query = { 'page.url_stub': urlPath };
