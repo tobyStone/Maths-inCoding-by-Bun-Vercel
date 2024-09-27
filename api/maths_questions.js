@@ -2,7 +2,6 @@ const { parse } = require('url');
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel');
 const { getAIResponse } = require('./chat');
-const cosineSimilarity = require('./cosine_similarity');
 require('dotenv').config();
 
 /**
@@ -62,47 +61,22 @@ module.exports = async (req, res) => {
             if (question.answer === "free-form") {
                 // AI-generated answer for the free-form question
                 const aiAnswer = await getAIFreeFormAnswer(question.questionText);
-                question.aiAnswer = aiAnswer;  // Store the AI answer for later comparison
 
                 // Display the free-form answer box for the student
                 let freeFormHtml = `
-                    <div class="question-block" data-question-index="${i}">
-                        <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
-                        <p>${question.questionText}</p>
-                        <textarea id="student-response-${i}" name="response${i}" rows="4" cols="50"></textarea>
-                       <p><strong>AI Generated Answer:</strong> ${aiAnswer}</p> <!-- Display AI answer -->
-                    </div>
+                         <div class="question-block" data-question-index="${i}">
+                            <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
+                            <p>${question.questionText}</p>
+                            <textarea id="student-response-${i}" name="response${i}" rows="4" cols="50"></textarea>
+                            <p><strong>AI Generated Answer:</strong> ${aiAnswer}</p>
+                            <button type="button" class="submit-answer" data-index="${i}" data-ai="${aiAnswer}">Submit Answer</button>
+                            <div id="result-${i}"></div>
+                        </div>
                 `;
 
                 console.log('Request method:', req.method);
                 console.log('Request body:', req.body);
 
-
-                // Check if form data is posted (POST request)
-                if (req.method === 'POST') {
-                    const studentResponse = req.body[`response${i}`]; // Get the student's typed answer
-                    console.log('Student response is: ', studentResponse);
-                    if (studentResponse) {
-                        const similarityScore = cosineSimilarity(studentResponse, aiAnswer); // Compare with AI answer
-                        console.log(`Cosine similarity score between AI and student response for question ${i}: ${similarityScore}`);
-
-                        // Handle similarity score threshold
-                        if (similarityScore < 0.7) {
-                            console.log(`Similarity below 70% for question ${i}, showing help.`);
-                            freeFormHtml += `
-                                <p>Score below threshold! Showing helper video or AI Tutor.</p>
-                                <button onclick="showHelpVideo()">Show Help Video</button>
-                            `;
-                        } else {
-                            console.log(`Similarity 70% or above for question ${i}, marking as answered.`);
-                            markQuestionsAsAnswered(i);
-                            freeFormHtml += `<p>Cosine Similarity: ${similarityScore.toFixed(2)}</p>`;
-                        }
-                    } else {
-                        console.log(`No student response found for question ${i}.`);
-                    }
-
-                }
 
                 return freeFormHtml;
 
@@ -184,6 +158,36 @@ module.exports = async (req, res) => {
                 }
             }
 
+           document.querySelectorAll('.submit-answer').forEach(button => {
+                button.addEventListener('click', async function() {
+                    const index = this.dataset.index;
+                    const aiAnswer = this.dataset.ai;
+                    const studentResponse = document.querySelector(\`#student-response-\${index}\`).value;
+
+                    if (!studentResponse) {
+                        alert('Please provide an answer.');
+                        return;
+                    }
+
+                    try {
+                        const response = await axios.post('/api/cosine_similarity', {
+                            studentResponse: studentResponse,
+                            aiAnswer: aiAnswer
+                        });
+
+                        const { similarityScore, passed } = response.data;
+                        document.querySelector(\`#result-\${index}\`).innerHTML = passed
+                            ? \`<p>Great job! Cosine Similarity: \${similarityScore}</p>\`
+                            : \`<p>Score below threshold. Cosine Similarity: \${similarityScore}</p>\`;
+
+                    } catch (error) {
+                        console.error('Error submitting answer:', error);
+                        alert('Error processing your answer.');
+                    }
+                });
+            });
+
+
             function markQuestionsAsAnswered(index) {
                 let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
                 console.log('Before updating, questionsAnswered:', questionsAnswered); 
@@ -235,21 +239,28 @@ module.exports = async (req, res) => {
                 let responses = [];
                 let score = 0;
 
-                // Iterate over the questions to gather the responses
-                pageData.page.questionData.forEach((question, i) => {
-                    if (question.answer === "free-form") {
-                        const response = document.getElementById('student-response-' + i).value;
-                        responses.push({ question: question.questionText, response });
+             // Iterate over the questions to gather the responses
+                    pageData.page.questionData.forEach((question, i) => {
+                        if (question.answer === "free-form") {
+
+                        // Free-form answers handled via AJAX (already sent)
+                        return; // Skip form handling for free-form questions
                     } else {
-                        const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
-                        if (selectedChoice) {
-                            responses.push({ question: question.questionText, response: selectedChoice.value });
-                            // Check if the answer is correct (for multiple-choice questions)
-                            if (correctAnswers[i] === selectedChoice.value) {
-                                score++;
+                            // Handle multiple-choice responses the traditional way
+                            const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
+                            if (selectedChoice) {
+                                responses.push({ question: question.questionText, response: selectedChoice.value });
+
+                                // Check if the answer is correct (for multiple-choice questions)
+                                if (correctAnswers[i] === selectedChoice.value) {
+                                    score++;
+                                }
+                            } else {
+                                // If no choice is selected, handle it here (optional)
+                                console.log('No answer selected for multiple - choice question ${ i }.');
                             }
                         }
-                    }
+
                 });
 
                 console.log('Responses:', responses);
@@ -297,7 +308,7 @@ module.exports = async (req, res) => {
                         </header>
                     </header>
                     <div id="questions-container" class="video-container">
-                            <form id="question-form" action="/submit-answers" method="POST" enctype="application/x-www-form-urlencoded">
+                            <form id="question-form" action="/submit-answer" method="POST" enctype="application/x-www-form-urlencoded">
                              ${questionsHtml}
                             <button type="submit" class="myButton">Send answer</button>
                         </form>
