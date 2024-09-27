@@ -180,6 +180,13 @@ module.exports = async (req, res) => {
                             ? \`<p>Great job! Cosine Similarity: \${similarityScore}</p>\`
                             : \`<p>Score below threshold. Cosine Similarity: \${similarityScore}</p>\`;
 
+
+                        // If the cosine similarity passes the threshold, mark the question as answered
+                        if (passed) {
+                            markQuestionsAsAnswered(index);  // Call the function to mark the question as answered
+                        }
+
+
                     } catch (error) {
                         console.error('Error submitting answer:', error);
                         alert('Error processing your answer.');
