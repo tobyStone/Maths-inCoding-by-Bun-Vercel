@@ -257,7 +257,7 @@ module.exports = async (req, res) => {
                                 }
                             } else {
                                 // If no choice is selected, handle it here (optional)
-                                console.log('No answer selected for multiple - choice question ${ i }.');
+                                console.log('No answer selected for multiple - choice question.');
                             }
                         }
 
