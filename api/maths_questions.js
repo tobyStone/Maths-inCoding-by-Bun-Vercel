@@ -184,6 +184,8 @@ module.exports = async (req, res) => {
                         // If the cosine similarity passes the threshold, mark the question as answered
                         if (passed) {
                             markQuestionsAsAnswered(index);  // Call the function to mark the question as answered
+                            redirectToPreviousVideo();
+
                         }
 
 
