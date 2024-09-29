@@ -160,7 +160,7 @@ module.exports = async (req, res) => {
 
            document.querySelectorAll('.submit-answer').forEach(button => {
                 button.addEventListener('click', async function() {
-                    const index = this.dataset.index;
+                    const index = parseInt(this.getAttribute('data-index'), 10);
                     const aiAnswer = this.dataset.ai;
                     const studentResponse = document.querySelector(\`#student-response-\${index}\`).value;
 
