@@ -161,6 +161,7 @@ module.exports = async (req, res) => {
            document.querySelectorAll('.submit-answer').forEach(button => {
                 button.addEventListener('click', async function() {
                     const index = parseInt(this.getAttribute('data-index'), 10);
+                    console.log("INDEX IN submit-answer button: ", index)
                     const aiAnswer = this.dataset.ai;
                     const studentResponse = document.querySelector(\`#student-response-\${index}\`).value;
 
@@ -198,6 +199,7 @@ module.exports = async (req, res) => {
 
 
             function markQuestionsAsAnswered(index) {
+                console.log("INDEX IN markQuestions function: ", index)
                 let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
                 console.log('Before updating, questionsAnswered:', questionsAnswered); 
 
