@@ -160,7 +160,9 @@ module.exports = async (req, res) => {
 
            document.querySelectorAll('.submit-answer').forEach(button => {
                 button.addEventListener('click', async function() {
-                    const index = parseInt(this.getAttribute('data-index'), 10);
+
+                // Determine the current question set by finding the closest .question-block and its data-question-index
+                    const index = parseInt(getQueryParameter('index'), 10);
                     console.log("INDEX IN submit-answer button: ", index)
                     const aiAnswer = this.dataset.ai;
                     const studentResponse = document.querySelector(\`#student-response-\${index}\`).value;
