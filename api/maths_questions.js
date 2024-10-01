@@ -160,10 +160,11 @@ module.exports = async (req, res) => {
 
            document.querySelectorAll('.submit-answer').forEach(button => {
                 button.addEventListener('click', async function() {
+                    const index = parseInt(this.getAttribute('data-index'), 10);
+                    const questionIndex = parseInt(getQueryParameter('index'), 10);
 
-                // Determine the current question set by finding the closest .question-block and its data-question-index
-                    const index = parseInt(getQueryParameter('index'), 10);
-                    console.log("INDEX IN submit-answer button: ", index)
+
+                    console.log("INDEX IN submit-answer button: ", questionIndex)
                     const aiAnswer = this.dataset.ai;
                     const studentResponse = document.querySelector(\`#student-response-\${index}\`).value;
 
@@ -186,7 +187,7 @@ module.exports = async (req, res) => {
 
                         // If the cosine similarity passes the threshold, mark the question as answered
                         if (passed) {
-                            markQuestionsAsAnswered(index);  // Call the function to mark the question as answered
+                            markQuestionsAsAnswered(questionIndex);  // Call the function to mark the question as answered
                             redirectToPreviousVideo();
 
                         }
