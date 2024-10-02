@@ -219,7 +219,7 @@ module.exports = async (req, res) => {
 
                     if (question.answer === "free-form") {
                         // Handle the free-form response, pushing the logic from the previous 'submit-answer' button into this block
-                        const studentResponse = document.getElementById('student-response-' + i).value;
+                        const studentResponse = document.getElementById('#student-response - ${ index }').value;
 
                         if (!studentResponse) {
                             console.log("No answer provided for free - form question.");
@@ -235,7 +235,7 @@ module.exports = async (req, res) => {
 
                             const { similarityScore, passed } = response.data;
 
-                            document.querySelector('#result - ${ i } ').innerHTML = passed
+                            document.querySelector('#result-${ index }').innerHTML = passed
                                 ? '< p > Great job! Cosine Similarity: ${ similarityScore }</p > '
                                 : '< p > Score below threshold.Cosine Similarity: ${ similarityScore }</p > ';
 
