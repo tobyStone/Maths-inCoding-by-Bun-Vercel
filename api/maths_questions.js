@@ -222,7 +222,7 @@ module.exports = async (req, res) => {
                         const studentResponse = document.getElementById('student-response-' + i).value;
 
                         if (!studentResponse) {
-                            console.log("No answer provided for free - form question at index ${ i } ");
+                            console.log("No answer provided for free - form question.");
                             continue; // Skip to the next question if no answer is provided
                         }
 
@@ -260,7 +260,7 @@ module.exports = async (req, res) => {
                                 score++;
                             }
                         } else {
-                            console.log("No answer selected for multiple - choice question at index ${ i }");
+                            console.log("No answer selected for multiple - choice question.");
                         }
                     }
                 }
