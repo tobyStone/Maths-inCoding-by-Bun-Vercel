@@ -245,7 +245,7 @@ module.exports = async (req, res) => {
                         }
 
                         } catch (error) {
-                            console.error('Error submitting answer for free - form question at index ${ i }:', error);
+                            console.error('Error submitting answer for free - form question at index ' + i, error);
                             alert('Error processing your free-form answer. Please try again.');
                         }
 
