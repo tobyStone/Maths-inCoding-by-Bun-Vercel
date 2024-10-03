@@ -63,14 +63,13 @@ module.exports = async (req, res) => {
                 const aiAnswer = await getAIFreeFormAnswer(question.questionText);
 
                 // Display the free-form answer box for the student
-                let freeFormHtml = `
-                         <div class="question-block" data-question-index="${i}">
-                            <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
-                            <p>${question.questionText}</p>
-                            <textarea id="student-response-${i}" name="response${i}" rows="4" cols="50"></textarea>
-                           <div id="result-${i}"></div>
-                        </div>
-                `;
+                let freeFormHtml =
+                    '<div class="question-block" data-question-index="' + i + '">' +
+                    '<img src="' + question.imgSrc + '" alt="' + question.imgAlt + '" width="525" height="350" />' +
+                    '<p>' + question.questionText + '</p>' +
+                    '<textarea id="student-response-' + i + '" name="response' + i + '" rows="4" cols="50"></textarea>' +
+                    '<div id="result-' + i + '"></div>' +
+                    '</div>';
 
                 console.log('Request method:', req.method);
                 console.log('Request body:', req.body);
@@ -80,10 +79,10 @@ module.exports = async (req, res) => {
 
             } else {
                 // Render multiple-choice questions
-                const choicesHtml = question.choices.map((choice, j) =>
-                    `<input type="radio" name="answer${i}" id="choice${i}-${j}" value="${choice}">
-                    <label for="choice${i}-${j}">${choice}</label>`
-                ).join('');
+                const choicesHtml = question.choices.map(function (choice, j) {
+                    return '<input type="radio" name="answer' + i + '" id="choice' + i + '-' + j + '" value="' + choice + '">' +
+                        '<label for="choice' + i + '-' + j + '">' + choice + '</label>';
+                }).join('');
 
                 return `
                     <div class="question-block" data-question-index="${i}">
@@ -104,9 +103,9 @@ module.exports = async (req, res) => {
 
         const predefinedQuestions = await generateQuestions(videoDescription);
 
-        const predefinedQuestionsHtml = predefinedQuestions.map((question, i) => `
-            <button class="question-button" onclick="handleQuestionButtonClick('${question.replace(/'/g, "\\'")}')">${question}</button>
-        `).join('');
+        const predefinedQuestionsHtml = predefinedQuestions.map(function (question, i) {
+            return '<button class="question-button" onclick="handleQuestionButtonClick(\'' + question.replace(/'/g, "\\'") + '\')">' + question + '</button>';
+        }).join('');
 
         const helpVideoExists = !!pageData.page.helpVideo;
 
@@ -251,8 +250,8 @@ module.exports = async (req, res) => {
 
                     } else {
                         // Handle multiple-choice responses
-                        const selectedChoice = document.querySelector("input[name="answer${i}"]: checked');
-                        if (selectedChoice) {
+                      const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
+                      if (selectedChoice) {
                             responses.push({ question: question.questionText, response: selectedChoice.value });
 
                             // Check if the answer is correct (for multiple-choice questions)
