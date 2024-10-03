@@ -226,7 +226,7 @@ module.exports = async (req, res) => {
 
                         try {
                             // Call the cosine similarity API for free-form answers
-                            const response = await axios.post('/api/cosine_similarity', {
+                            const response = await axios.post('/api/cosine_similarity.js', {
                                 studentResponse: studentResponse,
                                 aiAnswer: question.aiAnswer // Assuming aiAnswer is pre-fetched and available in the question object
                             });
