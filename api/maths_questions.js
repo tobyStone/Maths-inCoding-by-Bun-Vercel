@@ -156,49 +156,7 @@ module.exports = async (req, res) => {
                 }
             }
 
-           document.querySelectorAll('.submit-answer').forEach(button => {
-                button.addEventListener('click', async function() {
-                    const index = parseInt(this.getAttribute('data-index'), 10);
-                    const questionIndex = parseInt(getQueryParameter('index'), 10);
-
-
-                    console.log("INDEX IN submit-answer button: ", questionIndex)
-                    const aiAnswer = this.dataset.ai;
-                    const studentResponse = document.querySelector(\`#student-response-\${index}\`).value;
-
-                    if (!studentResponse) {
-                        alert('Please provide an answer.');
-                        return;
-                    }
-
-                    try {
-                        const response = await axios.post('/api/cosine_similarity', {
-                            studentResponse: studentResponse,
-                            aiAnswer: aiAnswer
-                        });
-
-                        const { similarityScore, passed } = response.data;
-                        document.querySelector(\`#result-\${index}\`).innerHTML = passed
-                            ? \`<p>Great job! Cosine Similarity: \${similarityScore}</p>\`
-                            : \`<p>Score below threshold. Cosine Similarity: \${similarityScore}</p>\`;
-
-
-                        // If the cosine similarity passes the threshold, mark the question as answered
-                        if (passed) {
-                            markQuestionsAsAnswered(questionIndex);  // Call the function to mark the question as answered
-                            redirectToPreviousVideo();
-
-                        }
-
-
-                    } catch (error) {
-                        console.error('Error submitting answer:', error);
-                        alert('Error processing your answer.');
-                    }
-                });
-            });
-
-
+ 
             function markQuestionsAsAnswered(index) {
                 console.log("INDEX IN markQuestions function: ", index)
                 let questionsAnswered = JSON.parse(localStorage.getItem('questionsAnswered')) || new Array(totalQuestions).fill(false);
@@ -246,48 +204,77 @@ module.exports = async (req, res) => {
             const totalQuestions = ${pageData.page.questionData.length};
             const helpVideoExists = ${helpVideoExists};
 
-            document.getElementById('question-form').addEventListener('submit', function(event) {
+            document.getElementById('question-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
                 let responses = [];
                 let score = 0;
+                const questionIndex = parseInt(getQueryParameter('index'), 10);
 
-             // Iterate over the questions to gather the responses
-                    pageData.page.questionData.forEach((question, i) => {
-                        if (question.answer === "free-form") {
 
-                        // Free-form answers handled via AJAX (already sent)
-                        return; // Skip form handling for free-form questions
-                    } else {
-                            // Handle multiple-choice responses the traditional way
-                            const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
-                            if (selectedChoice) {
-                                responses.push({ question: question.questionText, response: selectedChoice.value });
 
-                                // Check if the answer is correct (for multiple-choice questions)
-                                if (correctAnswers[i] === selectedChoice.value) {
-                                    score++;
-                                }
-                            } else {
-                                // If no choice is selected, handle it here (optional)
-                                console.log('No answer selected for multiple - choice question.');
-                            }
+                // Iterate over the questions to gather responses
+                for (let i = 0; i < pageData.page.questionData.length; i++) {
+                    const question = pageData.page.questionData[i];
+
+                    if (question.answer === "free-form") {
+                        // Handle the free-form response
+                        const studentResponse = document.querySelector('#student-response - ${ i } ').value;
+
+                        if (!studentResponse) {
+                            console.log('No answer provided for free - form question at index ${ i } ');
+                            continue; // Skip to the next question if no answer is provided
                         }
 
-                });
+                        try {
+                            // Call the cosine similarity API for free-form answers
+                            const response = await axios.post('/api/cosine_similarity', {
+                                studentResponse: studentResponse,
+                                aiAnswer: question.aiAnswer // Assuming aiAnswer is pre-fetched and available in the question object
+                            });
 
-                console.log('Responses:', responses);
+                            const { similarityScore, passed } = response.data;
+                            document.querySelector('#result - ${ i } ').innerHTML = passed
+                                ? '< p > Great job! Cosine Similarity: ${ similarityScore }</p > '
+                                : '< p > Score below threshold.Cosine Similarity: ${ similarityScore }</p > ';
 
-                // Calculate the percentage score based on total questions and correct answers
-                const scorePercentage = (score / totalQuestions) * 100;
+                            // If the cosine similarity passes the threshold, mark the question as answered
+                            if (passed) {
+                                markQuestionsAsAnswered(questionIndex);
+                                redirectToPreviousVideo();
 
-                // Determine the current question set by finding the closest .question-block and its data-question-index
-                const questionIndex = parseInt(getQueryParameter('index'), 10);
+                        }
+
+                        } catch (error) {
+                            console.error('Error submitting answer for free - form question at index ${ i }: ', error);
+                            alert('Error processing your free-form answer. Please try again.');
+                        }
+
+                    } else {
+                        // Handle multiple-choice responses
+                        const selectedChoice = document.querySelector('input[name = "answer${i}"]: checked');
+                        if (selectedChoice) {
+                            responses.push({ question: question.questionText, response: selectedChoice.value });
+
+                            // Check if the answer is correct (for multiple-choice questions)
+                            if (question.answer === selectedChoice.value) {
+                                score++;
+                            }
+                        } else {
+                            console.log('No answer selected for multiple - choice question at index ${ i }');
+                        }
+                    }
+                }
+
+                console.log('Collected Responses:', responses);
+
+                // Calculate score percentage and determine the next steps
+                const scorePercentage = (score / pageData.page.questionData.length) * 100;
 
                 if (scorePercentage <= 80) {
                     if (helpVideoExists) {
                         showHelpVideo();
                     } else {
-                        alert("Not found video");
+                        alert("No help video found");
                         window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
                     }
                 } else {
@@ -295,6 +282,7 @@ module.exports = async (req, res) => {
                     redirectToPreviousVideo();
                 }
             });
+
 
             window.handleQuestionButtonClick = handleQuestionButtonClick;
         `;
