@@ -251,7 +251,7 @@ module.exports = async (req, res) => {
 
                     } else {
                         // Handle multiple-choice responses
-                        const selectedChoice = document.querySelector('input[name = "answer " + i]: checked');
+                        const selectedChoice = document.querySelector('input[name = "answer${i}"]: checked');
                         if (selectedChoice) {
                             responses.push({ question: question.questionText, response: selectedChoice.value });
 
