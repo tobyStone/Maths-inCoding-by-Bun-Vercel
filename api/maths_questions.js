@@ -218,10 +218,10 @@ module.exports = async (req, res) => {
 
                     if (question.answer === "free-form") {
                         // Handle the free-form response
-                        const studentResponse = document.querySelector('#student-response - ${ i }').value;
+                        const studentResponse = document.querySelector('#student-response-${i}').value;
 
                         if (!studentResponse) {
-                            console.log('No answer provided for free - form question at index ${ i }');
+                            console.log('No answer provided for free - form question at index ${i}');
                             continue; // Skip to the next question if no answer is provided
                         }
 
@@ -233,9 +233,9 @@ module.exports = async (req, res) => {
                             });
 
                             const { similarityScore, passed } = response.data;
-                            document.querySelector('#result - ${ i } ').innerHTML = passed
-                                ? '< p > Great job! Cosine Similarity: ${ similarityScore }</p >'
-                                : '< p > Score below threshold.Cosine Similarity: ${ similarityScore }</p >';
+                            document.querySelector('#result-${i}').innerHTML = passed
+                                ? '< p > Great job! Cosine Similarity: ${similarityScore}</p >'
+                                : '< p > Score below threshold.Cosine Similarity: ${similarityScore}</p >';
 
                             // If the cosine similarity passes the threshold, mark the question as answered
                             if (passed) {
@@ -260,7 +260,7 @@ module.exports = async (req, res) => {
                                 score++;
                             }
                         } else {
-                            console.log('No answer selected for multiple - choice question at index ${ i }');
+                            console.log('No answer selected for multiple - choice question at index ${i}');
                         }
                     }
                 }
