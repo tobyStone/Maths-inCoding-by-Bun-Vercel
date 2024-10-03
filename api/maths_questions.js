@@ -224,12 +224,17 @@ module.exports = async (req, res) => {
                             continue; // Skip to the next question if no answer is provided
                         }
 
-                        try {
-                            // Call the cosine similarity API for free-form answers
+                     try {
+                            // Correcting the URL and data being sent to the API
                             const response = await axios.post('/api/cosine_similarity.js', {
                                 studentResponse: studentResponse,
                                 aiAnswer: question.aiAnswer // Assuming aiAnswer is pre-fetched and available in the question object
+                            }, {
+                                headers: {
+                                    'Content-Type': 'application/json' // Add appropriate content type
+                                }
                             });
+
 
                             const { similarityScore, passed } = response.data;
                             document.querySelector('#result-' + i).innerHTML = passed
