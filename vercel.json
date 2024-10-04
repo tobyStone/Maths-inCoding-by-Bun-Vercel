@@ -26,8 +26,8 @@
       "destination": "/api/maths_questions.js"
     },
     {
-      "source": "/api/handle_response",
-      "destination": "/api/maths_questions.js"
+      "source": "/api/cosine_similarity",
+      "destination": "/api/cosine_similarity.js"
     }
   ]
 }

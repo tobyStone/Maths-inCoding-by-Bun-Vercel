@@ -2,7 +2,6 @@ const { parse } = require('url');
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel');
 const { getAIResponse } = require('./chat');
-const cosineSimilarity = require('./cosine_similarity'); // Import the cosine similarity function
 require('dotenv').config();
 
 /**
@@ -64,13 +63,15 @@ module.exports = async (req, res) => {
                 const aiAnswer = await getAIFreeFormAnswer(question.questionText);
 
                 // Display the free-form answer box for the student
-                let freeFormHtml =
-                    '<div class="question-block" data-question-index="' + i + '">' +
-                    '<img src="' + question.imgSrc + '" alt="' + question.imgAlt + '" width="525" height="350" />' +
-                    '<p>' + question.questionText + '</p>' +
-                    '<textarea id="student-response-' + i + '" name="response' + i + '" rows="4" cols="50"></textarea>' +
-                    '<div id="result-' + i + '"></div>' +
-                    '</div>';
+                let freeFormHtml = `
+                    <div class="question-block" data-question-index="${i}">
+                        <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
+                        <p>${question.questionText}</p>
+                        <textarea id="student-response" name="response" rows="4" cols="50"></textarea>
+                        <input type="hidden" id="ai-answer" value="${aiAnswer}" />
+                        <div id="result-${i}"></div>
+                    </div>
+                `;
 
                 console.log('Request method:', req.method);
                 console.log('Request body:', req.body);
@@ -107,48 +108,6 @@ module.exports = async (req, res) => {
         const predefinedQuestionsHtml = predefinedQuestions.map(function (question, i) {
             return '<button class="question-button" onclick="handleQuestionButtonClick(\'' + question.replace(/'/g, "\\'") + '\')">' + question + '</button>';
         }).join('');
-
-        if (req.method === 'POST') {
-            try {
-                const { studentResponse } = req.body;
-                if (!studentResponse) {
-                    return res.status(400).json({ error: 'Student response is missing' });
-                }
-
-                // Fetch the page data again to access the AI-generated answer
-                const parsedUrl = parse(req.url, true);
-                const urlPath = parsedUrl.pathname;
-                const query = { 'page.url_stub': urlPath };
-
-                const pageData = await QuestionModel.findOne(query).exec();
-                if (!pageData || !pageData.page || !pageData.page.questionData) {
-                    return res.status(404).send('Page not found');
-                }
-
-                const question = pageData.page.questionData.find(q => q.answer === "free-form");
-                if (!question) {
-                    return res.status(404).send('Free-form question not found');
-                }
-
-                const aiAnswer = await getAIFreeFormAnswer(question.questionText);
-
-
-                // Use the cosineSimilarity function to compare the AI answer and student response
-                const similarityScore = cosineSimilarity(studentResponse, question.aiAnswer);
-                const passed = similarityScore >= 0.7;
-
-                res.status(200).json({
-                    similarityScore: similarityScore.toFixed(2),
-                    passed: passed
-                });
-
-            } catch (error) {
-                console.error('Error handling student response:', error);
-                res.status(500).json({ error: 'Internal Server Error' });
-            }
-        } else {
-            res.status(405).json({ message: 'Method Not Allowed' });
-        }
 
 
         const helpVideoExists = !!pageData.page.helpVideo;
@@ -263,7 +222,10 @@ module.exports = async (req, res) => {
     
                      try {
                         // Handle the free-form response
-                            const studentResponse = document.querySelector('#student-response-' + i).value;
+                            const studentResponse = document.querySelector('#student-response').value;
+                            // Get AI answer from the hidden input
+                            const aiAnswer = document.querySelector('#ai-answer').value;
+
 
                             if (!studentResponse) {
                                 console.log('No answer provided for free-form question at index ' + i);
@@ -279,9 +241,10 @@ module.exports = async (req, res) => {
 
 
                         // Correcting the URL and data being sent to the API
-                            const response = await axios.post('/api/handle_response', {
-                                studentResponse: studentResponse,
-                             }, {
+                             const response = await axios.post('/api/cosine_similarity', {
+                                    studentResponse: studentResponse,
+                                    aiAnswer: aiAnswer
+                               }, {
                                 headers: {
                                     'Content-Type': 'application/json' // Add appropriate content type
                                 }
