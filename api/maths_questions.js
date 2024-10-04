@@ -216,17 +216,26 @@ module.exports = async (req, res) => {
                     const question = pageData.page.questionData[i];
 
                     if (question.answer === "free-form") {
-                        // Handle the free-form response
-                        const studentResponse = document.querySelector('#student-response-' + i).value;
-
-                        if (!studentResponse) {
-                            console.log('No answer provided for free-form question at index ' + i);
-                            continue; // Skip to the next question if no answer is provided
-                        }
-
+    
                      try {
-                            // Correcting the URL and data being sent to the API
-                            const response = await axios.post('/api/cosine_similarity.js', {
+                        // Handle the free-form response
+                            const studentResponse = document.querySelector('#student-response-' + i).value;
+
+                            if (!studentResponse) {
+                                console.log('No answer provided for free-form question at index ' + i);
+                                continue; // Skip to the next question if no answer is provided
+                            }
+
+                           // Log the request data to verify before sending the request
+                            console.log('Request body:', {
+                                studentResponse: studentResponse,
+                                aiAnswer: question.aiAnswer
+                            });
+
+
+
+                        // Correcting the URL and data being sent to the API
+                            const response = await axios.post('/api/cosine_similarity', {
                                 studentResponse: studentResponse,
                                 aiAnswer: question.aiAnswer // Assuming aiAnswer is pre-fetched and available in the question object
                             }, {

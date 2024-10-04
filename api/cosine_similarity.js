@@ -25,6 +25,10 @@ function cosineSimilarity(text1, text2) {
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
+
+        console.log('Received POST request body:', req.body);
+
+
         const { studentResponse, aiAnswer } = req.body;
 
         // Ensure the student response and AI answer exist
