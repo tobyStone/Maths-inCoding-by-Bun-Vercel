@@ -63,15 +63,13 @@ module.exports = async (req, res) => {
                 const aiAnswer = await getAIFreeFormAnswer(question.questionText);
 
                 // Display the free-form answer box for the student
-                let freeFormHtml = `
-                    <div class="question-block" data-question-index="${i}">
-                        <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
-                        <p>${question.questionText}</p>
-                        <textarea id="student-response" name="response" rows="4" cols="50"></textarea>
-                        <input type="hidden" id="ai-answer" value="${aiAnswer}" />
-                        <div id="result-${i}"></div>
-                    </div>
-                `;
+                let freeFormHtml = '<div class="question-block" data-question-index="' + i + '">' +
+                    '<img src="' + question.imgSrc + '" alt="' + question.imgAlt + '" width="525" height="350" />' +
+                    '<p>' + question.questionText + '</p>' +
+                    '<textarea id="student-response-' + i + '" name="response' + i + '" rows="4" cols="50"></textarea>' +
+                    '<input type="hidden" id="ai-answer-' + i + '" value="' + aiAnswer + '" />' +
+                    '<div id="result-' + i + '"></div>' +
+                    '</div>';
 
                 console.log('Request method:', req.method);
                 console.log('Request body:', req.body);
@@ -230,7 +228,7 @@ module.exports = async (req, res) => {
                                     continue; // Skip to the next question if no answer is provided
                                 }
 
-                                const aiAnswerElement = document.querySelector('#ai-answer');
+                                const aiAnswerElement = document.querySelector('#ai-answer-' + i);
 
                                 // Log to confirm if the aiAnswer element is properly found
                                 console.log("AI Answer Element:", aiAnswerElement);
