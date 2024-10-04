@@ -2,6 +2,7 @@ const { parse } = require('url');
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel');
 const { getAIResponse } = require('./chat');
+const cosineSimilarity = require('./cosine_similarity'); // Import the cosine similarity function
 require('dotenv').config();
 
 /**
@@ -106,6 +107,46 @@ module.exports = async (req, res) => {
         const predefinedQuestionsHtml = predefinedQuestions.map(function (question, i) {
             return '<button class="question-button" onclick="handleQuestionButtonClick(\'' + question.replace(/'/g, "\\'") + '\')">' + question + '</button>';
         }).join('');
+
+        if (req.method === 'POST') {
+            try {
+                const { studentResponse } = req.body;
+                if (!studentResponse) {
+                    return res.status(400).json({ error: 'Student response is missing' });
+                }
+
+                // Fetch the page data again to access the AI-generated answer
+                const parsedUrl = parse(req.url, true);
+                const urlPath = parsedUrl.pathname;
+                const query = { 'page.url_stub': urlPath };
+
+                const pageData = await QuestionModel.findOne(query).exec();
+                if (!pageData || !pageData.page || !pageData.page.questionData) {
+                    return res.status(404).send('Page not found');
+                }
+
+                const question = pageData.page.questionData.find(q => q.answer === "free-form");
+                if (!question || !question.aiAnswer) {
+                    return res.status(404).send('Free-form question or AI answer not found');
+                }
+
+                // Use the cosineSimilarity function to compare the AI answer and student response
+                const similarityScore = cosineSimilarity(studentResponse, question.aiAnswer);
+                const passed = similarityScore >= 0.7;
+
+                res.status(200).json({
+                    similarityScore: similarityScore.toFixed(2),
+                    passed: passed
+                });
+
+            } catch (error) {
+                console.error('Error handling student response:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        } else {
+            res.status(405).json({ message: 'Method Not Allowed' });
+        }
+
 
         const helpVideoExists = !!pageData.page.helpVideo;
 
@@ -235,10 +276,9 @@ module.exports = async (req, res) => {
 
 
                         // Correcting the URL and data being sent to the API
-                            const response = await axios.post('/api/cosine_similarity', {
+                            const response = await axios.post('/api/handle_response', {
                                 studentResponse: studentResponse,
-                                aiAnswer: question.aiAnswer // Assuming aiAnswer is pre-fetched and available in the question object
-                            }, {
+                             }, {
                                 headers: {
                                     'Content-Type': 'application/json' // Add appropriate content type
                                 }
