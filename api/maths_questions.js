@@ -126,9 +126,12 @@ module.exports = async (req, res) => {
                 }
 
                 const question = pageData.page.questionData.find(q => q.answer === "free-form");
-                if (!question || !question.aiAnswer) {
-                    return res.status(404).send('Free-form question or AI answer not found');
+                if (!question) {
+                    return res.status(404).send('Free-form question not found');
                 }
+
+                const aiAnswer = await getAIFreeFormAnswer(question.questionText);
+
 
                 // Use the cosineSimilarity function to compare the AI answer and student response
                 const similarityScore = cosineSimilarity(studentResponse, question.aiAnswer);
