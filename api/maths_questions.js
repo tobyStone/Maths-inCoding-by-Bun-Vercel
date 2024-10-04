@@ -206,100 +206,105 @@ module.exports = async (req, res) => {
             const totalQuestions = ${pageData.page.questionData.length};
             const helpVideoExists = ${helpVideoExists};
 
-            document.getElementById('question-form').addEventListener('submit', async function(event) {
-                event.preventDefault();
-                let responses = [];
-                let score = 0;
-                const questionIndex = parseInt(getQueryParameter('index'), 10);
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('question-form').addEventListener('submit', async function(event) {
+                    event.preventDefault();
+                    let responses = [];
+                    let score = 0;
+                    const questionIndex = parseInt(getQueryParameter('index'), 10);
 
 
 
-                // Iterate over the questions to gather responses
-                for (let i = 0; i < pageData.page.questionData.length; i++) {
-                    const question = pageData.page.questionData[i];
+                    // Iterate over the questions to gather responses
+                    for (let i = 0; i < pageData.page.questionData.length; i++) {
+                        const question = pageData.page.questionData[i];
 
-                    if (question.answer === "free-form") {
+                        if (question.answer === "free-form") {
     
-                     try {
-                        // Handle the free-form response
-                            const studentResponse = document.querySelector('#student-response').value;
-                            // Get AI answer from the hidden input
-                            const aiAnswer = document.querySelector('#ai-answer').value;
+                         try {
+                            // Handle the free-form response
+                                const studentResponse = document.querySelector('#student-response').value;
 
-
-                            if (!studentResponse) {
-                                console.log('No answer provided for free-form question at index ' + i);
-                                continue; // Skip to the next question if no answer is provided
-                            }
-
-                           // Log the request data to verify before sending the request
-                            console.log('Request body:', {
-                                studentResponse: studentResponse,
-                                aiAnswer: question.aiAnswer
-                            });
-
-
-
-                        // Correcting the URL and data being sent to the API
-                             const response = await axios.post('/api/cosine_similarity', {
-                                    studentResponse: studentResponse,
-                                    aiAnswer: aiAnswer
-                               }, {
-                                headers: {
-                                    'Content-Type': 'application/json' // Add appropriate content type
+                                if (!studentResponse) {
+                                    console.log('No answer provided for free-form question at index ' + i);
+                                    continue; // Skip to the next question if no answer is provided
                                 }
-                            });
+
+                                // Get AI answer from the hidden input
+                                const aiAnswer = document.querySelector('#ai-answer')?.value;
+
+                                if (!aiAnswer) {
+                                    console.error("AI answer is undefined or missing from the hidden input.");
+                                }
+
+                               // Log the request data to verify before sending the request
+                                console.log('Request body:', {
+                                    studentResponse: studentResponse,
+                                    aiAnswer: question.aiAnswer
+                                });
 
 
-                            const { similarityScore, passed } = response.data;
-                            document.querySelector('#result-' + i).innerHTML = passed
-                                ? '<p>Great job! Cosine Similarity: ' + similarityScore + '</p>'
-                                : '<p>Score below threshold. Cosine Similarity: ' + similarityScore + '</p>';
+                            // Correcting the URL and data being sent to the API
+                                 const response = await axios.post('/api/cosine_similarity', {
+                                        studentResponse: studentResponse,
+                                        aiAnswer: aiAnswer
+                                   }, {
+                                    headers: {
+                                        'Content-Type': 'application/json' // Add appropriate content type
+                                    }
+                                });
 
-                            // If the cosine similarity passes the threshold, mark the question as answered
-                            if (passed) {
-                                markQuestionsAsAnswered(questionIndex);
-                                redirectToPreviousVideo();
 
-                        }
+                                const { similarityScore, passed } = response.data;
+                                document.querySelector('#result-' + i).innerHTML = passed
+                                    ? '<p>Great job! Cosine Similarity: ' + similarityScore + '</p>'
+                                    : '<p>Score below threshold. Cosine Similarity: ' + similarityScore + '</p>';
 
-                        } catch (error) {
-                            console.error('Error submitting answer for free - form question at index ' + i, error);
-                            alert('Error processing your free-form answer. Please try again.');
-                        }
+                                // If the cosine similarity passes the threshold, mark the question as answered
+                                if (passed) {
+                                    markQuestionsAsAnswered(questionIndex);
+                                    redirectToPreviousVideo();
 
-                    } else {
-                        // Handle multiple-choice responses
-                      const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
-                      if (selectedChoice) {
-                            responses.push({ question: question.questionText, response: selectedChoice.value });
-
-                            // Check if the answer is correct (for multiple-choice questions)
-                            if (question.answer === selectedChoice.value) {
-                                score++;
                             }
+
+                            } catch (error) {
+                                console.error('Error submitting answer for free - form question at index ' + i, error);
+                                alert('Error processing your free-form answer. Please try again.');
+                            }
+
                         } else {
-                            console.log('No answer selected for multiple-choice question at index ' + i);
+                            // Handle multiple-choice responses
+                          const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
+                          if (selectedChoice) {
+                                responses.push({ question: question.questionText, response: selectedChoice.value });
+
+                                // Check if the answer is correct (for multiple-choice questions)
+                                if (question.answer === selectedChoice.value) {
+                                    score++;
+                                }
+                            } else {
+                                console.log('No answer selected for multiple-choice question at index ' + i);
+                            }
                         }
                     }
-                }
 
-                console.log('Collected Responses:', responses);
+                    console.log('Collected Responses:', responses);
 
-                // Calculate score percentage and determine the next steps
-                const scorePercentage = (score / pageData.page.questionData.length) * 100;
+                    // Calculate score percentage and determine the next steps
+                    const scorePercentage = (score / pageData.page.questionData.length) * 100;
 
-                if (scorePercentage <= 80) {
-                    if (helpVideoExists) {
-                        showHelpVideo();
+                    if (scorePercentage <= 80) {
+                        if (helpVideoExists) {
+                            showHelpVideo();
+                        } else {
+                            alert("No help video found");
+                            window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
+                        }
                     } else {
-                        alert("No help video found");
-                        window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
+                        markQuestionsAsAnswered(questionIndex);
+                        redirectToPreviousVideo();
                     }
-                } else {
-                    markQuestionsAsAnswered(questionIndex);
-                    redirectToPreviousVideo();
-                }
+                });
             });
 
 
