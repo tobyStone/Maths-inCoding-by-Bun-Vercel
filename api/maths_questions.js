@@ -228,31 +228,26 @@ module.exports = async (req, res) => {
                                     continue; // Skip to the next question if no answer is provided
                                 }
 
-                                const aiAnswerElement = document.querySelector('#ai-answer-0');
+                                const aiAnswer = document.querySelector('#ai-answer-0');
 
                                 // Log to confirm if the aiAnswer element is properly found
-                                console.log("AI Answer Element:", aiAnswerElement);
+                                console.log("AI Answer:", aiAnswer);
 
                                 if (!studentResponse) {
                                     console.log('No answer provided by the student.');
                                     return;
                                 }
 
-                                if (!aiAnswerElement) {
-                                    console.error('Hidden input element for AI answer not found.');
+                                if (!aiAnswer) {
+                                    console.error('Hidden AI answer not found.');
                                     return;
                                 }
 
-                                const aiAnswer = aiAnswerElement.value;
-                                if (!aiAnswer) {
-                                    console.error('AI answer value is missing.');
-                                    return;
-                                }
 
                                // Log the request data to verify before sending the request
                                 console.log('Request body:', {
                                     studentResponse: studentResponse,
-                                    aiAnswer: question.aiAnswer
+                                    aiAnswer: aiAnswer
                                 });
 
 
