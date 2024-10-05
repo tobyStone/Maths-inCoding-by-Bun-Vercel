@@ -228,7 +228,7 @@ module.exports = async (req, res) => {
                                     continue; // Skip to the next question if no answer is provided
                                 }
 
-                                const aiAnswer = document.querySelector('#ai-answer-0');
+                                const aiAnswer = document.querySelector('#ai-answer-0').value;
 
                                 // Log to confirm if the aiAnswer element is properly found
                                 console.log("AI Answer:", aiAnswer);
