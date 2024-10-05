@@ -221,14 +221,14 @@ module.exports = async (req, res) => {
     
                          try {
                             // Handle the free-form response
-                                const studentResponse = document.querySelector('#student-response').value;
+                                const studentResponse = document.querySelector('#student-response-0').value;
 
                                 if (!studentResponse) {
-                                    console.log('No answer provided for free-form question at index ' + i);
+                                    console.log('No answer provided for free-form question at index 0');
                                     continue; // Skip to the next question if no answer is provided
                                 }
 
-                                const aiAnswerElement = document.querySelector('#ai-answer-' + i);
+                                const aiAnswerElement = document.querySelector('#ai-answer-0');
 
                                 // Log to confirm if the aiAnswer element is properly found
                                 console.log("AI Answer Element:", aiAnswerElement);
