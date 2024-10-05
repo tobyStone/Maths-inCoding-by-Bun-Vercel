@@ -31,4 +31,31 @@ function cosineSimilarity(text1, text2) {
     return magnitude1 === 0 || magnitude2 === 0 ? 0 : dotProduct / (magnitude1 * magnitude2);
 }
 
-module.exports = cosineSimilarity;
+// Serverless function handler
+module.exports = async (req, res) => {
+    if (req.method !== 'POST') {
+        res.status(405).json({ error: 'Method Not Allowed' });
+        return;
+    }
+
+    try {
+        const { studentResponse, aiAnswer } = req.body;
+
+        // Log to confirm received data
+        console.log('Received student response:', studentResponse);
+        console.log('Received AI answer:', aiAnswer);
+
+        // Check if both are strings
+        if (typeof studentResponse !== 'string' || typeof aiAnswer !== 'string') {
+            res.status(400).json({ error: 'Both studentResponse and aiAnswer must be strings.' });
+            return;
+        }
+
+        const similarityScore = cosineSimilarity(studentResponse, aiAnswer);
+        const passed = similarityScore >= 0.7;  // Assuming a threshold of 0.7
+        res.status(200).json({ similarityScore, passed });
+    } catch (error) {
+        console.error('Error calculating cosine similarity:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

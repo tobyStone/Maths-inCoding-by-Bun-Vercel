@@ -221,27 +221,35 @@ module.exports = async (req, res) => {
     
                          try {
                             // Handle the free-form response
-                                const studentResponse = document.querySelector('#student-response-0').value;
+                                const studentResponseElement = document.querySelector('#student-response-0').value;
 
-                                if (!studentResponse) {
+                                if (!studentResponseElement) {
                                     console.log('No answer provided for free-form question at index 0');
                                     continue; // Skip to the next question if no answer is provided
                                 }
 
-                                const aiAnswer = document.querySelector('#ai-answer-0').value;
+                                const aiAnswerElement = document.querySelector('#ai-answer-0').value;
 
                                 // Log to confirm if the aiAnswer element is properly found
-                                console.log("AI Answer:", aiAnswer);
+                                console.log("AI Answer:", aiAnswerElement);
 
-                                if (!studentResponse) {
+                                if (!studentResponseElement) {
                                     console.log('No answer provided by the student.');
                                     return;
                                 }
 
-                                if (!aiAnswer) {
+                                if (!aiAnswerElement) {
                                     console.error('Hidden AI answer not found.');
                                     return;
                                 }
+
+
+                              let studentResponse = studentResponseElement.value;
+                              let aiAnswer = aiAnswerElement.value;
+
+                              // Convert to strings explicitly
+                              studentResponse = String(studentResponse);
+                              aiAnswer = String(aiAnswer);
 
 
                                // Log the request data to verify before sending the request
@@ -257,7 +265,7 @@ module.exports = async (req, res) => {
                                         aiAnswer: aiAnswer
                                    }, {
                                     headers: {
-                                        'Content-Type': 'application/json' // Add appropriate content type
+                                        'Content-Type': 'application/json' 
                                     }
                                 });
 
