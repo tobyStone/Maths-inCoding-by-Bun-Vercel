@@ -7,9 +7,17 @@ const natural = require('natural');
  * @returns {number} - The cosine similarity score between 0 and 1.
  */
 function cosineSimilarity(text1, text2) {
+    if (typeof text1 !== 'string' || typeof text2 !== 'string') {
+        console.error('Both text1 and text2 must be strings.');
+        return 0;
+    }
+
+    text1 = text1.toLowerCase();
+    text2 = text2.toLowerCase();
+
     const tokenizer = new natural.WordTokenizer();
-    const tokens1 = tokenizer.tokenize(text1.toLowerCase());
-    const tokens2 = tokenizer.tokenize(text2.toLowerCase());
+    const tokens1 = tokenizer.tokenize(text1);
+    const tokens2 = tokenizer.tokenize(text2);
 
     const allTokens = Array.from(new Set([...tokens1, ...tokens2]));
 
