@@ -221,35 +221,28 @@ module.exports = async (req, res) => {
     
                          try {
                             // Handle the free-form response
-                                const studentResponseElement = document.querySelector('#student-response-0').value;
+                                const studentResponse = document.querySelector('#student-response-0').value;
 
-                                if (!studentResponseElement) {
+                                if (!studentResponse) {
                                     console.log('No answer provided for free-form question at index 0');
                                     continue; // Skip to the next question if no answer is provided
                                 }
 
-                                const aiAnswerElement = document.querySelector('#ai-answer-0').value;
+                                const aiAnswer = document.querySelector('#ai-answer-0').value;
 
                                 // Log to confirm if the aiAnswer element is properly found
-                                console.log("AI Answer:", aiAnswerElement);
+                                console.log("AI Answer:", aiAnswer);
 
-                                if (!studentResponseElement) {
+                                if (!studentResponse) {
                                     console.log('No answer provided by the student.');
                                     return;
                                 }
 
-                                if (!aiAnswerElement) {
+                                if (!aiAnswer) {
                                     console.error('Hidden AI answer not found.');
                                     return;
                                 }
 
-
-                              let studentResponse = studentResponseElement.value;
-                              let aiAnswer = aiAnswerElement.value;
-
-                              // Convert to strings explicitly
-                              studentResponse = String(studentResponse);
-                              aiAnswer = String(aiAnswer);
 
 
                                // Log the request data to verify before sending the request
