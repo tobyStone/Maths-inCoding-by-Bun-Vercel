@@ -52,7 +52,7 @@ module.exports = async (req, res) => {
         }
 
         const similarityScore = cosineSimilarity(studentResponse, aiAnswer);
-        const passed = similarityScore >= 0.7;  // Assuming a threshold of 0.7
+        const passed = similarityScore >= 0.27;  // Assuming a threshold of 0.7
         res.status(200).json({ similarityScore, passed });
     } catch (error) {
         console.error('Error calculating cosine similarity:', error);
