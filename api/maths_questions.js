@@ -268,13 +268,21 @@ module.exports = async (req, res) => {
                                     ? '<p>Great job! Cosine Similarity: ' + similarityScore + '</p>'
                                     : '<p>Score below threshold. Cosine Similarity: ' + similarityScore + '</p>';
 
-                                // If the cosine similarity passes the threshold, mark the question as answered
+                                 // Handle redirection based on cosine similarity result
                                 if (passed) {
                                     markQuestionsAsAnswered(questionIndex);
                                     redirectToPreviousVideo();
-
-                            }
-
+                                    return; // Exit here since freeform was passed successfully
+                                } else {
+                                    // If failed, show the help video immediately
+                                    if (helpVideoExists) {
+                                        showHelpVideo();
+                                    } else {
+                                        alert("No help video found");
+                                        window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
+                                    }
+                                    return; // Exit here since help video is being shown
+                                }
                             } catch (error) {
                                 console.error('Error submitting answer for free - form question at index ' + i, error);
                                 alert('Error processing your free-form answer. Please try again.');
