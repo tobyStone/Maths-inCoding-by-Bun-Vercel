@@ -17,11 +17,7 @@
       "source": "/(.*)",
       "destination": "/api/general_page.js?path=$1"
     },
-    {
-      "source": "/videoStream",
-      "destination": "/api/videoStream.js"
-    },
-    {
+  {
       "source": "/api/chat",
       "destination": "/api/maths_questions.js"
     },
