@@ -72,7 +72,7 @@ module.exports = async (req, res) => {
                     '</div>';
 
                 console.log('Request method:', req.method);
-                console.log('Request body:', req.body);
+                console.log('Request body is:', req.body);
 
 
                 return freeFormHtml;
