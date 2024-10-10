@@ -31,7 +31,7 @@ async function generateQuestions(description) {
 async function getAIFreeFormAnswer(questionText) {
     const prompt = `Answer the following question in simple terms for a 12-year-old student: "${questionText}"`;
     const aiAnswer = await getAIResponse(prompt); // This calls the AI with the specific question
-    console.log(`AI Response for question "${questionText}": ${aiAnswer}`);  // Log the AI response for clarity
+    console.log(`AI Response for question is "${questionText}": ${aiAnswer}`);  // Log the AI response for clarity
 
 
     return aiAnswer;
@@ -373,6 +373,5 @@ module.exports = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-//removed POST
 
 
