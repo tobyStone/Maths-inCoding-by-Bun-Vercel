@@ -200,7 +200,6 @@ module.exports = async (req, res) => {
                 return urlParams.get(name);
             }
 
-            const correctAnswers = ${JSON.stringify(pageData.page.questionData.map(q => q.answer))};
             const totalQuestions = ${pageData.page.questionData.length};
             const helpVideoExists = ${helpVideoExists};
 
