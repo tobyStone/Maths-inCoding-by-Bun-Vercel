@@ -209,7 +209,13 @@ module.exports = async (req, res) => {
                 event.preventDefault();
                 let responses = [];
                 const pageUrl = window.location.pathname; // Capture the original page URL
-                console.log("pageURL" + pageUrl)
+                try {
+                    console.log("Window location object:", window.location);
+                    console.log("Page URL:", pageUrl);
+                } catch (error) {
+                    console.error("Error logging page URL and window loaction:", error);
+                }
+
                 let score = 0;
                 const questionIndex = parseInt(getQueryParameter('index'), 10);
 
@@ -297,7 +303,7 @@ module.exports = async (req, res) => {
                 try {
                     // Send multiple-choice answers to the server
                     const response = await axios.post('/api/handle_questions', {
-                        studentAnswers: responses
+                        studentAnswers: responses,
                         pageUrl: pageUrl
                     }, {
                         headers: {
