@@ -1,4 +1,3 @@
-const { parse } = require('url');
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel');
 require('dotenv').config();
@@ -52,18 +51,11 @@ module.exports = async (req, res) => {
         const correctAnswers = pageData.page.questionData.map(q => q.answer);
         const scoreData = calculateScore(studentAnswers, correctAnswers);
 
-        // Determine next action based on pass/fail status
-        if (scoreData.passed) {
-            res.status(200).json({
-                action: 'returnToPreviousVideo',
-                scoreData
-            });
-        } else {
-            res.status(200).json({
-                action: 'showHelpVideo',
-                scoreData
-            });
-        }
+        // Return only pass/fail and score percentage
+        res.status(200).json({
+            passed: scoreData.passed,
+            scorePercentage: scoreData.scorePercentage
+        });
     } catch (error) {
         console.error('Error fetching page data or calculating score:', error);
         res.status(500).json({ error: 'Internal server error' });
