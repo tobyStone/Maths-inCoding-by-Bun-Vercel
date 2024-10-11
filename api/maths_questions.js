@@ -204,125 +204,127 @@ module.exports = async (req, res) => {
             const totalQuestions = ${pageData.page.questionData.length};
             const helpVideoExists = ${helpVideoExists};
 
-            document.addEventListener('DOMContentLoaded', function () {
-                document.getElementById('question-form').addEventListener('submit', async function(event) {
-                    event.preventDefault();
-                    let responses = [];
-                    let score = 0;
-                    const questionIndex = parseInt(getQueryParameter('index'), 10);
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('question-form').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                let responses = [];
+                const pageUrl = window.location.pathname; // Capture the original page URL
+                console.log("pageURL" + pageURL)
+                let score = 0;
+                const questionIndex = parseInt(getQueryParameter('index'), 10);
 
+                // Iterate over the questions to gather responses
+                for (let i = 0; i < pageData.page.questionData.length; i++) {
+                    const question = pageData.page.questionData[i];
 
-
-                    // Iterate over the questions to gather responses
-                    for (let i = 0; i < pageData.page.questionData.length; i++) {
-                        const question = pageData.page.questionData[i];
-
-                        if (question.answer === "free-form") {
-    
-                         try {
+                    if (question.answer === "free-form") {
+                        try {
                             // Handle the free-form response
-                                const studentResponse = document.querySelector('#student-response-0').value;
+                            const studentResponse = document.querySelector('#student-response-0').value;
 
-                                if (!studentResponse) {
-                                    console.log('No answer provided for free-form question at index 0');
-                                    continue; // Skip to the next question if no answer is provided
-                                }
+                            if (!studentResponse) {
+                                console.log('No answer provided for free-form question at index 0');
+                                continue; // Skip to the next question if no answer is provided
+                            }
 
-                                const aiAnswer = document.querySelector('#ai-answer-0').value;
+                            const aiAnswer = document.querySelector('#ai-answer-0').value;
 
-                                // Log to confirm if the aiAnswer element is properly found
-                                console.log("AI Answer:", aiAnswer);
+                            // Log to confirm if the aiAnswer element is properly found
+                            console.log("AI Answer:", aiAnswer);
 
-                                if (!studentResponse) {
-                                    console.log('No answer provided by the student.');
-                                    return;
-                                }
+                            if (!studentResponse) {
+                                console.log('No answer provided by the student.');
+                                return;
+                            }
 
-                                if (!aiAnswer) {
-                                    console.error('Hidden AI answer not found.');
-                                    return;
-                                }
+                            if (!aiAnswer) {
+                                console.error('Hidden AI answer not found.');
+                                return;
+                            }
 
-
-
-                               // Log the request data to verify before sending the request
-                                console.log('Request body:', {
-                                    studentResponse: studentResponse,
-                                    aiAnswer: aiAnswer
-                                });
-
+                            // Log the request data to verify before sending the request
+                            console.log('Request body:', {
+                                studentResponse: studentResponse,
+                                aiAnswer: aiAnswer
+                            });
 
                             // Correcting the URL and data being sent to the API
-                                 const response = await axios.post('/api/cosine_similarity', {
-                                        studentResponse: studentResponse,
-                                        aiAnswer: aiAnswer
-                                   }, {
-                                    headers: {
-                                        'Content-Type': 'application/json' 
-                                    }
-                                });
-
-
-                                const { similarityScore, passed } = response.data;
-                                document.querySelector('#result-' + i).innerHTML = passed
-                                    ? '<p>Great job! Cosine Similarity: ' + similarityScore + '</p>'
-                                    : '<p>Score below threshold. Cosine Similarity: ' + similarityScore + '</p>';
-
-                                 // Handle redirection based on cosine similarity result
-                                if (passed) {
-                                    markQuestionsAsAnswered(questionIndex);
-                                    redirectToPreviousVideo();
-                                    return; // Exit here since freeform was passed successfully
-                                } else {
-                                    // If failed, show the help video immediately
-                                    if (helpVideoExists) {
-                                        showHelpVideo();
-                                    } else {
-                                        alert("No help video found");
-                                        window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
-                                    }
-                                    return; // Exit here since help video is being shown
+                            const response = await axios.post('/api/cosine_similarity', {
+                                studentResponse: studentResponse,
+                                aiAnswer: aiAnswer
+                            }, {
+                                headers: {
+                                    'Content-Type': 'application/json'
                                 }
-                            } catch (error) {
-                                console.error('Error submitting answer for free - form question at index ' + i, error);
-                                alert('Error processing your free-form answer. Please try again.');
-                            }
+                            });
 
-                        } else {
-                            // Handle multiple-choice responses
-                          const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
-                          if (selectedChoice) {
-                                responses.push({ question: question.questionText, response: selectedChoice.value });
+                            const { similarityScore, passed } = response.data;
+                            document.querySelector('#result-' + i).innerHTML = passed
+                                ? '<p>Great job! Cosine Similarity: ' + similarityScore + '</p>'
+                                : '<p>Score below threshold. Cosine Similarity: ' + similarityScore + '</p>';
 
-                                // Check if the answer is correct (for multiple-choice questions)
-                                if (question.answer === selectedChoice.value) {
-                                    score++;
-                                }
+                            // Handle redirection based on cosine similarity result
+                            if (passed) {
+                                markQuestionsAsAnswered(questionIndex);
+                                redirectToPreviousVideo();
+                                return; // Exit here since freeform was passed successfully
                             } else {
-                                console.log('No answer selected for multiple-choice question at index ' + i);
+                                // If failed, show the help video immediately
+                                if (helpVideoExists) {
+                                    showHelpVideo();
+                                } else {
+                                    alert("No help video found");
+                                    window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
+                                }
+                                return; // Exit here since help video is being shown
                             }
+                        } catch (error) {
+                            console.error('Error submitting answer for free-form question at index ' + i, error);
+                            alert('Error processing your free-form answer. Please try again.');
+                        }
+
+                    } else {
+                        // Handle multiple-choice responses
+                        const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
+                        if (selectedChoice) {
+                            responses.push({ question: question.questionText, response: selectedChoice.value });
+                        } else {
+                            console.log('No answer selected for multiple-choice question at index ' + i);
                         }
                     }
+                }
 
-                    console.log('Collected Responses:', responses);
+                try {
+                    // Send multiple-choice answers to the server
+                    const response = await axios.post('/api/handle_questions', {
+                        studentAnswers: responses
+                        pageUrl: pageUrl
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
 
-                    // Calculate score percentage and determine the next steps
-                    const scorePercentage = (score / pageData.page.questionData.length) * 100;
+                    const { passed, scorePercentage } = response.data;
 
-                    if (scorePercentage <= 80) {
+                    // Handle redirection based on the server response
+                    if (passed) {
+                        markQuestionsAsAnswered(questionIndex);
+                        redirectToPreviousVideo();
+                    } else {
                         if (helpVideoExists) {
                             showHelpVideo();
                         } else {
                             alert("No help video found");
                             window.location.href = 'https://corbettmaths.com/2013/05/03/sine-rule-missing-sides/';
                         }
-                    } else {
-                        markQuestionsAsAnswered(questionIndex);
-                        redirectToPreviousVideo();
                     }
-                });
+                } catch (error) {
+                    console.error('Error submitting multiple-choice answers:', error);
+                    alert('Error processing your answers. Please try again.');
+                }
             });
-
+        });
 
             window.handleQuestionButtonClick = handleQuestionButtonClick;
         `;

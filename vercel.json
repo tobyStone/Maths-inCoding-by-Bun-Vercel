@@ -14,16 +14,20 @@
       "destination": "/api/submit_feedback.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "/api/general_page.js?path=$1"
-    },
-  {
       "source": "/api/chat",
       "destination": "/api/maths_questions.js"
     },
     {
       "source": "/api/cosine_similarity",
       "destination": "/api/cosine_similarity.js"
+    },
+    {
+      "source": "/api/handle_questions",
+      "destination": "/api/handle_questions.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/general_page.js?path=$1"
     }
   ]
 }

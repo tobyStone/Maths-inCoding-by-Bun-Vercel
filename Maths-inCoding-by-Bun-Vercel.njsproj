@@ -40,6 +40,7 @@
     </Content>
     <Content Include="api\database.js" />
     <Content Include="api\general_page.js" />
+    <Content Include="api\handle_questions.js" />
     <Content Include="api\maths_questions.js" />
     <Content Include="api\submit_feedback.js" />
     <Content Include="api\videoPlayer.js" />
