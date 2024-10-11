@@ -209,7 +209,7 @@ module.exports = async (req, res) => {
                 event.preventDefault();
                 let responses = [];
                 const pageUrl = window.location.pathname; // Capture the original page URL
-                console.log("pageURL" + pageURL)
+                console.log("pageURL" + pageUrl)
                 let score = 0;
                 const questionIndex = parseInt(getQueryParameter('index'), 10);
 
