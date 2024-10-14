@@ -1,5 +1,6 @@
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel');
+const math = require('mathjs');
 require('dotenv').config();
 
 /**
@@ -10,26 +11,35 @@ require('dotenv').config();
  * @returns {Object} - An object containing score, scorePercentage, and pass/fail status.
  */
 function checkTypedAnswer(studentAnswer, correctAnswer) {
-    // Trim both answers to avoid whitespace issues
-    studentAnswer = studentAnswer.trim();
-    correctAnswer = correctAnswer.trim();
+    // Normalize both answers
+    studentAnswer = studentAnswer.trim().toLowerCase();
+    correctAnswer = correctAnswer.trim().toLowerCase();
 
-    // If both are numbers, compare numerically
-    if (!isNaN(parseFloat(studentAnswer)) && !isNaN(parseFloat(correctAnswer))) {
-        return parseFloat(studentAnswer) === parseFloat(correctAnswer);
+    try {
+        // Compare both expressions using mathjs
+        return math.equal(math.simplify(studentAnswer), math.simplify(correctAnswer));
+    } catch (err) {
+        // If parsing fails, fall back to basic string comparison
+        return studentAnswer === correctAnswer;
     }
 
-    // Otherwise, compare strings (for symbolic answers or radio button values)
-    return studentAnswer === correctAnswer;
+    
 }
 
 function calculateScore(studentAnswers, correctAnswers) {
     let score = 0;
 
+    // Log the incoming student answers and the correct answers from the DB
+    console.log('Student Answers:', studentAnswers);
+    console.log('Correct Answers from DB:', correctAnswers);
+
     for (let i = 0; i < studentAnswers.length; i++) {
         const studentAnswer = studentAnswers[i]?.response;
         const correctAnswer = correctAnswers[i];
         const questionType = studentAnswers[i]?.questionType;  // Get the question type from the POST
+
+        // Log individual comparison for debugging
+        console.log(`Comparing student answer "${studentAnswer}" with correct answer "${correctAnswer}"`);
 
         // Check if it's a standard (typed) question or multiple-choice
         if (questionType === "standard") {
@@ -70,6 +80,9 @@ module.exports = async (req, res) => {
     }
 
     try {
+        // Log the incoming request body
+        console.log('Incoming request body:', req.body);
+
         // Use pageUrl from the request body to find the correct page in the database
         const query = { 'page.url_stub': pageUrl };
         const pageData = await QuestionModel.findOne(query).exec();
@@ -80,7 +93,15 @@ module.exports = async (req, res) => {
         }
 
         const correctAnswers = pageData.page.questionData.map(q => q.answer);
+
+        // Log the correct answers fetched from the database
+        console.log('Correct Answers fetched from the DB:', correctAnswers);
+
         const scoreData = calculateScore(studentAnswers, correctAnswers);
+
+        // Log the final score and pass/fail result
+        console.log('Final Score Data:', scoreData);
+
 
         // Return only pass/fail and score percentage
         res.status(200).json({

@@ -9,6 +9,7 @@
     "dotenv": "^16.4.5",
     "escape-html": "^1.0.3",
     "express": "^4.19.2",
+    "mathjs": "^13.2.0",
     "mongoose": "^5.13.22",
     "natural": "^8.0.1"
   },

@@ -319,6 +319,9 @@ module.exports = async (req, res) => {
                     }
                 }
 
+                // Log the responses array
+                console.log('Student Responses being sent to server:', responses);
+
                 try {
                     // Send multiple-choice answers to the server
                     const response = await axios.post('/api/handle_questions', {
