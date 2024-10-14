@@ -9,18 +9,40 @@ require('dotenv').config();
  * @param {Array} correctAnswers - An array of correct answers from the database.
  * @returns {Object} - An object containing score, scorePercentage, and pass/fail status.
  */
+function checkTypedAnswer(studentAnswer, correctAnswer) {
+    // Trim both answers to avoid whitespace issues
+    studentAnswer = studentAnswer.trim();
+    correctAnswer = correctAnswer.trim();
+
+    // If both are numbers, compare numerically
+    if (!isNaN(parseFloat(studentAnswer)) && !isNaN(parseFloat(correctAnswer))) {
+        return parseFloat(studentAnswer) === parseFloat(correctAnswer);
+    }
+
+    // Otherwise, compare strings (for symbolic answers or radio button values)
+    return studentAnswer === correctAnswer;
+}
+
 function calculateScore(studentAnswers, correctAnswers) {
     let score = 0;
+
     for (let i = 0; i < studentAnswers.length; i++) {
-        if (studentAnswers[i] && studentAnswers[i].response === correctAnswers[i]) {
+        const studentAnswer = studentAnswers[i]?.response;  
+        const correctAnswer = correctAnswers[i];  
+
+        // Call checkTypedAnswer, which handles trimming
+        if (checkTypedAnswer(studentAnswer, correctAnswer)) {
             score++;
         }
     }
+
     const scorePercentage = (score / correctAnswers.length) * 100;
-    const passed = scorePercentage >= 80;
+    const passed = scorePercentage >= 80;  // Pass mark set to 80%
 
     return { score, scorePercentage, passed };
 }
+
+
 
 // Serverless function handler
 module.exports = async (req, res) => {

@@ -56,7 +56,16 @@
 					"questionText": "Which is the correct answer?",
 					"answer": "d",
 					"choices": [ "a", "b", "c", "d" ]
+				},
+				{
+					"Qnumber": 7, 
+					"imgSrc": "/images/question_images/angle_question_4.webp",
+					"imgAlt": "11_12_angle_question_7",
+					"questionText": "Identify the right angle.",
+					"answer": "b",
+					"choices": [ "a", "b", "c", "d" ]
 				}
+		
 			]
 		}
 	},
