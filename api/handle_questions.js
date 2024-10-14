@@ -27,12 +27,20 @@ function calculateScore(studentAnswers, correctAnswers) {
     let score = 0;
 
     for (let i = 0; i < studentAnswers.length; i++) {
-        const studentAnswer = studentAnswers[i]?.response;  
-        const correctAnswer = correctAnswers[i];  
+        const studentAnswer = studentAnswers[i]?.response;
+        const correctAnswer = correctAnswers[i];
+        const questionType = studentAnswers[i]?.questionType;  // Get the question type from the POST
 
-        // Call checkTypedAnswer, which handles trimming
-        if (checkTypedAnswer(studentAnswer, correctAnswer)) {
-            score++;
+        // Check if it's a standard (typed) question or multiple-choice
+        if (questionType === "standard") {
+            if (checkTypedAnswer(studentAnswer, correctAnswer)) {
+                score++;
+            }
+        } else if (questionType === "multiple-choice") {
+            // For multiple-choice, compare directly
+            if (studentAnswer === correctAnswer) {
+                score++;
+            }
         }
     }
 
@@ -41,6 +49,7 @@ function calculateScore(studentAnswers, correctAnswers) {
 
     return { score, scorePercentage, passed };
 }
+
 
 
 

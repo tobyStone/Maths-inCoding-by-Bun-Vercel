@@ -58,14 +58,14 @@
 					"choices": [ "a", "b", "c", "d" ]
 				},
 				{
-					"Qnumber": 7, 
+					"Qnumber": 7,
 					"imgSrc": "/images/question_images/angle_question_4.webp",
 					"imgAlt": "11_12_angle_question_7",
 					"questionText": "Identify the right angle.",
 					"answer": "b",
 					"choices": [ "a", "b", "c", "d" ]
 				}
-		
+
 			]
 		}
 	},
@@ -435,33 +435,70 @@
 					"choices": [ "a", "b", "c", "d" ]
 				}
 
-		
-]
+
+			]
+		}
+	},
+	{
+		"page": {
+			"url_stub": "/maths_questions/algebra_1",
+			"description": "standard 11_12 age range questions on probability",
+			"helpVideo": {
+				"videoSrc": "https://storage.googleapis.com/maths_incoding/ProbabilityBasic%20-%20Corbettmaths.mp4",
+				"imgSrc": "/images/help_video_poster.jpg",
+				"videoTitle": "Understanding the concepts behind probability"
+			},
+			"questionData": [
+				{
+					"Qnumber": 1,
+					"imgSrc": null,
+					"imgAlt": null,
+					"questionText": "Make y the subject of y + w = c",
+					"answer": "y = c - w",
+					"choices": null
+				},
+				{
+					"Qnumber": 2,
+					"imgSrc": null,
+					"imgAlt": null,
+					"questionText": "Make y the subject of y - p = m",
+					"answer": "y = m + p",
+					"choices": null
+				},
+				{
+					"Qnumber": 3,
+					"imgSrc": null,
+					"imgAlt": null,
+					"questionText": "Make y the subject of m + y = s",
+					"answer": "y = s - m",
+					"choices": null
+				}
+			]
 		}
 	},
 
 
+	{
+		"page": {
+			"url_stub": "/maths_questions/free_form_probability_1",
+			"description": "free-form 11_12 age range questions on probability",
+			"helpVideo": {
+				"videoSrc": "https://storage.googleapis.com/maths_incoding/ProbabilityBasic%20-%20Corbettmaths.mp4",
+				"imgSrc": "/images/help_video_poster.jpg",
+				"videoTitle": "Understanding the concepts behind probability"
+			},
+			"questionData": [
 				{
-					"page": {
-						"url_stub": "/maths_questions/free_form_probability_1",
-						"description": "11_12 age range questions on probability",
-						"helpVideo": {
-							"videoSrc": "https://storage.googleapis.com/maths_incoding/ProbabilityBasic%20-%20Corbettmaths.mp4",
-							"imgSrc": "/images/help_video_poster.jpg",
-							"videoTitle": "Understanding the concepts behind probability"
-						},
-						"questionData": [
-							{
-								"Qnumber": null,
-								"imgSrc": "/images/question_images/independent_probability_6.webp",
-								"imgAlt": "11_12_probability_question_6",
-								"questionText": "How would you explain what independent probability is?",
-								"answer": "free-form",
-								"choices": [ null ]
-							}
-
-						]
-					}
+					"Qnumber": null,
+					"imgSrc": "/images/question_images/independent_probability_6.webp",
+					"imgAlt": "11_12_probability_question_6",
+					"questionText": "How would you explain what independent probability is? Please include an example of independent probability in your description.",
+					"answer": "free-form",
+					"choices": [ null ]
 				}
-		
+
+			]
+		}
+	}
+
 ]

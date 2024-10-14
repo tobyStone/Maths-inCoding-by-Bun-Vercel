@@ -298,11 +298,21 @@ module.exports = async (req, res) => {
                             alert('Error processing your free-form answer. Please try again.');
                         }
 
+                    } else if (!question.choices || question.choices.length === 0) {
+                        // It's a typed standard question (no multiple-choice options)
+                        const studentResponse = document.querySelector('input[id="student-response-' + i + '"]').value;
+
+                        responses.push({
+                            question: question.questionText,
+                            response: studentResponse,
+                            questionType: "standard"  // Include the question type
+                        });
+
                     } else {
                         // Handle multiple-choice responses
                         const selectedChoice = document.querySelector('input[name="answer' + i + '"]:checked');
                         if (selectedChoice) {
-                            responses.push({ question: question.questionText, response: selectedChoice.value });
+                            responses.push({ question: question.questionText, response: selectedChoice.value, questionType: "multiple-choice" });
                         } else {
                             console.log('No answer selected for multiple-choice question at index ' + i);
                         }
