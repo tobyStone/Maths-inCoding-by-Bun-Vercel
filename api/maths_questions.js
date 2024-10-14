@@ -56,14 +56,10 @@ module.exports = async (req, res) => {
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
             : 'http://localhost:3000/';
 
-        // Extract the first word from the description to determine question type
-        const questionType = pageData.page.description.split(' ')[0].toLowerCase();  // get the first word and lowercase it
-
-
 
         // Handle both free-form and multiple-choice questions
         let questionsHtml = await Promise.all(pageData.page.questionData.map(async (question, i) => {
-            if (questionType === "free-form") {
+            if (question.answer === "free-form") {
                 // AI-generated answer for the free-form question
                 const aiAnswer = await getAIFreeFormAnswer(question.questionText);
 
@@ -79,17 +75,7 @@ module.exports = async (req, res) => {
   
                 return freeFormHtml;
 
-            } else if (questionType === "standard") {
-                // Standard typed-answer questions (maths questions)
-                return `
-                    <div class="question-block" data-question-index="${i}">
-                        <p>${question.questionText}</p>
-                        <input type="text" id="student-response-${i}" name="response${i}" />
-                        <input type="hidden" id="correct-answer-${i}" value="${question.answer}" />
-                        <div id="result-${i}"></div>
-                    </div>
-                `;
-            } else if (questionType === "multiple-choice") {
+            } else {
                 // Render multiple-choice questions
                 const choicesHtml = question.choices.map(function (choice, j) {
                     return '<input type="radio" name="answer' + i + '" id="choice' + i + '-' + j + '" value="' + choice + '">' +
