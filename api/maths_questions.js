@@ -56,10 +56,12 @@ module.exports = async (req, res) => {
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
             : 'http://localhost:3000/';
 
+        // Get the first word of the description to determine question type
+        const questionType = pageData.page.description.split(' ')[0].toLowerCase();
 
         // Handle both free-form and multiple-choice questions
         let questionsHtml = await Promise.all(pageData.page.questionData.map(async (question, i) => {
-            if (question.answer === "free-form") {
+            if (questionType === "free-form") {
                 // AI-generated answer for the free-form question
                 const aiAnswer = await getAIFreeFormAnswer(question.questionText);
 
@@ -75,7 +77,7 @@ module.exports = async (req, res) => {
   
                 return freeFormHtml;
 
-            } else {
+            } else if (questionType === 'multiple-choice') {
                 // Render multiple-choice questions
                 const choicesHtml = question.choices.map(function (choice, j) {
                     return '<input type="radio" name="answer' + i + '" id="choice' + i + '-' + j + '" value="' + choice + '">' +
@@ -87,6 +89,16 @@ module.exports = async (req, res) => {
                         <img src="${question.imgSrc}" alt="${question.imgAlt}" width="525" height="350" />
                         <p>${question.questionText}</p>
                         <div class="choices">${choicesHtml}</div>
+                    </div>
+                `;
+            } else if (questionType === 'standard') {
+                // Render standard typed-answer questions
+                return `
+                    <div class="question-block" data-question-index="${i}">
+                        <p>${question.questionText}</p>
+                        <input type="text" id="student-response-${i}" name="response${i}" />
+                        <input type="hidden" id="correct-answer-${i}" value="${question.answer}" />
+                        <div id="result-${i}"></div>
                     </div>
                 `;
             }
