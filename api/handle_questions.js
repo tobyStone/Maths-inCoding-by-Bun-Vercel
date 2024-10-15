@@ -4,7 +4,7 @@ const math = require('mathjs');
 require('dotenv').config();
 
 /**
- * Handle multiple-choice questions and return a score and pass/fail result.
+ * Handle multiple-choice and standard questions, and return a score and pass/fail result.
  *
  * @param {Array} studentAnswers - An array of student responses.
  * @param {Array} correctAnswers - An array of correct answers from the database.
@@ -22,11 +22,9 @@ function checkTypedAnswer(studentAnswer, correctAnswer) {
         // If parsing fails, fall back to basic string comparison
         return studentAnswer === correctAnswer;
     }
-
-    
 }
 
-function calculateScore(studentAnswers, correctAnswers) {
+function calculateScore(studentAnswers, correctAnswers, passPercentage) {
     let score = 0;
 
     // Log the incoming student answers and the correct answers from the DB
@@ -55,13 +53,10 @@ function calculateScore(studentAnswers, correctAnswers) {
     }
 
     const scorePercentage = (score / correctAnswers.length) * 100;
-    const passed = scorePercentage >= 80;  // Pass mark set to 80%
+    const passed = scorePercentage >= passPercentage;  // Use the dynamic pass percentage
 
     return { score, scorePercentage, passed };
 }
-
-
-
 
 // Serverless function handler
 module.exports = async (req, res) => {
@@ -93,15 +88,23 @@ module.exports = async (req, res) => {
         }
 
         const correctAnswers = pageData.page.questionData.map(q => q.answer);
-
-        // Log the correct answers fetched from the database
         console.log('Correct Answers fetched from the DB:', correctAnswers);
 
-        const scoreData = calculateScore(studentAnswers, correctAnswers);
+        // Extract pass percentage from the description (default to 80% if not found)
+        let passPercentage = 80;
+        const description = pageData.page.description;
+        const passPercentageMatch = description.match(/pass percentage:\s*(\d+)/i);
+        if (passPercentageMatch) {
+            passPercentage = parseInt(passPercentageMatch[1], 10);
+        }
+
+        console.log('Pass Percentage extracted:', passPercentage);
+
+        // Calculate the score and pass/fail result using the extracted pass percentage
+        const scoreData = calculateScore(studentAnswers, correctAnswers, passPercentage);
 
         // Log the final score and pass/fail result
         console.log('Final Score Data:', scoreData);
-
 
         // Return only pass/fail and score percentage
         res.status(200).json({

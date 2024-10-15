@@ -72,7 +72,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/angles2",
-			"description": "12_13 age range questions on angles",
+			"description": "multiple-choice 12_13 age range questions on angles",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/HelpWithAngles.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -133,7 +133,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/angles3",
-			"description": "13_14 age range questions on angles",
+			"description": "multiple-choice 13_14 age range questions on angles",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/HelpWithAngles.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -194,7 +194,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/ratio",
-			"description": "11_12 age range questions on ratios",
+			"description": "multiple-choice 11_12 age range questions on ratios",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/ratioWithDifferences.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -255,7 +255,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/sine_wave",
-			"description": "11_12 age range questions on sine waves",
+			"description": "multiple-choice 11_12 age range questions on sine waves",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/sinewave.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -317,7 +317,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/mental_maths1",
-			"description": "11_12 age range questions on mental maths",
+			"description": "multiple-choice 11_12 age range questions on mental maths",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/mental_math_tricks.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -379,7 +379,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/probability_1",
-			"description": "11_12 age range questions on probability",
+			"description": "multiple-choice 11_12 age range questions on probability",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/ProbabilityBasic%20-%20Corbettmaths.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -454,7 +454,7 @@
 					"imgSrc": null,
 					"imgAlt": null,
 					"questionText": "Make y the subject of y + w = c",
-					"answer": "y = c - w",
+					"answer": "y=c-w",
 					"choices": null
 				},
 				{
@@ -462,7 +462,7 @@
 					"imgSrc": null,
 					"imgAlt": null,
 					"questionText": "Make y the subject of y - p = m",
-					"answer": "y = m + p",
+					"answer": "y=m+p",
 					"choices": null
 				},
 				{
@@ -470,7 +470,7 @@
 					"imgSrc": null,
 					"imgAlt": null,
 					"questionText": "Make y the subject of m + y = s",
-					"answer": "y = s - m",
+					"answer": "y=s-m",
 					"choices": null
 				}
 			]
