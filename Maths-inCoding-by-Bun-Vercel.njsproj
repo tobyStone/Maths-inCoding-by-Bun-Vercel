@@ -48,6 +48,10 @@
     <Content Include="models\feedbackModel.js" />
     <Content Include="models\linkedPage.js" />
     <Content Include="models\mathQuestionsModel.js" />
+    <Content Include="models\quizResultModel.js" />
+    <Content Include="models\schoolModel.js" />
+    <Content Include="models\studentModel.js" />
+    <Content Include="models\teacherModel.js" />
     <Content Include="models\videoModel.js" />
     <Content Include="package.json" />
     <Content Include="public\about_us.html" />
@@ -127,6 +131,7 @@
     </Content>
     <Content Include="seeds\layoutData.json" />
     <Content Include="seeds\mathsQuestionData.json" />
+    <Content Include="seeds\seedSecondIteration.js" />
     <Content Include="seeds\videoData.json" />
     <Content Include="vercel.json" />
   </ItemGroup>
