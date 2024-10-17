@@ -2,7 +2,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/angles1",
-			"description": "multiple-choice 11_12 age range questions on angles",
+			"description": "multiple-choice 11_12 age range questions on angles, pass percentage: 80",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/HelpWithAngles.mp4",
 				"imgSrc": "/images/help_video_poster.webp",
@@ -72,7 +72,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/angles2",
-			"description": "multiple-choice 12_13 age range questions on angles",
+			"description": "multiple-choice 12_13 age range questions on angles, pass percentage: 80",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/HelpWithAngles.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -133,7 +133,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/angles3",
-			"description": "multiple-choice 13_14 age range questions on angles",
+			"description": "multiple-choice 13_14 age range questions on angles, pass percentage: 80",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/HelpWithAngles.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -194,7 +194,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/ratio",
-			"description": "multiple-choice 11_12 age range questions on ratios",
+			"description": "multiple-choice 11_12 age range questions on ratios, pass percentage: 80",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/ratioWithDifferences.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -254,7 +254,7 @@
 	},
 	{
 		"page": {
-			"url_stub": "/maths_questions/sine_wave",
+			"url_stub": "/maths_questions/sine_wave, pass percentage: 80",
 			"description": "multiple-choice 11_12 age range questions on sine waves",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/sinewave.mp4",
@@ -317,7 +317,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/mental_maths1",
-			"description": "multiple-choice 11_12 age range questions on mental maths",
+			"description": "multiple-choice 11_12 age range questions on mental maths, pass percentage: 80",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/mental_math_tricks.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -379,7 +379,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/probability_1",
-			"description": "multiple-choice 11_12 age range questions on probability",
+			"description": "multiple-choice 11_12 age range questions on probability, pass percentage: 80",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/ProbabilityBasic%20-%20Corbettmaths.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",
@@ -442,7 +442,7 @@
 	{
 		"page": {
 			"url_stub": "/maths_questions/algebra_1",
-			"description": "standard 11_12 age range questions on probability",
+			"description": "standard 11_12 age range questions on probability, pass percentage: 80",
 			"helpVideo": {
 				"videoSrc": "https://storage.googleapis.com/maths_incoding/ProbabilityBasic%20-%20Corbettmaths.mp4",
 				"imgSrc": "/images/help_video_poster.jpg",

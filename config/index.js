@@ -2,10 +2,12 @@ require('dotenv').config();
 
 module.exports = {
     getDbConnectionString: function () {
-        return `mongodb+srv://${process.env.uname}:${process.env.pwd}@cluster0.ntuqn.mongodb.net/maths_through_coding?retryWrites=true&w=majority`;
+        const isTestEnv = process.env.NODE_ENV === 'test';
+        const dbName = isTestEnv ? 'maths_through_coding_test' : 'maths_through_coding';
+
+        return `mongodb+srv://${process.env.uname}:${process.env.pwd}@cluster0.ntuqn.mongodb.net/${dbName}?retryWrites=true&w=majority`;
     },
-        getOpenAiApiKey: function () {
+    getOpenAiApiKey: function () {
         return process.env.OPENAI_API_KEY;
     }
 }
-
