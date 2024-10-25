@@ -59,7 +59,8 @@ header.SiteHeader {
     margin-bottom: 10px;
 }
 
-.about-us-link, .how-it-works-link {
+/* Position the 'About Us' link to the top-left corner */
+.about-us-link, .how-it-works-link, .login-link {
     font-size: 1em;
     color: white;
     text-decoration: none;
@@ -68,10 +69,22 @@ header.SiteHeader {
     border-radius: 4px;
 }
 
-    .about-us-link:hover, .how-it-works-link:hover {
+    .about-us-link:hover, .how-it-works-link:hover, .login-link:hover {
         background: #2c3e50;
         text-decoration: underline;
     }
+
+/* Ensure About Us is at the top-left */
+.about-us-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+/* Align Login to the far right */
+.login-link {
+    margin-left: auto; /* Pushes Login to the far right */
+}
 
 .containerImg {
     width: 75%;
@@ -389,5 +402,11 @@ h4 {
     .profile-images {
         flex-direction: column;
         gap: 10px;
+    }
+
+    .about-us-link {
+        top: 10px; /* Move it higher */
+        left: 10px; /* Move it further left */
+        padding: 6px 12px; /* Slightly reduce padding to fit better */
     }
 }

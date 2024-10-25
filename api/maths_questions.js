@@ -4,6 +4,7 @@ const QuestionModel = require('../models/mathQuestionsModel');
 const { getAIResponse } = require('./chat');
 require('dotenv').config();
 
+
 /**
  * Generate predefined questions based on the video description.
  *
@@ -46,6 +47,7 @@ module.exports = async (req, res) => {
     const query = { 'page.url_stub': urlPath };
 
     try {
+
         const pageData = await QuestionModel.findOne(query).exec();
         if (!pageData || !pageData.page || !pageData.page.questionData) {
             res.status(404).send('Page not found');
@@ -218,6 +220,8 @@ module.exports = async (req, res) => {
                 event.preventDefault();
                 let responses = [];
                 const pageUrl = window.location.pathname; // Capture the original page URL
+                const token = localStorage.getItem('token'); // Get the JWT token from localStorage
+
                 try {
                     console.log("Window location object:", window.location);
                     console.log("Page URL:", pageUrl);
@@ -266,10 +270,12 @@ module.exports = async (req, res) => {
                             // Correcting the URL and data being sent to the API
                             const response = await axios.post('/api/cosine_similarity', {
                                 studentResponse: studentResponse,
-                                aiAnswer: aiAnswer
+                                aiAnswer: aiAnswer,
+                                pageUrl: pageUrl
                             }, {
                                 headers: {
-                                    'Content-Type': 'application/json'
+                                    'Content-Type': 'application/json',
+                                    'Authorization': 'Bearer ' + token // Pass the token in the Authorization header
                                 }
                             });
 
@@ -329,7 +335,8 @@ module.exports = async (req, res) => {
                         pageUrl: pageUrl
                     }, {
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token // Pass the token in the Authorization header
                         }
                     });
 

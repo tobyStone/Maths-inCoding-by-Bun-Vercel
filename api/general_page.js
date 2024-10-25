@@ -23,11 +23,15 @@ module.exports = async (req, res) => {
             return res.status(404).send('Page not found');
         }
 
+  
+
         // If the request is made via HTTPS, ensure assets are loaded via HTTPS
         const protocol = req.headers['x-forwarded-proto'] || 'http'; // Use 'x-forwarded-proto' for determining the protocol
         const baseUrl = protocol === 'https'
             ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
             : 'http://localhost:3000/';
+
+        
 
         // Manually read the geolocation headers
         const country = req.headers['x-vercel-ip-country'];
@@ -40,10 +44,16 @@ module.exports = async (req, res) => {
                 return '';
             }
 
+            // Replace '/public' in localhost environment
+            if (protocol === 'http' && section.imgSrc.startsWith('public')) {
+                section.imgSrc = section.imgSrc.replace('public', '');
+            }
 
+            // Prepend baseUrl only if imgSrc doesn't already start with 'http'
             if (!section.imgSrc.startsWith('http')) {
                 section.imgSrc = `${baseUrl}${section.imgSrc}`;
             }
+
 
             const locality = (country === 'GB') ? 'UK' : 'US';
             const yearGroup = locality === 'UK' ? section.UK_yearGroup : section.US_yearGroup;
@@ -78,6 +88,7 @@ module.exports = async (req, res) => {
 <body>
     <main>
         <header class="SiteHeader">
+            <a href="/about_us.html" class="about-us-link">About Us</a>
             <h1>Maths inCoding
                 <img style="float: right;" width="120" height="120" src="/images/linux_site_logo.webp" 
                      alt="Pi with numbers">
@@ -85,7 +96,7 @@ module.exports = async (req, res) => {
             <h3>... learning maths through coding computer games</h3>
             <nav class="header-bottom">
                 <a href="/how_it_works.html" class="how-it-works-link">How it Works</a>
-                <a href="/about_us.html" class="about-us-link">About Us</a>
+                <a href="/login.html" class="login-link">Login</a>
             </nav>
         </header>
 

@@ -1,4 +1,10 @@
+const db = require('./database');
 const natural = require('natural');
+const jwt = require('jsonwebtoken');
+const QuestionModel = require('../models/mathQuestionsModel');
+const QuizResults = require('../models/quizResultModel');
+require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 /**
  * Calculate the cosine similarity between two strings.
@@ -38,9 +44,26 @@ module.exports = async (req, res) => {
         return;
     }
 
-    try {
-        const { studentResponse, aiAnswer } = req.body;
+    await db.connectToDatabase();
 
+    const { studentResponse, aiAnswer, pageUrl } = req.body;
+
+
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+    let studentId = null;
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET);
+            studentId = decoded.id;
+        } catch (error) {
+            console.log('Invalid token, results will not be saved.');
+        }
+    }
+
+
+    try {
+ 
         // Log to confirm received data
         console.log('Received student response:', studentResponse);
         console.log('Received AI answer:', aiAnswer);
@@ -52,7 +75,31 @@ module.exports = async (req, res) => {
         }
 
         const similarityScore = cosineSimilarity(studentResponse, aiAnswer);
-        const passed = similarityScore >= 0.27;  // Assuming a threshold of 0.7
+        const passed = similarityScore >= 0.27;
+
+        // Log the result of the cosine similarity check
+        console.log('Cosine Similarity Score:', similarityScore);
+        console.log('Passed:', passed);
+
+
+        // Use pageUrl from the request body to find the correct page in the database
+        const query = { 'page.url_stub': pageUrl };
+        const pageData = await QuestionModel.findOne(query).exec();
+        console.log("PAGEDATA:", pageData)
+
+
+        if (studentId) {
+            const quizResult = new QuizResults({
+                student: studentId,
+                quizId: pageData.page.description,
+                score: similarityScore * 100, // Assuming percentage from 0-1
+                passed: passed,
+                date: new Date(),
+            });
+            await quizResult.save();
+            console.log(`Free-form quiz result saved for student ID: ${studentId}`);
+        }
+
         res.status(200).json({ similarityScore, passed });
     } catch (error) {
         console.error('Error calculating cosine similarity:', error);

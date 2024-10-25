@@ -22,9 +22,36 @@ module.exports = async (req, res) => {
             return res.status(404).send('Video not found');
         }
 
+        // If the request is made via HTTPS, ensure assets are loaded via HTTPS
+        const protocol = req.headers['x-forwarded-proto'] || 'http'; // Use 'x-forwarded-proto' for determining the protocol
+        const baseUrl = protocol === 'https'
+            ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
+            : 'http://localhost:3000';
+
         const video = videoEntry.page.videoData[0];
         const description = videoEntry.page.description || '';
-        const videoSrc = video.video;  // Use the video URL directly
+     
+
+        let posterSrc = video.imgSrc;
+        let videoSrc = video.video;
+
+        // Replace '/public' for localhost environment in both poster and video source
+        if (protocol === 'http') {
+            if (posterSrc.startsWith('/public')) {
+                posterSrc = posterSrc.replace('/public', '');
+            }
+            if (videoSrc.startsWith('/public')) {
+                videoSrc = videoSrc.replace('/public', '');
+            }
+        }
+
+        // Prepend baseUrl to poster and video source only if they don’t already start with 'http'
+        if (!posterSrc.startsWith('http')) {
+            posterSrc = `${baseUrl}${posterSrc}`;
+        }
+        if (!videoSrc.startsWith('http')) {
+            videoSrc = `${baseUrl}${videoSrc}`;
+        }
 
         //MAGIC NUMBERS
         const timeStops = [
@@ -48,12 +75,7 @@ module.exports = async (req, res) => {
         ].filter(ql => ql !== null); // Handle multiple question links
 
 
-       // If the request is made via HTTPS, ensure assets are loaded via HTTPS
-        const protocol = req.headers['x-forwarded-proto'] || 'http'; // Use 'x-forwarded-proto' for determining the protocol
-        const baseUrl = protocol === 'https'
-            ? 'https://maths-in-coding-by-bun-vercel.vercel.app'
-            : 'http://localhost:3000/';
-      const posterSrc = baseUrl + video.imgSrc;
+ 
 
         const html = `
 <!DOCTYPE html>

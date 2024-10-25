@@ -6,4 +6,4 @@ const SchoolSchema = new mongoose.Schema({
     contactNumber: String
 });
 
-module.exports = mongoose.model('School', SchoolSchema);
+module.exports = mongoose.model('School', SchoolSchema, 'schools');

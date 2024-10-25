@@ -1,7 +1,13 @@
 const db = require('./database');
 const QuestionModel = require('../models/mathQuestionsModel');
+const QuizResults = require('../models/quizResultModel');
 const math = require('mathjs');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
+
+// Load JWT secret from environment variables
+const JWT_SECRET = process.env.JWT_SECRET;
+
 
 /**
  * Handle multiple-choice and standard questions, and return a score and pass/fail result.
@@ -68,6 +74,8 @@ module.exports = async (req, res) => {
     await db.connectToDatabase();
 
     const { studentAnswers, pageUrl } = req.body;
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+
 
     if (!Array.isArray(studentAnswers) || typeof pageUrl !== 'string') {
         res.status(400).json({ error: 'Invalid request format.' });
@@ -75,8 +83,22 @@ module.exports = async (req, res) => {
     }
 
     try {
+
+
         // Log the incoming request body
         console.log('Incoming request body:', req.body);
+
+        // Verify JWT token if present
+        let studentId = null;
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, JWT_SECRET);
+                studentId = decoded.id; // Extract student ID from token
+            } catch (error) {
+                console.log('Invalid token, proceeding without saving results.');
+            }
+        }
+
 
         // Use pageUrl from the request body to find the correct page in the database
         const query = { 'page.url_stub': pageUrl };
@@ -105,6 +127,21 @@ module.exports = async (req, res) => {
 
         // Log the final score and pass/fail result
         console.log('Final Score Data:', scoreData);
+
+        // Save quiz result if the student is authenticated (has a valid token)
+        if (studentId) {
+            const quizResult = new QuizResults({
+                student: studentId,
+                quizId: pageData.page.description, 
+                score: scoreData.scorePercentage,
+                passed: scoreData.passed,
+                date: new Date(),
+            });
+            await quizResult.save();
+            console.log(`Quiz result saved for student ID: ${studentId}`);
+        } else {
+            console.log('No token provided, results will not be saved.');
+        }
 
         // Return only pass/fail and score percentage
         res.status(200).json({

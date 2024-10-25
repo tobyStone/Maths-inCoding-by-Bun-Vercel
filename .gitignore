@@ -8,6 +8,10 @@
 # Environment variables
 .env
 
+#seeding database
+
+seedSecondIteration.js
+
 
 *.config.json
 

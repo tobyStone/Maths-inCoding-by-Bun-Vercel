@@ -26,6 +26,14 @@
       "destination": "/api/handle_questions.js"
     },
     {
+      "source": "/api/login",
+      "destination": "/api/login.js"
+    },
+    {
+      "source": "/teacher_dashboard",
+      "destination": "/api/teacher_dashboard.js"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api/general_page.js?path=$1"
     }
