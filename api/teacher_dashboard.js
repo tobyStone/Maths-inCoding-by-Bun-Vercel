@@ -152,9 +152,9 @@ module.exports = async (req, res) => {
                           <div class="quiz-result ${score.passed && score.score > 0 ? '' : (score.score === 0 ? 'red' : 'yellow')}">
                                 Quiz: ${score.quizId} - Score: ${score.score}% -
                             <span class="${score.passed && score.score > 0 ? 'passed' : 'failed'}">${score.passed && score.score > 0 ? 'Passed' : 'Failed'}</span>
-                            - Date: ${new Date(score.date).toLocaleDateString()}
+                            - Date: ${score.date}  
                             </div>
-                        `).join('')}
+                           `).join('')}
                     </div>
                 </div>
             `).join('')}
