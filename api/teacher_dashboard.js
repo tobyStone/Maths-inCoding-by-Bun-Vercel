@@ -41,6 +41,23 @@ const authenticateTeacher = async (req, res) => {
     }
 };
 
+
+const getFormattedDate = (date, country) => {
+    const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    };
+
+    if (country === 'GB') {
+        // UK Format: DD/MM/YYYY
+        return new Date(date).toLocaleDateString('en-GB', options);
+    } else {
+        // Default to US format: MM/DD/YYYY
+        return new Date(date).toLocaleDateString('en-US', options);
+    }
+};
+
 // Serverless function handler for teacher dashboard.
 
 module.exports = async (req, res) => {
@@ -72,6 +89,9 @@ module.exports = async (req, res) => {
         // Fetch quiz results for all students associated with the teacher
         const quizResults = await QuizResults.find({ student: { $in: studentIds } }).populate('student', 'name email');
 
+        // Get the country from the header
+        const country = req.headers['x-vercel-ip-country'] || 'US'; // Default to US if the header is missing
+
         // Organize the quiz results by student
         const resultsByStudent = quizResults.reduce((acc, result) => {
             if (!acc[result.student._id]) {
@@ -85,7 +105,7 @@ module.exports = async (req, res) => {
                 quizId: result.quizId,
                 score: result.score,
                 passed: result.passed,
-                date: result.date
+                date: getFormattedDate(result.date, country)
             });
             return acc;
         }, {});
