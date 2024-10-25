@@ -43,6 +43,13 @@ const authenticateTeacher = async (req, res) => {
 
 
 const getFormattedDate = (date, country) => {
+    const parsedDate = new Date(date);  // Ensure we parse the date string
+
+    // Check if the parsed date is valid
+    if (isNaN(parsedDate.getTime())) {
+        return 'Invalid Date';  // Return a fallback if the date is invalid
+    }
+
     const options = {
         year: 'numeric',
         month: '2-digit',
@@ -51,12 +58,13 @@ const getFormattedDate = (date, country) => {
 
     if (country === 'GB') {
         // UK Format: DD/MM/YYYY
-        return new Date(date).toLocaleDateString('en-GB', options);
+        return parsedDate.toLocaleDateString('en-GB', options);
     } else {
         // Default to US format: MM/DD/YYYY
-        return new Date(date).toLocaleDateString('en-US', options);
+        return parsedDate.toLocaleDateString('en-US', options);
     }
 };
+
 
 // Serverless function handler for teacher dashboard.
 
