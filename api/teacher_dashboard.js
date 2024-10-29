@@ -84,8 +84,8 @@ module.exports = async (req, res) => {
             return; // Authentication failed, response already sent
         }
 
-        // Fetch students associated with the teacher
-        const students = await Student.find({ teacher: teacher._id });
+        // Fetch students associated with the authenticated teacher
+        const students = await Student.find({ teacher: teacher._id }).lean();
 
         if (!students || students.length === 0) {
             return res.status(404).send('<h2>No students found for this teacher.</h2>');

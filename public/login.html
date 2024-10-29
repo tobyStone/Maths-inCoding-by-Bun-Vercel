@@ -152,7 +152,6 @@
                 return;  // Prevent login if consent not given
             }
 
-
             try {
                 const response = await axios.post('/api/login', {
                     email,
@@ -163,28 +162,9 @@
                 localStorage.setItem('token', response.data.token);
 
                 if (response.data.user.role === 'teacher') {
-                    // Token stored, now proceed with dashboard request
-                    const token = localStorage.getItem('token');  // Retrieve the stored token from localStorage
-
-                    if (token) {
-                        // Fetch and replace content with dashboard
-                        const dashboardResponse = await fetch('/teacher_dashboard', {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                            }
-                        });
-
-                        if (dashboardResponse.ok) {
-                            const dashboardHtml = await dashboardResponse.text(); // Get HTML as text
-                            document.body.innerHTML = dashboardHtml; // Replace entire body content
-                        } else {
-                            throw new Error('Unable to load dashboard');
-                        }
-                    } else {
-                        alert('No valid token found. Please log in again.');
-                        window.location.href = '/login.html';  // Redirect to login if no token
-                    }
+                    fetchUpdatedDashboardData(); // Load dashboard after login
+                    // Set up periodic refresh every 60 seconds (60000 ms)
+                    setInterval(fetchUpdatedDashboardData, 60000);  // 60,000 milliseconds = 1 minute
                 } else {
                     // Redirect students to their general page
                     window.location.href = '/';
@@ -193,6 +173,38 @@
                 alert('Login failed: ' + err.response.data.message);
             }
         });
+
+        // Function to fetch updated dashboard data periodically
+        async function fetchUpdatedDashboardData() {
+            try {
+                const token = localStorage.getItem('token');  // Retrieve the stored token from localStorage
+
+                if (!token) {
+                    alert('No valid token found. Please log in again.');
+                    window.location.href = '/login.html';  // Redirect to login if no token
+                    return;
+                }
+
+                // Fetch the latest dashboard data
+                const dashboardResponse = await fetch('/teacher_dashboard', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+
+                if (!dashboardResponse.ok) {
+                    throw new Error('Unable to load dashboard');
+                }
+
+                const dashboardHtml = await dashboardResponse.text(); // Get HTML as text
+                document.body.innerHTML = dashboardHtml;  // Replace entire body content with the latest dashboard
+
+            } catch (err) {
+                console.error('Error fetching updated dashboard:', err);
+                alert('Unable to fetch the updated dashboard: ' + err.message);
+            }
+        }
     </script>
 
 </body>
