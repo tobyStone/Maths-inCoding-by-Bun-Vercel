@@ -187,10 +187,7 @@
 
                 // Fetch the latest dashboard data
                 const dashboardResponse = await fetch('/teacher_dashboard', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    }
+                    method: 'GET'
                 });
 
                 if (!dashboardResponse.ok) {
