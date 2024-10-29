@@ -158,7 +158,7 @@ module.exports = async (req, res) => {
                     <div class="quiz-results">
                          ${Object.entries(student.scores).map(([quizId, result]) => `
                             <div class="quiz-result ${result.count >= 3 ? 'red' : result.count === 2 ? 'orange' : 'yellow'}">
-                                Quiz: ${quizId} - ${result.count} ${result.count === 1 ? 'failure' : 'failures'} - Dates: ${result.dates.join(', ')}
+                                Quiz: ${quizId} - ${result.count} ${result.count === 1 ? 'failure' : 'failures'} - Last Date: ${result.dates[result.dates.length - 1]}
                             </div>
                         `).join('')}
                         ${student.passedResults.map(passed => `
@@ -167,7 +167,7 @@ module.exports = async (req, res) => {
                                 <span class="passed">Passed</span> - Date: ${passed.date}
                             </div>
                         `).join('')}
-                   </div>
+                </div>
                 </div>
             `).join('')}
         </body>
