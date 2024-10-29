@@ -100,23 +100,31 @@ module.exports = async (req, res) => {
         // Get the country from the header
         const country = req.headers['x-vercel-ip-country'] || 'US'; // Default to US if the header is missing
 
-        // Organize the quiz results by student
         const resultsByStudent = quizResults.reduce((acc, result) => {
             if (!acc[result.student._id]) {
                 acc[result.student._id] = {
                     studentName: result.student.name,
                     email: result.student.email,
-                    scores: []
+                    scores: {},
+                    passedResults: []
                 };
             }
-            acc[result.student._id].scores.push({
-                quizId: result.quizId,
-                score: result.score,
-                passed: result.passed,
-                date: getFormattedDate(result.date, country)
-            });
+            if (result.passed) {
+                acc[result.student._id].passedResults.push({
+                    quizId: result.quizId,
+                    score: result.score,
+                    date: getFormattedDate(result.date, country)
+                });
+            } else {
+                if (!acc[result.student._id].scores[result.quizId]) {
+                    acc[result.student._id].scores[result.quizId] = { count: 0, dates: [] };
+                }
+                acc[result.student._id].scores[result.quizId].count += 1;
+                acc[result.student._id].scores[result.quizId].dates.push(getFormattedDate(result.date, country));
+            }
             return acc;
         }, {});
+
 
         // Prepare the response HTML for the teacher's dashboard
         const html = `
@@ -148,14 +156,18 @@ module.exports = async (req, res) => {
                         <strong>${student.studentName} (${student.email})</strong>
                     </div>
                     <div class="quiz-results">
-                        ${student.scores.map(score => `
-                          <div class="quiz-result ${score.passed && score.score > 0 ? '' : (score.score === 0 ? 'red' : 'yellow')}">
-                                Quiz: ${score.quizId} - Score: ${score.score}% -
-                            <span class="${score.passed && score.score > 0 ? 'passed' : 'failed'}">${score.passed && score.score > 0 ? 'Passed' : 'Failed'}</span>
-                            - Date: ${score.date}  
+                         ${Object.entries(student.scores).map(([quizId, result]) => `
+                            <div class="quiz-result ${result.count >= 3 ? 'red' : result.count === 2 ? 'orange' : 'yellow'}">
+                                Quiz: ${quizId} - ${result.count} ${result.count === 1 ? 'failure' : 'failures'} - Dates: ${result.dates.join(', ')}
                             </div>
-                           `).join('')}
-                    </div>
+                        `).join('')}
+                        ${student.passedResults.map(passed => `
+                            <div class="quiz-result">
+                                Quiz: ${passed.quizId} - Score: ${passed.score}% - 
+                                <span class="passed">Passed</span> - Date: ${passed.date}
+                            </div>
+                        `).join('')}
+                   </div>
                 </div>
             `).join('')}
         </body>
