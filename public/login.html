@@ -1,81 +1,137 @@
+const jwt = require('jsonwebtoken');
+const Teacher = require('../models/teacherModel');
+const Student = require('../models/studentModel');
+const QuizResults = require('../models/quizResultModel');
+const db = require('./database'); // Your database connection logic
+require('dotenv').config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+/**
+ * Middleware to authenticate and authorize teachers.
+ * Verifies the JWT token and checks if the user is a teacher.
+ */
+const authenticateTeacher = async (req, res) => {
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+    if (!token) {
+        res.status(401).json({ message: 'Unauthorized: No token provided' });
+        return null; // Ensure function exits after sending a response
+    }
+
+    try {
+        // Verify the token and decode it
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        // Ensure the role is 'teacher'
+        if (decoded.role !== 'teacher') {
+            res.status(403).json({ message: 'Forbidden: You are not authorized to access this route' });
+            return null; // Ensure function exits after sending a response
+        }
+
+        // Fetch the teacher using the decoded ID
+        const teacher = await Teacher.findById(decoded.id);
+        if (!teacher) {
+            res.status(404).json({ message: 'Teacher not found' });
+            return null; // Ensure function exits after sending a response
+        }
+
+        return teacher; // Return teacher if found
+    } catch (error) {
+        console.error('Error verifying token:', error);
+        res.status(401).json({ message: 'Invalid token' });
+        return null; // Ensure function exits after sending a response
+    }
+};
+
+const getFormattedDate = (date, country) => {
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return 'Invalid Date';
+
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return parsedDate.toLocaleDateString(country === 'GB' ? 'en-GB' : 'en-US', options);
+};
+
+module.exports = async (req, res) => {
+    if (req.method !== 'GET') {
+        res.setHeader('Allow', ['GET']);
+        return res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+
+    try {
+        await db.connectToDatabase();
+
+        // Authenticate the teacher
+        const teacher = await authenticateTeacher(req, res);
+        if (!teacher) return; // Exit if authentication fails
+
+        // Fetch students associated with the authenticated teacher
+        const students = await Student.find({ teacher: teacher._id }).lean();
+        if (!students || students.length === 0) {
+            res.status(404).send('<h2>No students found for this teacher.</h2>');
+            return; // Ensure function exits after sending a response
+        }
+
+        // Collect all student IDs to query their quiz results
+        const studentIds = students.map(student => student._id);
+
+        // Fetch quiz results for all students associated with the teacher
+        const quizResults = await QuizResults.find({ student: { $in: studentIds } }).populate('student', 'name email');
+
+        const country = req.headers['x-vercel-ip-country'] || 'US';
+        const resultsByStudent = quizResults.reduce((acc, result) => {
+            if (!acc[result.student._id]) {
+                acc[result.student._id] = {
+                    studentName: result.student.name,
+                    email: result.student.email,
+                    scores: {},
+                    passedResults: []
+                };
+            }
+            if (result.passed) {
+                acc[result.student._id].passedResults.push({
+                    quizId: result.quizId,
+                    score: result.score,
+                    date: getFormattedDate(result.date, country)
+                });
+            } else {
+                if (!acc[result.student._id].scores[result.quizId]) {
+                    acc[result.student._id].scores[result.quizId] = { count: 0, dates: [] };
+                }
+                acc[result.student._id].scores[result.quizId].count += 1;
+                acc[result.student._id].scores[result.quizId].dates.push(getFormattedDate(result.date, country));
+            }
+            return acc;
+        }, {});
+
+        // Prepare the response HTML for the teacher's dashboard
+        const html = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Form</title>
-    <link rel="icon" type="image/png" href="/images/linux_site_logo.webp" sizes="32x32">
-
-    <!-- Link to your existing stylesheet for consistent styling -->
-    <link href="/style.css" rel="stylesheet">
-
-    <!-- Inline styles to enhance the login form, similar to the feedback form -->
+    <title>Teacher Dashboard</title>
     <style>
         body {
-            /* Inherits the font-family and other styles from your main stylesheet */
+            font-family: Arial, sans-serif;
         }
 
-        .login-container {
-            max-width: 600px;
-            margin: 50px auto;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+        h1 {
+            text-align: center;
         }
 
-            .login-container h2 {
-                text-align: center;
-                margin-bottom: 30px;
-                color: #333;
-            }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-            .form-group label {
-                display: block;
-                font-weight: 600;
-                margin-bottom: 10px;
-            }
-
-            .form-group input {
-                width: 100%;
-                padding: 15px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                margin-bottom: 10px;
-            }
-
-        button.myButton {
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            margin-top: 20px;
-            border-radius: 4px;
-            box-shadow: none;
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-
-            button.myButton:hover {
-                background-color: #575f8a;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-
-        /* Dashboard styles */
         .student-container {
-            margin: 20px 0;
-            padding: 15px;
+            margin: 20px;
+            padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
+        }
+
+        .student-details {
+            margin-bottom: 15px;
         }
 
         .quiz-result {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 4px;
+            margin-left: 20px;
         }
 
         .yellow {
@@ -99,110 +155,45 @@
             color: red;
             font-weight: bold;
         }
+
+        .red .failed {
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <header class="SiteHeader">
-        <h1>
-            Maths inCoding
-            <img style="float: right;" width="120" height="120" src="/images/linux_site_logo.webp" alt="Pi with numbers">
-        </h1>
-        <div id="missionStatement">
-            <h3>... learning maths through coding computer games</h3>
+    <h1>Welcome ${teacher.name}, here are your students' quiz results:</h1>
+    ${Object.values(resultsByStudent).map(student => `
+    <div class="student-container">
+        <div class="student-details">
+            <strong>${student.studentName} (${student.email})</strong>
         </div>
-    </header>
-    <div class="login-container">
-        <h2>Login Form</h2>
-        <form id="loginForm" method="POST" action="/api/login">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Your Email" required class="myInput">
+        <div class="quiz-results">
+            ${Object.entries(student.scores).map(([quizId, result]) => `
+            <div class="quiz-result ${result.count >= 3 ? 'red' : result.count === 2 ? 'orange' : 'yellow'}">
+                Quiz: ${quizId} - ${result.count} ${result.count === 1 ? 'failure' : 'failures'} - Last Date: ${result.dates[result.dates.length - 1]}
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Your Password" required class="myInput">
+            `).join('')}
+            ${student.passedResults.map(passed => `
+            <div class="quiz-result">
+                Quiz: ${passed.quizId} - Score: ${passed.score}% -
+                <span class="passed">Passed</span> - Date: ${passed.date}
             </div>
-            <!-- Consent Section for Quiz Data Collection -->
-            <div class="consent-section">
-                <h3>Data Collection Consent</h3>
-                <p>We collect personal information such as your quiz results to track your learning progress. This data will not be shared with third parties and will be stored securely. By clicking "I Accept", you agree to our <a href="/privacy-policy.html">Privacy Policy</a> and <a href="/terms-of-service.html">Terms of Service</a>.</p>
-                <input type="checkbox" id="consentCheckbox" required>
-                <label for="consentCheckbox">I Accept</label>
-            </div>
-            <button type="submit" class="myButton">Login</button>
-        </form>
+            `).join('')}
+        </div>
     </div>
-    <!-- Teacher Dashboard Container -->
-    <div id="dashboard" class="login-container" style="display: none;">
-        <h2>Teacher Dashboard</h2>
-        <div id="results"></div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const consentCheckbox = document.getElementById('consentCheckbox');
-
-            // Check if the user has accepted the consent
-            if (!consentCheckbox.checked) {
-                alert('You must accept the data collection consent to log in.');
-                return;  // Prevent login if consent not given
-            }
-
-            try {
-                const response = await axios.post('/api/login', {
-                    email,
-                    password
-                });
-
-                // Store the JWT token for future use
-                localStorage.setItem('token', response.data.token);
-
-                if (response.data.user.role === 'teacher') {
-                    fetchUpdatedDashboardData(); // Load dashboard after login
-                    // Set up periodic refresh every 60 seconds (60000 ms)
-                    setInterval(fetchUpdatedDashboardData, 60000);  // 60,000 milliseconds = 1 minute
-                } else {
-                    // Redirect students to their general page
-                    window.location.href = '/';
-                }
-            } catch (err) {
-                alert('Login failed: ' + err.response.data.message);
-            }
-        });
-
-        // Function to fetch updated dashboard data periodically
-        async function fetchUpdatedDashboardData() {
-            try {
-                const token = localStorage.getItem('token');  // Retrieve the stored token from localStorage
-
-                if (!token) {
-                    alert('No valid token found. Please log in again.');
-                    window.location.href = '/login.html';  // Redirect to login if no token
-                    return;
-                }
-
-                // Fetch the latest dashboard data
-                const dashboardResponse = await fetch('/teacher_dashboard', {
-                    method: 'GET'
-                });
-
-                if (!dashboardResponse.ok) {
-                    throw new Error('Unable to load dashboard');
-                }
-
-                const dashboardHtml = await dashboardResponse.text(); // Get HTML as text
-                document.body.innerHTML = dashboardHtml;  // Replace entire body content with the latest dashboard
-
-            } catch (err) {
-                console.error('Error fetching updated dashboard:', err);
-                alert('Unable to fetch the updated dashboard: ' + err.message);
-            }
-        }
-    </script>
-
+    `).join('')}
 </body>
 </html>
+        `;
+
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).send(html);
+
+    } catch (error) {
+        console.error('Error fetching teacher dashboard data:', error);
+        if (!res.headersSent) {
+            res.status(500).send('<h2>Internal server error. Please try again later.</h2>');
+        }
+    }
+};
