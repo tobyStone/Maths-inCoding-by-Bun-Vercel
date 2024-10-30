@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Form</title>
     <link rel="icon" type="image/png" href="/images/linux_site_logo.webp" sizes="32x32">
-
-    <!-- Link to your existing stylesheet for consistent styling -->
     <link href="/style.css" rel="stylesheet">
-
-    <!-- Inline styles to enhance the login form, similar to the feedback form -->
     <style>
-        body {
-            /* Inherits the font-family and other styles from your main stylesheet */
+        /* Inline styling as per your original code */
+        body { /* Inherits the font-family and other styles from your main stylesheet */
         }
 
         .login-container {
@@ -62,7 +58,6 @@
                 background-color: #575f8a;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             }
-
         /* Dashboard styles */
         .student-container {
             margin: 20px 0;
@@ -153,59 +148,51 @@
             }
 
             try {
-                const response = await axios.post('/api/login', {
-                    email,
-                    password
-                });
+                const response = await axios.post('/api/login', { email, password });
 
                 // Store the JWT token for future use
                 localStorage.setItem('token', response.data.token);
 
                 if (response.data.user.role === 'teacher') {
                     fetchUpdatedDashboardData(); // Load dashboard after login
-                    // Set up periodic refresh every 60 seconds (60000 ms)
-                    setInterval(fetchUpdatedDashboardData, 60000);  // 60,000 milliseconds = 1 minute
+                    setInterval(fetchUpdatedDashboardData, 60000);  // Refresh every 60 seconds
                 } else {
-                    // Redirect students to their general page
                     window.location.href = '/';
                 }
             } catch (err) {
-                alert('Login failed: ' + err.response.data.message);
+                alert('Login failed: ' + (err.response?.data?.message || 'Unknown error'));
             }
         });
 
-        // Function to fetch updated dashboard data periodically
         async function fetchUpdatedDashboardData() {
             try {
-                const token = localStorage.getItem('token');  // Retrieve the stored token from localStorage
+                const token = localStorage.getItem('token');
 
                 if (!token) {
                     alert('No valid token found. Please log in again.');
-                    window.location.href = '/login.html';  // Redirect to login if no token
+                    window.location.href = '/login.html';
                     return;
                 }
 
-                // Fetch the latest dashboard data
                 const dashboardResponse = await fetch('/teacher_dashboard', {
                     method: 'GET',
                     headers: {
-                        'Authorization': Bearer ${ token },
-                        }
-                    });
+                        'Authorization': `Bearer ${token}`,  // Correct template literal
+                    }
+                });
 
-        if (!dashboardResponse.ok) {
-            throw new Error('Unable to load dashboard');
-        }
+                if (!dashboardResponse.ok) {
+                    throw new Error('Unable to load dashboard');
+                }
 
-        const dashboardHtml = await dashboardResponse.text(); // Get HTML as text
-        document.body.innerHTML = dashboardHtml;  // Replace entire body content with the latest dashboard
+                const dashboardHtml = await dashboardResponse.text();
+                document.body.innerHTML = dashboardHtml;
 
-                } catch (err) {
-            console.error('Error fetching updated dashboard:', err);
-            alert('Unable to fetch the updated dashboard: ' + err.message);
-        }
+            } catch (err) {
+                console.error('Error fetching updated dashboard:', err);
+                alert('Unable to fetch the updated dashboard: ' + err.message);
             }
+        }
     </script>
-
 </body>
 </html>
