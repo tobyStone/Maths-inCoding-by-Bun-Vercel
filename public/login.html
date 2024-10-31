@@ -131,7 +131,7 @@
                 }
 
                 const dashboardHtml = await dashboardResponse.text();
-                document.getElementById('dashboard').innerHTML = dashboardHtml; // Update only dashboard content
+                document.body.innerHTML = dashboardHtml;
 
             } catch (err) {
                 console.error('Error fetching updated dashboard:', err);
