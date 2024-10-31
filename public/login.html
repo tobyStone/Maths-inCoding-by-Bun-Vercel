@@ -8,9 +8,7 @@
     <link href="/style.css" rel="stylesheet">
     <style>
         /* Inline styling as per your original code */
-        body { /* Inherits the font-family and other styles from your main stylesheet */
-        }
-
+        body { /* Inherits the font-family and other styles from your main stylesheet */ }
         .login-container {
             max-width: 600px;
             margin: 50px auto;
@@ -19,31 +17,10 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
-
-            .login-container h2 {
-                text-align: center;
-                margin-bottom: 30px;
-                color: #333;
-            }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-            .form-group label {
-                display: block;
-                font-weight: 600;
-                margin-bottom: 10px;
-            }
-
-            .form-group input {
-                width: 100%;
-                padding: 15px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                margin-bottom: 10px;
-            }
-
+        .login-container h2 { text-align: center; margin-bottom: 30px; color: #333; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 10px; }
+        .form-group input { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; }
         button.myButton {
             width: 100%;
             padding: 15px;
@@ -53,47 +30,15 @@
             box-shadow: none;
             transition: background-color 0.3s, box-shadow 0.3s;
         }
-
-            button.myButton:hover {
-                background-color: #575f8a;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
+        button.myButton:hover { background-color: #575f8a; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
         /* Dashboard styles */
-        .student-container {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-
-        .quiz-result {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        .yellow {
-            background-color: yellow;
-        }
-
-        .orange {
-            background-color: orange;
-        }
-
-        .red {
-            background-color: red;
-        }
-
-        .passed {
-            color: green;
-            font-weight: bold;
-        }
-
-        .failed {
-            color: red;
-            font-weight: bold;
-        }
+        .student-container { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9; }
+        .quiz-result { margin-top: 10px; padding: 10px; border-radius: 4px; }
+        .yellow { background-color: yellow; }
+        .orange { background-color: orange; }
+        .red { background-color: red; }
+        .passed { color: green; font-weight: bold; }
+        .failed { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -186,7 +131,7 @@
                 }
 
                 const dashboardHtml = await dashboardResponse.text();
-                document.body.innerHTML = dashboardHtml;
+                document.getElementById('dashboard').innerHTML = dashboardHtml; // Update only dashboard content
 
             } catch (err) {
                 console.error('Error fetching updated dashboard:', err);
