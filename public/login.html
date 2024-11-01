@@ -99,7 +99,7 @@
                 localStorage.setItem('token', response.data.token);
                 if (response.data.user.role === 'teacher') {
                     // Redirect to the dashboard page
-                    window.location.href = '/teacher_dashboard';
+                    window.location.href = '/teacher_dashboard.html';
                 } else {
                     window.location.href = '/';
                 }
@@ -108,35 +108,7 @@
             }
         });
 
-        async function fetchUpdatedDashboardData() {
-            try {
-                const token = localStorage.getItem('token');
-
-                if (!token) {
-                    alert('No valid token found. Please log in again.');
-                    window.location.href = '/login.html';
-                    return;
-                }
-
-                const dashboardResponse = await fetch('/teacher_dashboard', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,  // Correct template literal
-                    }
-                });
-
-                if (!dashboardResponse.ok) {
-                    throw new Error('Unable to load dashboard');
-                }
-
-                const dashboardHtml = await dashboardResponse.text();
-                document.body.innerHTML = dashboardHtml;
-
-            } catch (err) {
-                console.error('Error afetching updated dashboard:', err);
-                alert('Unable to fetch the updated dashboard: ' + err.message);
-            }
-        }
+  
     </script>
 </body>
 </html>
