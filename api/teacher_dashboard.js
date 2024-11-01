@@ -126,29 +126,8 @@ module.exports = async (req, res) => {
         }, {});
 
 
-        // Prepare the response HTML for the teacher's dashboard
+        // Generate HTML for the dashboard content (only the results section)
         const html = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Teacher Dashboard</title>
-            <style>
-                body { font-family: Arial, sans-serif; }
-                h1 { text-align: center; }
-                .student-container { margin: 20px; padding: 10px; border: 1px solid #ccc; }
-                .student-details { margin-bottom: 15px; }
-                .quiz-result { margin-left: 20px; }
-                .yellow { background-color: yellow; }
-                .orange { background-color: orange; }
-                .red { background-color: red; }
-                .passed { color: green; font-weight: bold; }
-                .failed { color: red; font-weight: bold; }
-                .red .failed { color: white; }
-            </style>
-        </head>
-        <body>
             <h1>Welcome ${teacher.name}, here are your students' quiz results:</h1>
             ${Object.values(resultsByStudent).map(student => `
                 <div class="student-container">
@@ -167,14 +146,12 @@ module.exports = async (req, res) => {
                                 <span class="passed">Passed</span> - Date: ${passed.date}
                             </div>
                         `).join('')}
-                </div>
+                    </div>
                 </div>
             `).join('')}
-        </body>
-        </html>
         `;
 
-        // Return the HTML
+        // Return the HTML content to be embedded in `teacher_dashboard.html`
         res.setHeader('Content-Type', 'text/html');
         return res.status(200).send(html);
 
@@ -183,4 +160,3 @@ module.exports = async (req, res) => {
         return res.status(500).send('<h2>Internal server error. Please try again later.</h2>');
     }
 };
-

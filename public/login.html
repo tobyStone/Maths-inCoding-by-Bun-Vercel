@@ -97,10 +97,9 @@
 
                 // Store the JWT token for future use
                 localStorage.setItem('token', response.data.token);
-
                 if (response.data.user.role === 'teacher') {
-                    fetchUpdatedDashboardData(); // Load dashboard after login
-                    setInterval(fetchUpdatedDashboardData, 60000);  // Refresh every 60 seconds
+                    // Redirect to the dashboard page
+                    window.location.href = '/teacher_dashboard';
                 } else {
                     window.location.href = '/';
                 }
@@ -134,7 +133,7 @@
                 document.body.innerHTML = dashboardHtml;
 
             } catch (err) {
-                console.error('Error fetching updated dashboard:', err);
+                console.error('Error afetching updated dashboard:', err);
                 alert('Unable to fetch the updated dashboard: ' + err.message);
             }
         }

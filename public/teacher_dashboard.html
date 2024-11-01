@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link href="/style.css" rel="stylesheet">
+    <style>
+        /* Styling similar to the login page, but adjusted for the dashboard */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .student-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+
+        .quiz-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .yellow {
+            background-color: yellow;
+        }
+
+        .orange {
+            background-color: orange;
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .passed {
+            color: green;
+            font-weight: bold;
+        }
+
+        .failed {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header class="SiteHeader">
+        <h1>Maths inCoding Dashboard</h1>
+        <div id="missionStatement"><h3>... learning maths through coding computer games</h3></div>
+    </header>
+
+    <!-- Dashboard Container -->
+    <div id="dashboard">
+        <h2>Teacher Dashboard</h2>
+        <div id="results">Loading...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Function to fetch updated dashboard data periodically
+        async function fetchUpdatedDashboardData() {
+            try {
+                const token = localStorage.getItem('token');
+
+                if (!token) {
+                    alert('No valid token found. Please log in again.');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                // Fetch the latest dashboard data
+                const dashboardResponse = await fetch('/teacher_dashboard', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,  // Use the stored token
+                    }
+                });
+
+                if (dashboardResponse.status === 401) {
+                    alert('Session expired. Please log in again.');
+                    localStorage.removeItem('token'); // Clear expired token
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                if (!dashboardResponse.ok) {
+                    throw new Error('Unable to load dashboard');
+                }
+
+                // Update the dashboard content
+                const dashboardHtml = await dashboardResponse.text();
+                document.getElementById('results').innerHTML = dashboardHtml;
+
+            } catch (err) {
+                console.error('Error fetching updated dashboard:', err);
+                alert('Unable to fetch the updated dashboard: ' + err.message);
+            }
+        }
+
+        // Initial fetch when the page loads
+        fetchUpdatedDashboardData();
+
+        // Set up periodic refresh every 60 seconds (60000 ms)
+        setInterval(fetchUpdatedDashboardData, 60000);  // Refresh every 60 seconds
+    </script>
+</body>
+</html>

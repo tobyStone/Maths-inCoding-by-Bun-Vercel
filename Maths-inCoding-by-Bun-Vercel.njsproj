@@ -34183,6 +34183,7 @@
     <Content Include="public\login.html" />
     <Content Include="public\privacy-policy.html" />
     <Content Include="public\style.css" />
+    <Content Include="public\teacher_dashboard.html" />
     <Content Include="public\terms-of-service.html" />
     <Content Include="public\VideoPlayer.css" />
     <Content Include="public\videos\3Dgameengine.mp4" />
