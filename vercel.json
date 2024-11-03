@@ -34,6 +34,10 @@
       "destination": "/api/teacher_dashboard.js"
     },
     {
+      "source": "/repeat_teacher_dashboard",
+      "destination": "/api/repeat_teacher_dashboard.js"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api/general_page.js?path=$1"
     }

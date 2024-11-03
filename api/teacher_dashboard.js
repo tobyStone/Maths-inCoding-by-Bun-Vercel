@@ -84,6 +84,7 @@ module.exports = async (req, res) => {
             return; // Authentication failed, response already sent
         }
 
+
         // Fetch students associated with the authenticated teacher
         const students = await Student.find({ teacher: teacher._id }).lean();
 

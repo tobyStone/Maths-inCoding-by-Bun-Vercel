@@ -6,7 +6,7 @@
     <title>Teacher Dashboard</title>
     <link href="/style.css" rel="stylesheet">
     <style>
-        /* Styling similar to the login page, but adjusted for the dashboard */
+        /* Styling for the dashboard */
         body {
             font-family: Arial, sans-serif;
         }
@@ -61,51 +61,50 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        // Function to fetch updated dashboard data periodically
         async function fetchUpdatedDashboardData() {
             try {
-                const token = localStorage.getItem('token');
-
-                if (!token) {
-                    alert('No valid token found. Please log in again.');
-                    window.location.href = '/login.html';
-                    return;
+                const response = await axios.get('/repeat_teacher_dashboard');
+                if (response.status !== 200) {
+                    throw new Error('Unable to load dashboard data');
                 }
 
-                // Fetch the latest dashboard data
-                const dashboardResponse = await fetch('/teacher_dashboard', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,  // Use the stored token
-                    }
+                // Update the results dynamically
+                const data = response.data;
+                const resultsContainer = document.getElementById('results');
+                resultsContainer.innerHTML = ''; // Clear existing content
+
+                Object.values(data).forEach(student => {
+                    const studentContainer = document.createElement('div');
+                    studentContainer.classList.add('student-container');
+                    studentContainer.innerHTML = `
+                            <div><strong>${student.studentName} (${student.email})</strong></div>
+                            <div class="quiz-results">
+                                ${Object.entries(student.scores).map(([quizId, result]) => `
+                                    <div class="quiz-result ${result.count >= 3 ? 'red' : result.count === 2 ? 'orange' : 'yellow'}">
+                                        Quiz: ${quizId} - ${result.count} ${result.count === 1 ? 'failure' : 'failures'} - Last Date: ${result.dates[result.dates.length - 1]}
+                                    </div>
+                                `).join('')}
+                                ${student.passedResults.map(passed => `
+                                    <div class="quiz-result">
+                                        Quiz: ${passed.quizId} - Score: ${passed.score}% -
+                                        <span class="passed">Passed</span> - Date: ${passed.date}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    resultsContainer.appendChild(studentContainer);
                 });
-
-                if (dashboardResponse.status === 401) {
-                    alert('Session expired. Please log in again.');
-                    localStorage.removeItem('token'); // Clear expired token
-                    window.location.href = '/login.html';
-                    return;
-                }
-
-                if (!dashboardResponse.ok) {
-                    throw new Error('Unable to load dashboard');
-                }
-
-                // Update the dashboard content
-                const dashboardHtml = await dashboardResponse.text();
-                document.getElementById('results').innerHTML = dashboardHtml;
-
-            } catch (err) {
-                console.error('Error fetching updated dashboard:', err);
-                alert('Unable to fetch the updated dashboard: ' + err.message);
+            } catch (error) {
+                console.error('Error fetching updated dashboard:', error);
+                alert('Unable to fetch the updated dashboard: ' + error.message);
             }
         }
 
         // Initial fetch when the page loads
         fetchUpdatedDashboardData();
 
-        // Set up periodic refresh every 60 seconds (60000 ms)
-        setInterval(fetchUpdatedDashboardData, 60000);  // Refresh every 60 seconds
+        // Set up periodic refresh every 10 seconds (10000 ms)
+        setInterval(fetchUpdatedDashboardData, 10000); // Refresh every 10 seconds
     </script>
 </body>
 </html>

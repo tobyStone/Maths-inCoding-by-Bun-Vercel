@@ -43,6 +43,7 @@
     <Content Include="api\handle_questions.js" />
     <Content Include="api\login.js" />
     <Content Include="api\maths_questions.js" />
+    <Content Include="api\repeat_teacher_dashboard.js" />
     <Content Include="api\submit_feedback.js" />
     <Content Include="api\teacher_dashboard.js" />
     <Content Include="api\videoPlayer.js" />
