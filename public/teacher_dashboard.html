@@ -78,8 +78,6 @@
         // Function to fetch updated dashboard data
         async function fetchUpdatedDashboardData() {
             try {
-                // Determine the endpoint based on whether it's the first load
-                const endpoint = firstLoad ? '/teacher_dashboard' : '/repeat_teacher_dashboard';
 
                 let dashboardResponse;
 
@@ -92,7 +90,7 @@
                         return;
                     }
 
-                    dashboardResponse = await fetch(endpoint, {
+                    dashboardResponse = await fetch('/teacher_dashboard', {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,  // Use the stored token
@@ -107,7 +105,7 @@
                     }
                 } else {
                     // Subsequent loads without authorization headers
-                    dashboardResponse = await fetch(endpoint, {
+                    dashboardResponse = await fetch('/repeat_teacher_dashboard', {
                         method: 'GET'
                     });
                 }
