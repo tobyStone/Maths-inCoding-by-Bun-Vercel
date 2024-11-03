@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Dashboard</title>
+
+    <!-- Link to favicon in a more universally supported .ico format -->
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+
+    <!-- Link to your webp icon for more specific cases if needed -->
+    <link rel="icon" href="/images/linux_site_logo.webp" sizes="32x32" type="image/webp">
+
     <link href="/style.css" rel="stylesheet">
     <style>
         /* Styling similar to the login page, but adjusted for the dashboard */
@@ -49,10 +56,14 @@
 </head>
 <body>
     <header class="SiteHeader">
-        <h1>Maths inCoding Dashboard</h1>
-        <div id="missionStatement"><h3>... learning maths through coding computer games</h3></div>
+        <h1>
+            Maths inCoding
+            <img style="float: right;" width="120" height="120" src="/images/linux_site_logo.webp" alt="Pi with numbers">
+        </h1>
+        <div id="missionStatement">
+            <h3>... learning maths through coding computer games</h3>
+        </div>
     </header>
-
     <!-- Dashboard Container -->
     <div id="dashboard">
         <h2>Teacher Dashboard</h2>
@@ -61,30 +72,44 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        // Function to fetch updated dashboard data periodically
+        // Flag to track the first load
+        let firstLoad = true;
+
+        // Function to fetch updated dashboard data
         async function fetchUpdatedDashboardData() {
             try {
-                const token = localStorage.getItem('token');
+                // Determine the endpoint based on whether it's the first load
+                const endpoint = firstLoad ? '/teacher_dashboard' : '/repeat_teacher_dashboard';
 
-                if (!token) {
-                    alert('No valid token found. Please log in again.');
-                    window.location.href = '/login.html';
-                    return;
-                }
+                let dashboardResponse;
 
-                // Fetch the latest dashboard data
-                const dashboardResponse = await fetch('/teacher_dashboard', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,  // Use the stored token
+                if (firstLoad) {
+                    // First load with authorization headers
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        alert('No valid token found. Please log in again.');
+                        window.location.href = '/login.html';
+                        return;
                     }
-                });
 
-                if (dashboardResponse.status === 401) {
-                    alert('Session expired. Please log in again.');
-                    localStorage.removeItem('token'); // Clear expired token
-                    window.location.href = '/login.html';
-                    return;
+                    dashboardResponse = await fetch(endpoint, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,  // Use the stored token
+                        }
+                    });
+
+                    if (dashboardResponse.status === 401) {
+                        alert('Session expired. Please log in again.');
+                        localStorage.removeItem('token'); // Clear expired token
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                } else {
+                    // Subsequent loads without authorization headers
+                    dashboardResponse = await fetch(endpoint, {
+                        method: 'GET'
+                    });
                 }
 
                 if (!dashboardResponse.ok) {
@@ -94,6 +119,11 @@
                 // Update the dashboard content
                 const dashboardHtml = await dashboardResponse.text();
                 document.getElementById('results').innerHTML = dashboardHtml;
+
+                // Set firstLoad to false after the initial load
+                if (firstLoad) {
+                    firstLoad = false;
+                }
 
             } catch (err) {
                 console.error('Error fetching updated dashboard:', err);
@@ -105,7 +135,7 @@
         fetchUpdatedDashboardData();
 
         // Set up periodic refresh every 10 seconds (10000 ms)
-        setInterval(fetchUpdatedDashboardData, 10000);  // Refresh every 60 seconds
+        setInterval(fetchUpdatedDashboardData, 10000);  // Refresh every 10 seconds
     </script>
 </body>
 </html>
