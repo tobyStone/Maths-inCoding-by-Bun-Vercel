@@ -64,6 +64,14 @@
         // Function to fetch updated dashboard data periodically
         async function fetchUpdatedDashboardData() {
             try {
+                const token = localStorage.getItem('token');
+
+                if (!token) {
+                    alert('No valid token found. Please log in again.');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
                 // Fetch the latest dashboard data
                 const dashboardResponse = await fetch('/teacher_dashboard', {
                     method: 'GET',
