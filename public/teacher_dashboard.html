@@ -121,9 +121,7 @@
                 document.getElementById('results').innerHTML = dashboardHtml;
 
                 // Set firstLoad to false after the initial load
-                if (firstLoad) {
-                    firstLoad = false;
-                }
+                firstLoad = false;
 
             } catch (err) {
                 console.error('Error fetching updated dashboard:', err);
