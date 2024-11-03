@@ -20,10 +20,12 @@ module.exports = async (req, res) => {
     try {
         await db.connectToDatabase();
 
-        // Fetch students and quiz results (assuming teacher ID or relevant criteria are available)
-        const teacherId = "YOUR_TEACHER_ID_HERE";  // Use a static teacher ID or another approach to select students
-        const students = await Student.find({ teacher: teacherId }).lean();
+        const teacherId = req.query.teacherId;
+        if (!teacherId) {
+            return res.status(400).json({ message: 'Teacher ID is required' });
+        }
 
+        const students = await Student.find({ teacher: teacherId }).lean();
         if (!students || students.length === 0) {
             return res.status(404).json({ message: 'No students found for this teacher.' });
         }

@@ -150,6 +150,11 @@ module.exports = async (req, res) => {
                     </div>
                 </div>
             `).join('')}
+          <script>
+                // Store the teacherId for subsequent requests
+                window.teacherId = "${teacher._id}";
+            </script>
+
         `;
 
         // Return the HTML content to be embedded in `teacher_dashboard.html`

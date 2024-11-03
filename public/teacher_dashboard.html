@@ -104,11 +104,12 @@
                         return;
                     }
                 } else {
-                    // Subsequent loads without authorization headers
-                    dashboardResponse = await fetch('/repeat_teacher_dashboard', {
+                    // Subsequent loads without authorization headers, using teacherId from window
+                    const teacherId = window.teacherId;  // Retrieve the teacherId set in the initial HTML response
+                    dashboardResponse = await fetch(`/repeat_teacher_dashboard?teacherId=${teacherId}`, {
                         method: 'GET'
                     });
-                }
+                    }
 
                 if (!dashboardResponse.ok) {
                     throw new Error('Unable to load dashboard');
