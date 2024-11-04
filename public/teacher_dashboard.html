@@ -70,14 +70,12 @@
     <script>
         // Flag to track the first load
         let firstLoad = true;
+        const teacherId = localStorage.getItem('teacherId');  // Retrieve teacherId from localStorage at the beginning
 
         // Function to fetch updated dashboard data
         async function fetchUpdatedDashboardData() {
             try {
-
                 let dashboardResponse;
-                const teacherId = localStorage.getItem('teacherId');  // Retrieve teacherId from localStorage
-
 
                 if (firstLoad) {
                     // First load with authorization headers
@@ -101,6 +99,14 @@
                         window.location.href = '/login.html';
                         return;
                     }
+
+                    if (!dashboardResponse.ok) {
+                        throw new Error('Unable to load dashboard');
+                    }
+
+                    const dashboardHtml = await dashboardResponse.text();
+                    document.getElementById('results').innerHTML = dashboardHtml;
+                    firstLoad = false;
                 } else {
                     if (!teacherId) {
                         console.error('Teacher ID not found');
@@ -125,11 +131,36 @@
             }
         }
 
+        // Helper function to format results into HTML
+        function formatResultsHtml(results) {
+            return Object.values(results).map(student => `
+                <div class="student-container">
+                    <div class="student-details">
+                        <strong>${student.studentName} (${student.email})</strong>
+                    </div>
+                    <div class="quiz-results">
+                        ${Object.entries(student.scores).map(([quizId, result]) => `
+                            <div class="quiz-result ${result.count >= 3 ? 'red' : result.count === 2 ? 'orange' : 'yellow'}">
+                                Quiz: ${quizId} - ${result.count} ${result.count === 1 ? 'failure' : 'failures'} - Last Date: ${result.dates[result.dates.length - 1]}
+                            </div>
+                        `).join('')}
+                        ${student.passedResults.map(passed => `
+                            <div class="quiz-result">
+                                Quiz: ${passed.quizId} - Score: ${passed.score}% -
+                                <span class="passed">Passed</span> - Date: ${passed.date}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
         // Initial fetch when the page loads
         fetchUpdatedDashboardData();
 
         // Set up periodic refresh every 10 seconds (10000 ms)
         setInterval(fetchUpdatedDashboardData, 10000);  // Refresh every 10 seconds
     </script>
+
 </body>
 </html>
