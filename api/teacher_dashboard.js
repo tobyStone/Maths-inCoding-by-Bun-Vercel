@@ -128,7 +128,7 @@ module.exports = async (req, res) => {
 
 
         // Generate HTML for the dashboard content (only the results section)
-        const html = `
+        const htmlContent = `
             <h1>Welcome ${teacher.name}, here are your students' quiz results:</h1>
             <script>
                 localStorage.setItem('teacherId', '${teacher._id}');
@@ -157,9 +157,8 @@ module.exports = async (req, res) => {
 
         `;
 
-        // Return the HTML content to be embedded in `teacher_dashboard.html`
-        res.setHeader('Content-Type', 'text/html');
-        return res.status(200).send(html);
+        // Return JSON data including both teacherId and HTML content
+        return res.status(200).json({ teacherId: teacher._id, htmlContent });
 
     } catch (error) {
         console.error('Error fetching teacher dashboard data:', error);

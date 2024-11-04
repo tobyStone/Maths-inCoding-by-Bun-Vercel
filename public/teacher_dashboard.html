@@ -104,10 +104,16 @@
                         throw new Error('Unable to load dashboard');
                     }
 
-                    const dashboardHtml = await dashboardResponse.text();
-                    document.getElementById('results').innerHTML = dashboardHtml;
+                    const data = await dashboardResponse.json();
+
+                    // Set teacherId in localStorage
+                    localStorage.setItem('teacherId', data.teacherId);
+
+                    // Update results HTML
+                    document.getElementById('results').innerHTML = data.htmlContent;
                     firstLoad = false;
                 } else {
+                    const teacherId = localStorage.getItem('teacherId');
                     if (!teacherId) {
                         console.error('Teacher ID not found');
                         alert('Unable to load dashboard updates: Teacher ID missing');
