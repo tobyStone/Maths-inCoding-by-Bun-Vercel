@@ -130,6 +130,9 @@ module.exports = async (req, res) => {
         // Generate HTML for the dashboard content (only the results section)
         const html = `
             <h1>Welcome ${teacher.name}, here are your students' quiz results:</h1>
+            <script>
+                localStorage.setItem('teacherId', '${teacher._id}');
+            </script>
             ${Object.values(resultsByStudent).map(student => `
                 <div class="student-container">
                     <div class="student-details">

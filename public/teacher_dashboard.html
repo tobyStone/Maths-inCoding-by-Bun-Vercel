@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Dashboard</title>
-
-    <!-- Link to favicon in a more universally supported .ico format -->
-    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
-
     <!-- Link to your webp icon for more specific cases if needed -->
     <link rel="icon" href="/images/linux_site_logo.webp" sizes="32x32" type="image/webp">
 
@@ -80,6 +76,8 @@
             try {
 
                 let dashboardResponse;
+                const teacherId = localStorage.getItem('teacherId');  // Retrieve teacherId from localStorage
+
 
                 if (firstLoad) {
                     // First load with authorization headers
@@ -104,24 +102,23 @@
                         return;
                     }
                 } else {
-                    // Subsequent loads without authorization headers, using teacherId from window
-                    const teacherId = window.teacherId;  // Retrieve the teacherId set in the initial HTML response
-                    dashboardResponse = await fetch(`/repeat_teacher_dashboard?teacherId=${teacherId}`, {
-                        method: 'GET'
-                    });
+                    if (!teacherId) {
+                        console.error('Teacher ID not found');
+                        alert('Unable to load dashboard updates: Teacher ID missing');
+                        return;
                     }
 
-                if (!dashboardResponse.ok) {
-                    throw new Error('Unable to load dashboard');
+                    dashboardResponse = await fetch(`/repeat_teacher_dashboard?teacherId=${teacherId}`, {
+                        method: 'GET',
+                    });
+
+                    if (!dashboardResponse.ok) {
+                        throw new Error('Unable to load dashboard updates');
+                    }
+
+                    const resultsJson = await dashboardResponse.json();
+                    document.getElementById('results').innerHTML = formatResultsHtml(resultsJson);
                 }
-
-                // Update the dashboard content
-                const dashboardHtml = await dashboardResponse.text();
-                document.getElementById('results').innerHTML = dashboardHtml;
-
-                // Set firstLoad to false after the initial load
-                firstLoad = false;
-
             } catch (err) {
                 console.error('Error fetching updated dashboard:', err);
                 alert('Unable to fetch the updated dashboard: ' + err.message);

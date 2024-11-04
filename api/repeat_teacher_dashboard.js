@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
     try {
         await db.connectToDatabase();
 
-        const teacherId = req.query.teacherId;
+        const teacherId = req.query.teacherId;  // Read teacherId from query
         if (!teacherId) {
             return res.status(400).json({ message: 'Teacher ID is required' });
         }
