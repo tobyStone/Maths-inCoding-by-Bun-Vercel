@@ -21,7 +21,8 @@ const db = {
             return this.connection;
         }
 
-        const dbUri = 'mongodb+srv://tstone4:criminalseagull@cluster0.ntuqn.mongodb.net/maths_through_coding?retryWrites=true&w=majority';
+        const dbUri = config.getDbConnectionString();
+
 
         console.log(`Using full DB URI: ${dbUri}`);
 
