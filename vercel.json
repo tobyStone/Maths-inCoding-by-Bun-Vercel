@@ -30,6 +30,10 @@
       "destination": "/api/login.js"
     },
     {
+      "source": "/mathsQuiz",
+      "destination": "/api/mathsQuiz.js"
+    },
+    {
       "source": "/teacher_dashboard",
       "destination": "/api/teacher_dashboard.js"
     },
