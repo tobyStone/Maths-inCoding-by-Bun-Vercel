@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
             }
         }
 
-        // Prepend baseUrl to poster and video source only if they don’t already start with 'http'
+        // Prepend baseUrl to poster and video source only if they donï¿½t already start with 'http'
         if (!posterSrc.startsWith('http')) {
             posterSrc = `${baseUrl}${posterSrc}`;
         }
@@ -98,8 +98,17 @@ module.exports = async (req, res) => {
         </header>
 
         <div class="video-container">
-           <video id="videoPlayer" controls preload="auto" poster="${posterSrc}">
-                <source src="${videoSrc}" type="video/mp4">
+            <div class="video-quality-selector">
+                <label for="quality-select">Quality:</label>
+                <select id="quality-select">
+                    <option value="auto">Auto</option>
+                    <option value="high">High (1080p)</option>
+                    <option value="medium" selected>Medium (720p)</option>
+                    <option value="low">Low (480p)</option>
+                </select>
+            </div>
+           <video id="videoPlayer" controls preload="metadata" poster="${posterSrc}">
+                <source src="${videoSrc}" type="video/mp4" data-quality="medium">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -113,11 +122,133 @@ module.exports = async (req, res) => {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const videoPlayer = document.getElementById('videoPlayer');
+            const qualitySelect = document.getElementById('quality-select');
+            const baseVideoSrc = "${videoSrc}";
+
             const videoData = {
                 time_stops: ${JSON.stringify(timeStops)}, // Array of time stops
                 question_links: ${JSON.stringify(questionLinks)} // Array of question links
-
             };
+
+            // Quality switching functionality
+            function switchVideoQuality(quality) {
+                const currentTime = videoPlayer.currentTime;
+                const wasPlaying = !videoPlayer.paused;
+
+                let newSrc = baseVideoSrc;
+
+                if (quality !== 'auto' && quality !== 'medium') {
+                    // Replace .mp4 with _quality.mp4 for compressed versions
+                    newSrc = baseVideoSrc.replace('.mp4', \`_\${quality}.mp4\`);
+                }
+
+                videoPlayer.src = newSrc;
+                videoPlayer.load();
+
+                videoPlayer.addEventListener('loadedmetadata', function() {
+                    videoPlayer.currentTime = currentTime;
+                    if (wasPlaying) {
+                        videoPlayer.play();
+                    }
+                }, { once: true });
+            }
+
+            // Auto quality detection based on connection speed
+            function detectOptimalQuality() {
+                if ('connection' in navigator) {
+                    const connection = navigator.connection;
+                    const effectiveType = connection.effectiveType;
+
+                    switch(effectiveType) {
+                        case 'slow-2g':
+                        case '2g':
+                            return 'low';
+                        case '3g':
+                            return 'medium';
+                        case '4g':
+                        default:
+                            return 'high';
+                    }
+                }
+                return 'medium'; // Default fallback
+            }
+
+            // Set initial quality based on auto-detection
+            if (qualitySelect.value === 'auto') {
+                const optimalQuality = detectOptimalQuality();
+                switchVideoQuality(optimalQuality);
+                qualitySelect.value = optimalQuality;
+            }
+
+            // Handle quality selection changes
+            qualitySelect.addEventListener('change', function() {
+                const selectedQuality = this.value;
+                if (selectedQuality === 'auto') {
+                    const optimalQuality = detectOptimalQuality();
+                    switchVideoQuality(optimalQuality);
+                } else {
+                    switchVideoQuality(selectedQuality);
+                }
+            });
+
+            // Progressive loading and buffering improvements
+            let loadingIndicator = null;
+
+            function showLoadingIndicator() {
+                if (!loadingIndicator) {
+                    loadingIndicator = document.createElement('div');
+                    loadingIndicator.className = 'video-loading';
+                    loadingIndicator.innerHTML = '<div class="spinner"></div><p>Loading video...</p>';
+                    videoPlayer.parentNode.appendChild(loadingIndicator);
+                }
+                loadingIndicator.style.display = 'flex';
+            }
+
+            function hideLoadingIndicator() {
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+
+            // Video event listeners for better UX
+            videoPlayer.addEventListener('loadstart', showLoadingIndicator);
+            videoPlayer.addEventListener('canplay', hideLoadingIndicator);
+            videoPlayer.addEventListener('waiting', showLoadingIndicator);
+            videoPlayer.addEventListener('playing', hideLoadingIndicator);
+
+            // Preload next quality level in background for smooth switching
+            let preloadedQualities = new Set();
+
+            function preloadQuality(quality) {
+                if (preloadedQualities.has(quality)) return;
+
+                const preloadVideo = document.createElement('video');
+                preloadVideo.preload = 'metadata';
+                preloadVideo.src = baseVideoSrc.replace('.mp4', \`_\${quality}.mp4\`);
+                preloadVideo.style.display = 'none';
+                document.body.appendChild(preloadVideo);
+
+                preloadedQualities.add(quality);
+
+                // Remove preload video after 30 seconds to free memory
+                setTimeout(() => {
+                    if (preloadVideo.parentNode) {
+                        preloadVideo.parentNode.removeChild(preloadVideo);
+                    }
+                    preloadedQualities.delete(quality);
+                }, 30000);
+            }
+
+            // Preload adjacent quality levels when video starts playing
+            videoPlayer.addEventListener('play', function() {
+                const currentQuality = qualitySelect.value;
+                const qualities = ['low', 'medium', 'high'];
+                const currentIndex = qualities.indexOf(currentQuality);
+
+                // Preload one level up and down
+                if (currentIndex > 0) preloadQuality(qualities[currentIndex - 1]);
+                if (currentIndex < qualities.length - 1) preloadQuality(qualities[currentIndex + 1]);
+            });
 
             // Example to handle URL parameters to start video at specific time
             const params = new URLSearchParams(window.location.search);

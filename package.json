@@ -17,7 +17,10 @@
     "natural": "^8.0.1"
   },
   "scripts": {
-    "update-urls": "node scripts/updateVideoUrls.js"
+    "update-urls": "node scripts/updateVideoUrls.js",
+    "compress-videos": "node scripts/compressVideos.js",
+    "analyze-video-performance": "node scripts/updateVideoUrlsForCDN.js analyze",
+    "update-cdn-urls": "node scripts/updateVideoUrlsForCDN.js update"
   },
   "engines": {
     "bun": ">=0.1.0"
