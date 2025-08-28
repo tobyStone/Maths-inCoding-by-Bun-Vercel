@@ -107,7 +107,7 @@ module.exports = async (req, res) => {
                     <option value="low">Low (480p)</option>
                 </select>
             </div>
-           <video id="videoPlayer" controls preload="metadata" poster="${posterSrc}">
+           <video id="videoPlayer" controls preload="none" poster="${posterSrc}">
                 <source src="${videoSrc}" type="video/mp4" data-quality="medium">
                 Your browser does not support the video tag.
             </video>
